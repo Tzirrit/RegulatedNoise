@@ -82,9 +82,9 @@ namespace RegulatedNoise
         private StationHistory _StationHistory = new StationHistory();
         //bool _cbIncludeWithinRegionOfStation_IndexChanged               = false;
 
-        private String m_lastestStationInfo                             = String.Empty;
-        private System.Windows.Forms.Timer Clock; 
-        private CommandersLogEvent m_RightMouseSelectedLogEvent                   = null;
+        private String m_lastestStationInfo = String.Empty;
+        private System.Windows.Forms.Timer Clock;
+        private CommandersLogEvent m_RightMouseSelectedLogEvent = null;
 
         [SecurityPermission(SecurityAction.Demand, ControlAppDomain = true)]
         public Form1()
@@ -327,7 +327,7 @@ namespace RegulatedNoise
             }
             catch (Exception ex)
             {
-                throw new Exception("Error while reading system and station data", ex);   
+                throw new Exception("Error while reading system and station data", ex);
             }
         }
 
@@ -1338,11 +1338,11 @@ namespace RegulatedNoise
             }
             catch (Exception ex)
             {
-                
+
                 throw ex;
             }
 
-            
+
         }
 
         private void SetupGui(bool force = false)
@@ -1761,7 +1761,7 @@ namespace RegulatedNoise
             var selectedItem = cmbStation.SelectedItem;
 
             if (selectedItem != null)
-            { 
+            {
                 var dist = DistanceInLightYears(CombinedNameToSystemName(getCmbItemKey(selectedItem)));
 
                 if (dist < double.MaxValue)
@@ -1770,10 +1770,10 @@ namespace RegulatedNoise
                     lblLightYearsFromCurrentSystem.Text = "(system location unknown)";
 
                 lbPrices.Items.Clear();
-                var stationName =  getCmbItemKey(((ComboBox)sender).SelectedItem); 
+                var stationName = getCmbItemKey(((ComboBox)sender).SelectedItem);
 
                 if (stationName != ID_DELIMITER)
-                { 
+                {
                     var start = stationName.IndexOf("[", StringComparison.Ordinal);
                     var end = stationName.IndexOf("]", StringComparison.Ordinal);
 
@@ -1827,7 +1827,7 @@ namespace RegulatedNoise
                 else
                 {
                     tbStationRename.Text = String.Empty;
-                    tbSystemRename.Text  = String.Empty;
+                    tbSystemRename.Text = String.Empty;
                     cmdApplySystemRename.Enabled = false;
                     lbPrices.Items.Clear();
                 }
@@ -1985,7 +1985,7 @@ namespace RegulatedNoise
             lbCommodities.Items.Clear();
 
             if (selectedCmbItem != null)
-            { 
+            {
                 foreach (var row in CommodityDirectory[(selectedCmbItem.ToString())].Where(x => !cbLimitLightYears.Checked || Distance(CombinedNameToSystemName(x.SystemName))))
                 {
                     lbCommodities.Items.Add(new ListViewItem(new[] 
@@ -2676,7 +2676,7 @@ namespace RegulatedNoise
         {
             if (InvokeRequired)
             {
-                Int32 currentTry=0;
+                Int32 currentTry = 0;
                 bool Retry = false;
 
                 do
@@ -2692,7 +2692,7 @@ namespace RegulatedNoise
                         if (currentTry >= 3)
                             throw ex;
                         else
-                        { 
+                        {
                             Thread.Sleep(333);
                             currentTry++;
                             Retry = true;
@@ -3949,7 +3949,7 @@ namespace RegulatedNoise
             Regex RegExTest = null;
             Match m = null;
 
-            var appConfigPath   = RegulatedNoiseSettings.ProductsPath;
+            var appConfigPath = RegulatedNoiseSettings.ProductsPath;
 
             if (Directory.Exists(appConfigPath))
             {
@@ -3969,17 +3969,17 @@ namespace RegulatedNoise
 
                         FileStream Datei = new FileStream(newestNetLog, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
                         Byte[] ByteBuffer = new Byte[1];
-                        Byte   lastByte = 0;
+                        Byte lastByte = 0;
 
                         StringBuilder SBuilder = new StringBuilder();
 
                         for (long Offset = Datei.Length - ByteBuffer.Length; Offset > -1; Offset -= ByteBuffer.Length)
                         {
                             Datei.Seek(Offset, SeekOrigin.Begin);
-                            Datei.Read(ByteBuffer,0,ByteBuffer.Length);
+                            Datei.Read(ByteBuffer, 0, ByteBuffer.Length);
 
                             if ((ByteBuffer[0] == 0x0D) && (lastByte == 0x0A) && (SBuilder.Length > 1))
-                            { 
+                            {
                                 // stop - we found the end of the previous line
                                 logLump = SBuilder.ToString();
 
@@ -3997,7 +3997,7 @@ namespace RegulatedNoise
                                         RegExTest = new Regex(String.Format("FindBestIsland:.+:.+:.+:{0}", systemName), RegexOptions.IgnoreCase);
                                     else
                                         RegExTest = new Regex(String.Format("{1}:.+:.+:{0}", systemName, RegulatedNoiseSettings.PilotsName), RegexOptions.IgnoreCase);
-                                        
+
                                     Debug.Print("System: " + systemName);
                                     // start search at the beginning
                                     Offset = Datei.Length - ByteBuffer.Length;
@@ -4005,7 +4005,7 @@ namespace RegulatedNoise
 
                                 // if we have the systemname we're looking for the stationname
                                 if (!string.IsNullOrEmpty(systemName))
-                                { 
+                                {
                                     m = RegExTest.Match(logLump);
                                     //Debug.Print(logLump);
                                     //if (logLump.Contains("Duke Jones"))
@@ -4014,23 +4014,23 @@ namespace RegulatedNoise
                                     {
                                         string[] parts = m.Groups[0].ToString().Split(':');
                                         if (parts.GetUpperBound(0) >= 3)
-                                        { 
+                                        {
                                             Debug.Print("Stationstring:" + logLump);
                                             if (parts[0].Equals("FindBestIsland", StringComparison.InvariantCultureIgnoreCase))
                                             {
-                                                stationName =  _textInfo.ToTitleCase(parts[3].ToLower());
+                                                stationName = _textInfo.ToTitleCase(parts[3].ToLower());
                                                 if (String.IsNullOrEmpty(RegulatedNoiseSettings.PilotsName))
                                                     RegulatedNoiseSettings.PilotsName = parts[1];
 
                                             }
                                             else
                                             {
-                                                stationName =  parts[2];
+                                                stationName = parts[2];
                                                 if (String.IsNullOrEmpty(RegulatedNoiseSettings.PilotsName))
                                                     RegulatedNoiseSettings.PilotsName = parts[0];
                                             }
-                                        }    
-                                        
+                                        }
+
                                         Debug.Print("Station:" + stationName);
                                     }
                                 }
@@ -4041,17 +4041,17 @@ namespace RegulatedNoise
                             if ((ByteBuffer[0] != 0x0D) && (ByteBuffer[0] != 0x0A))
                                 SBuilder.Insert(0, Encoding.ASCII.GetString(ByteBuffer));
 
-                            if (! String.IsNullOrEmpty(stationName))
-	                        {
-		                        break;
-	                        }
+                            if (!String.IsNullOrEmpty(stationName))
+                            {
+                                break;
+                            }
                         }
 
 
                         if (systemName != "")
                         {
                             Debug.Print("<" + systemName + "> - <" + tbCurrentSystemFromLogs.Text + ">");
-                            
+
                             if (_LoggedSystem != systemName)
                             {
                                 // "ClientArrivedtoNewSystem()" was often faster - so nothing was logged
@@ -4081,7 +4081,7 @@ namespace RegulatedNoise
                         setStationInfo();
 
                     }
-                    
+
                     Debug.Print("\n\n\n");
                     if (stateTimer == null)
                     {
@@ -4241,7 +4241,7 @@ namespace RegulatedNoise
                 m_RightMouseSelectedLogEvent = null;
                 ListViewItem theClickedOne = currentListView.GetItemAt(e.X, e.Y);
 
-                if(theClickedOne != null)
+                if (theClickedOne != null)
                 {
                     var selectedGuid = theClickedOne.SubItems[currentListView.Columns.IndexOfKey("EventID")].Text;
                     m_RightMouseSelectedLogEvent = CommandersLog.LogEvents.Single(x => x.EventID == selectedGuid);
@@ -4342,7 +4342,7 @@ namespace RegulatedNoise
 
         private void Clock_Tick(object sender, EventArgs e)
         {
-            setClock();    
+            setClock();
         }
 
         private void setClock()
@@ -4350,7 +4350,7 @@ namespace RegulatedNoise
             if (InvokeRequired)
                 Invoke(new MethodInvoker(setClock));
             else
-            { 
+            {
                 txtLocalTime.Text = DateTime.Now.ToString("T");
                 txtEDTime.Text = DateTime.UtcNow.ToString("T");
             }
@@ -4579,7 +4579,7 @@ namespace RegulatedNoise
             }
             catch (Exception ex)
             {
-                throw ex  ;  
+                throw ex;
             }
         }
 
@@ -5306,27 +5306,53 @@ namespace RegulatedNoise
         /// <param name="e"></param>
         private void copySystenmameToClipboardToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if(m_RightMouseSelectedLogEvent != null)
+            if (m_RightMouseSelectedLogEvent != null)
             {
-                 Clipboard.SetText(m_RightMouseSelectedLogEvent.System);
+                Clipboard.SetText(m_RightMouseSelectedLogEvent.System);
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         private void InitializeExternalData()
         {
             ExternalDataManager = new ExternalDataManager();
-            
+
             // Set data binding for availabe external data sources
             dataSourceBindingSource.DataSource = ExternalDataManager.DataSources;
             ExternalDataManager.SelectedDataSource = cb_DataSource.SelectedItem as DataSource;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         async private void btn_TestDataSourceConnection_Click(object sender, EventArgs e)
         {
-            string res = await ExternalDataManager.TestAuthentication("");
-            tb_ExternalDataLog.AppendText(res);
+            tb_ExternalDataLog.AppendText(string.Format("Testing connection to '{0}' at {1} (authentication type: {2}): ",
+                ExternalDataManager.SelectedDataSource.Name,
+                ExternalDataManager.SelectedDataSource.Url,
+                ExternalDataManager.SelectedDataSource.Authentication.Type));
+
+            try
+            {
+                string res = await ExternalDataManager.TestAuthentication("");
+                tb_ExternalDataLog.AppendText(string.Format("{0}\n", res));
+            }
+            catch (Exception ex)
+            {
+                tb_ExternalDataLog.AppendText(string.Format("{0} ({1})\n", ex.Message, ex.InnerException.Message));
+            }
+
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void cb_DataSource_SelectedIndexChanged(object sender, EventArgs e)
         {
             ExternalDataManager.SelectedDataSource = cb_DataSource.SelectedItem as DataSource;
