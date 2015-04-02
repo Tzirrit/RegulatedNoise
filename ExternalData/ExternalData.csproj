@@ -45,10 +45,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Header.cs" />
-    <Compile Include="IDataSource.cs" />
+    <Compile Include="Authenticator.cs" />
+    <Compile Include="DataSource.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RESTfulDataSource.cs" />
+    <Compile Include="ExternalDataManager.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="datasources.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
