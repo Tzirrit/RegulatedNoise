@@ -13,19 +13,8 @@ namespace ExternalData
 {
     public class ExternalDataManager
     {
-        Uri currentUrl;
-        DataSource currentDataSource;
-
         public List<DataSource> DataSources { get; private set; }
-        public DataSource SelectedDataSource
-        {
-            get { return currentDataSource; }
-            set 
-            { 
-                currentDataSource = value;
-                currentUrl = new Uri(currentDataSource.Url);
-            } 
-        }
+        public DataSource SelectedDataSource { get; set; }
         
         /// <summary>
         /// 
@@ -46,7 +35,7 @@ namespace ExternalData
         {
             using (HttpClient client = new HttpClient())
             {
-                client.BaseAddress = currentUrl;
+                client.BaseAddress = new Uri(SelectedDataSource.Url);
 
                 // Add authentication header
                 client.DefaultRequestHeaders.Add(SelectedDataSource.Authentication.Name, SelectedDataSource.Authentication.Value);
@@ -70,7 +59,7 @@ namespace ExternalData
         {
             using (HttpClient client = new HttpClient())
             {
-                client.BaseAddress = currentUrl;
+                client.BaseAddress = new Uri(SelectedDataSource.Url);
 
                 // Add authentication header
                 client.DefaultRequestHeaders.Add(SelectedDataSource.Authentication.Name, SelectedDataSource.Authentication.Value);
@@ -101,7 +90,7 @@ namespace ExternalData
         {
             using (HttpClient client = new HttpClient())
             {
-                client.BaseAddress = currentUrl;
+                client.BaseAddress = new Uri(SelectedDataSource.Url);
 
                 // Add authentication & content header
                 client.DefaultRequestHeaders.Add(SelectedDataSource.Authentication.Name, SelectedDataSource.Authentication.Value);
