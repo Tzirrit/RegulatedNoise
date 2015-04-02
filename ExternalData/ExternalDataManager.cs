@@ -11,11 +11,31 @@ using System.Net.Http.Headers;
 
 namespace ExternalData
 {
-    public class RESTfulDataSource : IDataSource
+    public class ExternalDataManager
     {
-        public string Name { get; set; }
-        public string Url { get; set; }
-        public Header AuthenticationHeader { get; set; }
+        Uri currentUrl;
+        DataSource currentDataSource;
+
+        public List<DataSource> DataSources { get; private set; }
+        public DataSource SelectedDataSource
+        {
+            get { return currentDataSource; }
+            set 
+            { 
+                currentDataSource = value;
+                currentUrl = new Uri(currentDataSource.Url);
+            } 
+        }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        public ExternalDataManager()
+        {
+            DataSources = new List<DataSource>();
+            // Load available data sources from json file
+            LoadAvailableDataSources("datasources.json");
+        }
 
         /// <summary>
         /// Test connection to given requestPath for set Url and AuthenticationHeader
@@ -26,10 +46,10 @@ namespace ExternalData
         {
             using (HttpClient client = new HttpClient())
             {
-                client.BaseAddress = new Uri(Url);
+                client.BaseAddress = currentUrl;
 
                 // Add authentication header
-                client.DefaultRequestHeaders.Add(AuthenticationHeader.Name, AuthenticationHeader.Value);
+                client.DefaultRequestHeaders.Add(SelectedDataSource.Authentication.Name, SelectedDataSource.Authentication.Value);
 
                 // Add an Accept header for JSON format
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -50,10 +70,10 @@ namespace ExternalData
         {
             using (HttpClient client = new HttpClient())
             {
-                client.BaseAddress = new Uri(Url);
+                client.BaseAddress = currentUrl;
 
                 // Add authentication header
-                client.DefaultRequestHeaders.Add(AuthenticationHeader.Name, AuthenticationHeader.Value);
+                client.DefaultRequestHeaders.Add(SelectedDataSource.Authentication.Name, SelectedDataSource.Authentication.Value);
 
                 // Add an Accept header for JSON format
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -81,10 +101,10 @@ namespace ExternalData
         {
             using (HttpClient client = new HttpClient())
             {
-                client.BaseAddress = new Uri(Url);
+                client.BaseAddress = currentUrl;
 
                 // Add authentication & content header
-                client.DefaultRequestHeaders.Add(AuthenticationHeader.Name, AuthenticationHeader.Value);
+                client.DefaultRequestHeaders.Add(SelectedDataSource.Authentication.Name, SelectedDataSource.Authentication.Value);
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
                 // Make POST call and handle response
@@ -93,6 +113,23 @@ namespace ExternalData
                     new StringContent(json.ToString(), Encoding.UTF8, "application/json"));
 
                 return response.StatusCode.ToString();
+            }
+        }
+
+        private void LoadAvailableDataSources(string fileName)
+        {
+            string sourceFile = Path.GetFullPath(fileName);
+
+            if (File.Exists(sourceFile))
+            {
+                using (StreamReader streamReader = new StreamReader(sourceFile))
+                {
+                    foreach (var json in JArray.Parse(streamReader.ReadToEnd()))
+                    {
+                        DataSource dataSource = JsonConvert.DeserializeObject<DataSource>(json.ToString());
+                        DataSources.Add(dataSource);
+                    }
+                }
             }
         }
     }

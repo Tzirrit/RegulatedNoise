@@ -260,6 +260,14 @@
             this.txtTraineddataFile = new System.Windows.Forms.TextBox();
             this.cmdSelectTraineddataFile = new System.Windows.Forms.Button();
             this.label12 = new System.Windows.Forms.Label();
+            this.tabExternalData = new System.Windows.Forms.TabPage();
+            this.groupBox14 = new System.Windows.Forms.GroupBox();
+            this.tb_ExternalDataLog = new System.Windows.Forms.TextBox();
+            this.groupBox13 = new System.Windows.Forms.GroupBox();
+            this.cb_DataSource = new System.Windows.Forms.ComboBox();
+            this.dataSourceBindingSource = new System.Windows.Forms.BindingSource(this.components);
+            this.lbl_DataSourceConnectionStatus = new System.Windows.Forms.Label();
+            this.btn_TestDataSourceConnection = new System.Windows.Forms.Button();
             this.bOpen = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dsCommodities)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.namesBindingSource)).BeginInit();
@@ -321,6 +329,10 @@
             this.groupBox6.SuspendLayout();
             this.groupBox9.SuspendLayout();
             this.groupBox11.SuspendLayout();
+            this.tabExternalData.SuspendLayout();
+            this.groupBox14.SuspendLayout();
+            this.groupBox13.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dataSourceBindingSource)).BeginInit();
             this.SuspendLayout();
             // 
             // openFileDialog1
@@ -427,6 +439,7 @@
             this.tabControl1.Controls.Add(this.tabWebserver);
             this.tabControl1.Controls.Add(this.tabEDDN);
             this.tabControl1.Controls.Add(this.tabSettings);
+            this.tabControl1.Controls.Add(this.tabExternalData);
             this.tabControl1.Location = new System.Drawing.Point(18, 54);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
@@ -735,7 +748,7 @@
             this.lblRegulatedNoise.Font = new System.Drawing.Font("Segoe UI", 60F, System.Drawing.FontStyle.Bold);
             this.lblRegulatedNoise.Location = new System.Drawing.Point(12, 0);
             this.lblRegulatedNoise.Name = "lblRegulatedNoise";
-            this.lblRegulatedNoise.Size = new System.Drawing.Size(641, 106);
+            this.lblRegulatedNoise.Size = new System.Drawing.Size(639, 106);
             this.lblRegulatedNoise.TabIndex = 2;
             this.lblRegulatedNoise.Text = "RegulatedNoise";
             // 
@@ -925,7 +938,7 @@
             // 
             this.splitContainer1.Panel2.Controls.Add(this.label9);
             this.splitContainer1.Panel2.Controls.Add(this.chart2);
-            this.splitContainer1.Size = new System.Drawing.Size(194, 521);
+            this.splitContainer1.Size = new System.Drawing.Size(174, 521);
             this.splitContainer1.SplitterDistance = 237;
             this.splitContainer1.SplitterWidth = 6;
             this.splitContainer1.TabIndex = 7;
@@ -952,7 +965,7 @@
             series1.ChartArea = "ChartArea1";
             series1.Name = "Series1";
             this.chart1.Series.Add(series1);
-            this.chart1.Size = new System.Drawing.Size(189, 235);
+            this.chart1.Size = new System.Drawing.Size(169, 235);
             this.chart1.TabIndex = 5;
             this.chart1.Text = "chart1";
             this.chart1.MouseMove += new System.Windows.Forms.MouseEventHandler(this.chart1_MouseMove);
@@ -979,7 +992,7 @@
             series2.ChartArea = "ChartArea1";
             series2.Name = "Series1";
             this.chart2.Series.Add(series2);
-            this.chart2.Size = new System.Drawing.Size(184, 245);
+            this.chart2.Size = new System.Drawing.Size(164, 225);
             this.chart2.TabIndex = 6;
             this.chart2.Text = "chart2";
             this.chart2.MouseMove += new System.Windows.Forms.MouseEventHandler(this.chart1_MouseMove);
@@ -2903,6 +2916,87 @@
             this.label12.TabIndex = 7;
             this.label12.Text = "\"traineddata\"-File for TesseractOCR";
             // 
+            // tabExternalData
+            // 
+            this.tabExternalData.Controls.Add(this.groupBox14);
+            this.tabExternalData.Controls.Add(this.groupBox13);
+            this.tabExternalData.Location = new System.Drawing.Point(4, 22);
+            this.tabExternalData.Name = "tabExternalData";
+            this.tabExternalData.Padding = new System.Windows.Forms.Padding(6);
+            this.tabExternalData.Size = new System.Drawing.Size(1059, 593);
+            this.tabExternalData.TabIndex = 13;
+            this.tabExternalData.Text = "External Data";
+            this.tabExternalData.UseVisualStyleBackColor = true;
+            // 
+            // groupBox14
+            // 
+            this.groupBox14.Controls.Add(this.tb_ExternalDataLog);
+            this.groupBox14.Dock = System.Windows.Forms.DockStyle.Right;
+            this.groupBox14.Location = new System.Drawing.Point(298, 6);
+            this.groupBox14.Name = "groupBox14";
+            this.groupBox14.Size = new System.Drawing.Size(755, 581);
+            this.groupBox14.TabIndex = 1;
+            this.groupBox14.TabStop = false;
+            this.groupBox14.Text = "Log";
+            // 
+            // tb_ExternalDataLog
+            // 
+            this.tb_ExternalDataLog.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tb_ExternalDataLog.Location = new System.Drawing.Point(3, 16);
+            this.tb_ExternalDataLog.Multiline = true;
+            this.tb_ExternalDataLog.Name = "tb_ExternalDataLog";
+            this.tb_ExternalDataLog.ReadOnly = true;
+            this.tb_ExternalDataLog.Size = new System.Drawing.Size(749, 562);
+            this.tb_ExternalDataLog.TabIndex = 0;
+            // 
+            // groupBox13
+            // 
+            this.groupBox13.Controls.Add(this.cb_DataSource);
+            this.groupBox13.Controls.Add(this.lbl_DataSourceConnectionStatus);
+            this.groupBox13.Controls.Add(this.btn_TestDataSourceConnection);
+            this.groupBox13.Dock = System.Windows.Forms.DockStyle.Left;
+            this.groupBox13.Location = new System.Drawing.Point(6, 6);
+            this.groupBox13.Name = "groupBox13";
+            this.groupBox13.Size = new System.Drawing.Size(280, 581);
+            this.groupBox13.TabIndex = 0;
+            this.groupBox13.TabStop = false;
+            this.groupBox13.Text = "Data Source";
+            // 
+            // cb_DataSource
+            // 
+            this.cb_DataSource.DataSource = this.dataSourceBindingSource;
+            this.cb_DataSource.DisplayMember = "Name";
+            this.cb_DataSource.FormattingEnabled = true;
+            this.cb_DataSource.Location = new System.Drawing.Point(10, 20);
+            this.cb_DataSource.Name = "cb_DataSource";
+            this.cb_DataSource.Size = new System.Drawing.Size(120, 21);
+            this.cb_DataSource.TabIndex = 3;
+            this.cb_DataSource.SelectedIndexChanged += new System.EventHandler(this.cb_DataSource_SelectedIndexChanged);
+            // 
+            // dataSourceBindingSource
+            // 
+            this.dataSourceBindingSource.DataSource = typeof(ExternalData.DataSource);
+            // 
+            // lbl_DataSourceConnectionStatus
+            // 
+            this.lbl_DataSourceConnectionStatus.AutoSize = true;
+            this.lbl_DataSourceConnectionStatus.BackColor = System.Drawing.Color.Transparent;
+            this.lbl_DataSourceConnectionStatus.Location = new System.Drawing.Point(238, 24);
+            this.lbl_DataSourceConnectionStatus.Name = "lbl_DataSourceConnectionStatus";
+            this.lbl_DataSourceConnectionStatus.Size = new System.Drawing.Size(22, 13);
+            this.lbl_DataSourceConnectionStatus.TabIndex = 2;
+            this.lbl_DataSourceConnectionStatus.Text = "OK";
+            // 
+            // btn_TestDataSourceConnection
+            // 
+            this.btn_TestDataSourceConnection.Location = new System.Drawing.Point(136, 20);
+            this.btn_TestDataSourceConnection.Name = "btn_TestDataSourceConnection";
+            this.btn_TestDataSourceConnection.Size = new System.Drawing.Size(96, 21);
+            this.btn_TestDataSourceConnection.TabIndex = 1;
+            this.btn_TestDataSourceConnection.Text = "Test Connection";
+            this.btn_TestDataSourceConnection.UseVisualStyleBackColor = true;
+            this.btn_TestDataSourceConnection.Click += new System.EventHandler(this.btn_TestDataSourceConnection_Click);
+            // 
             // bOpen
             // 
             this.bOpen.Location = new System.Drawing.Point(18, 12);
@@ -3015,6 +3109,12 @@
             this.groupBox9.PerformLayout();
             this.groupBox11.ResumeLayout(false);
             this.groupBox11.PerformLayout();
+            this.tabExternalData.ResumeLayout(false);
+            this.groupBox14.ResumeLayout(false);
+            this.groupBox14.PerformLayout();
+            this.groupBox13.ResumeLayout(false);
+            this.groupBox13.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dataSourceBindingSource)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -3249,6 +3349,14 @@
         private System.Windows.Forms.LinkLabel linkLabel5;
         private System.Windows.Forms.LinkLabel linkLabel6;
         private System.Windows.Forms.LinkLabel linkLabel7;
+        private System.Windows.Forms.TabPage tabExternalData;
+        private System.Windows.Forms.GroupBox groupBox13;
+        private System.Windows.Forms.Label lbl_DataSourceConnectionStatus;
+        private System.Windows.Forms.Button btn_TestDataSourceConnection;
+        private System.Windows.Forms.BindingSource dataSourceBindingSource;
+        private System.Windows.Forms.ComboBox cb_DataSource;
+        private System.Windows.Forms.GroupBox groupBox14;
+        private System.Windows.Forms.TextBox tb_ExternalDataLog;
     }
 }
 
