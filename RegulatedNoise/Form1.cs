@@ -24,6 +24,7 @@ using RegulatedNoise.EDDB_Data;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text.RegularExpressions;
+using ExternalData;
 
 namespace RegulatedNoise
 {
@@ -40,7 +41,7 @@ namespace RegulatedNoise
         private delegate void delCheckboxInvoker(CheckBox myCheckbox, bool setChecked);
 
         public static Form1 InstanceObject;
-        
+
         public EDDN Eddn;
         public Random random = new Random();
         public Guid SessionGuid;
@@ -70,12 +71,15 @@ namespace RegulatedNoise
         //Implementation of the new classlibrary
         public EdSystem CurrentSystem;
 
-        private BindingSource _bs_Stations                              = new BindingSource();
-        private BindingSource _bs_StationsFrom                          = new BindingSource();
-        private BindingSource _bs_StationsTo                            = new BindingSource();
-        private Dictionary<string, int> _StationIndices                 = new Dictionary<string,int>();
-        private bool _InitDone                                          = false;
-        private StationHistory _StationHistory                          = new StationHistory();
+        // Added external data sources for EIC edition
+        public ExternalDataManager ExternalDataManager;
+
+        private BindingSource _bs_Stations = new BindingSource();
+        private BindingSource _bs_StationsFrom = new BindingSource();
+        private BindingSource _bs_StationsTo = new BindingSource();
+        private Dictionary<string, int> _StationIndices = new Dictionary<string, int>();
+        private bool _InitDone = false;
+        private StationHistory _StationHistory = new StationHistory();
         //bool _cbIncludeWithinRegionOfStation_IndexChanged               = false;
 
         private String m_lastestStationInfo                             = String.Empty;
@@ -85,12 +89,12 @@ namespace RegulatedNoise
         [SecurityPermission(SecurityAction.Demand, ControlAppDomain = true)]
         public Form1()
         {
-            _InitDone = false ;
+            _InitDone = false;
 
             InstanceObject = this;
 
             _Splash = new SplashScreenForm();
-//            _Splash.Show();
+            //            _Splash.Show();
 
             Cursor = Cursors.WaitCursor;
 
@@ -158,8 +162,6 @@ namespace RegulatedNoise
 
                 _logger.Log("  - initialised Ocr Calibrator");
 
-                _logger.Log("  - created EDDN object");
-
                 UpdateSystemNameFromLogFile();
 
                 _logger.Log("  - fetched system name from file");
@@ -195,6 +197,9 @@ namespace RegulatedNoise
 
                 if (!Directory.Exists(".//OCR Correction Images"))
                     Directory.CreateDirectory(".//OCR Correction Images");
+
+                InitializeExternalData();
+                _logger.Log("  - external data sources initialized");
 
                 _logger.Log("Initialisation complete");
 
@@ -244,7 +249,7 @@ namespace RegulatedNoise
             catch (Exception ex)
             {
                 Cursor = Cursors.Default;
-                cErr.processError(ex, "Error in main init function");    
+                cErr.processError(ex, "Error in main init function");
             }
 
             Cursor = Cursors.Default;
@@ -260,7 +265,7 @@ namespace RegulatedNoise
             toolTip1.SetToolTip(lblPixelThreshold, "defines what a dark pixel is 0.0 is black, 1.0 is white");
 
             toolTip1.SetToolTip(cbCheckAOne, "Activate the pixel check with a click on this button. Then buy -one- ton of a commodity and take a screenshot of the market with the \"1\" on it.\nSee how much dark pixels the 1 has and take approximately the half of this value as \"dark pixel amount\"");
-            
+
         }
 
         private void OnClientArrivedtoNewSystem(object sender, EdLogLineSystemArgs args)
@@ -271,16 +276,16 @@ namespace RegulatedNoise
                 return;
             }
             ClientArrivedtoNewSystem(args.System);
-            
+
         }
 
         private void ClientArrivedtoNewSystem(EdSystem System)
         {
             CurrentSystem = System;
-            tbCurrentSystemFromLogs.Text  = System.Name;
+            tbCurrentSystemFromLogs.Text = System.Name;
             //replace UpdateSystemNameFromLogFile
         }
-       
+
         /// <summary>
         /// using the direct EDDB format 
         /// (see http://eddb.io/api)
@@ -291,9 +296,9 @@ namespace RegulatedNoise
             try
             {
                 _Milkyway = new EDMilkyway();
-                
+
                 // 1. load the EDDN data
-                { 
+                {
                     // look which stations-file we can get
                     if (File.Exists(@"./Data/stations.json"))
                         myMilkyway.loadStationData(@"./Data/stations.json", EDMilkyway.enDataType.Data_EDDB, false);
@@ -303,16 +308,16 @@ namespace RegulatedNoise
                     // load the systems
                     myMilkyway.loadSystemData(@"./Data/systems.json", EDMilkyway.enDataType.Data_EDDB, false);
                 }
-                    
+
                 // 2. load own local data
                 myMilkyway.loadStationData(@"./Data/stations_own.json", EDMilkyway.enDataType.Data_Own, true);
                 myMilkyway.loadSystemData(@"./Data/systems_own.json", EDMilkyway.enDataType.Data_Own, true);
 
                 if (myMilkyway.mergeData())
-                { 
+                {
                     myMilkyway.saveStationData(@"./Data/stations_own.json", EDMilkyway.enDataType.Data_Own, true);
                     myMilkyway.saveSystemData(@"./Data/systems_own.json", EDMilkyway.enDataType.Data_Own, true);
-                }    
+                }
 
                 myMilkyway.loadCommodityData(@"./Data/commodities.json", @"./Data/commodities_RN.json", true);
 
@@ -417,7 +422,7 @@ namespace RegulatedNoise
 
             string returnValue = null;
             foreach (var directory in autoSearchdir)
-            { 
+            {
                 if (directory == null) continue;
                 foreach (var dir in Directory.GetDirectories(directory))
                 {
@@ -429,7 +434,7 @@ namespace RegulatedNoise
             }
             if (returnValue != null) return returnValue;
 
-            if(Directory.Exists(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\Frontier_Developments\Products\"))
+            if (Directory.Exists(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\Frontier_Developments\Products\"))
                 return Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\Frontier_Developments\Products\";
 
             // nothing found ? then lets have a try with the MUICache
@@ -441,7 +446,7 @@ namespace RegulatedNoise
             if (key != null)
             {
                 string[] Names = key.GetValueNames();
-                
+
 
                 for (int i = 0; i < Names.Count(); i++)
                 {
@@ -453,7 +458,7 @@ namespace RegulatedNoise
                     }
 
                 }
-               
+
             }
 
             return null;
@@ -471,13 +476,13 @@ namespace RegulatedNoise
                     if (Path.GetFileName(dialog.SelectedPath) == "Products")
                     {
                         return dialog.SelectedPath;
-                        
+
                     }
                 }
 
                 MessageBox.Show(
                     "Hm, that doesn't seem right" +
-                    (dialog.SelectedPath != "" ? ", " + dialog.SelectedPath + " isn't the Frontier 'Products' directory"  : "")
+                    (dialog.SelectedPath != "" ? ", " + dialog.SelectedPath + " isn't the Frontier 'Products' directory" : "")
                 + ". Please try again...", "", MessageBoxButtons.OK);
             }
         }
@@ -485,7 +490,7 @@ namespace RegulatedNoise
         {
             //Already set, no reason to set it again :)
             if (RegulatedNoiseSettings.ProductsPath != "" && RegulatedNoiseSettings.GamePath != "") return;
-            
+
             //Automatic
             var path = getProductPathAutomatically();
 
@@ -499,9 +504,9 @@ namespace RegulatedNoise
 
             //Verify that path contains FORC-FDEV
             var dirs = Directory.GetDirectories(path);
-                
+
             var b = false;
-            while(!b)
+            while (!b)
             {
                 var gamedirs = new List<string>();
                 foreach (var dir in dirs)
@@ -519,7 +524,7 @@ namespace RegulatedNoise
                     b = true;
                     continue;
                 }
-                
+
                 MessageBox.Show("Couldn't find a FORC-FDEV.. directory in the Frontier Products dir, please try again...");
                 path = getProductPathManually();
                 dirs = Directory.GetDirectories(path);
@@ -651,30 +656,30 @@ namespace RegulatedNoise
                 ocr.IsMonitoring = true;
             }
 
-            txtTraineddataFile.Text                 = RegulatedNoiseSettings.TraineddataFile;
-            
-            _commandersLogColumnSorter.SortColumn   = RegulatedNoiseSettings.CmdrsLogSortColumn;
-            _commandersLogColumnSorter.Order        = RegulatedNoiseSettings.CmdrsLogSortOrder;
+            txtTraineddataFile.Text = RegulatedNoiseSettings.TraineddataFile;
 
-            cbAutoAdd_JumpedTo.Checked              = RegulatedNoiseSettings.AutoEvent_JumpedTo;
+            _commandersLogColumnSorter.SortColumn = RegulatedNoiseSettings.CmdrsLogSortColumn;
+            _commandersLogColumnSorter.Order = RegulatedNoiseSettings.CmdrsLogSortOrder;
 
-            txtPixelThreshold.Text                  = RegulatedNoiseSettings.EBPixelThreshold.ToString("F1");
-            txtPixelAmount.Text                     = RegulatedNoiseSettings.EBPixelAmount.ToString();
-            txtGUIColorCutoffLevel.Text             = RegulatedNoiseSettings.GUIColorCutoffLevel.ToString();
+            cbAutoAdd_JumpedTo.Checked = RegulatedNoiseSettings.AutoEvent_JumpedTo;
+
+            txtPixelThreshold.Text = RegulatedNoiseSettings.EBPixelThreshold.ToString("F1");
+            txtPixelAmount.Text = RegulatedNoiseSettings.EBPixelAmount.ToString();
+            txtGUIColorCutoffLevel.Text = RegulatedNoiseSettings.GUIColorCutoffLevel.ToString();
 
             // perform the sort with the last sort options.
             this.lvCommandersLog.Sort();
 
-            txtlastStationCount.Text                = RegulatedNoiseSettings.lastStationCount.ToString();
-            cbLightYears.Text                       = RegulatedNoiseSettings.lastLightYears.ToString();
-            cblastVisitedFirst.Checked              = RegulatedNoiseSettings.lastStationCountActive;
-            cbLimitLightYears.Checked               = RegulatedNoiseSettings.limitLightYears;
-            cbPerLightYearRoundTrip.Checked         = RegulatedNoiseSettings.PerLightYearRoundTrip;
-            cbAutoActivateOCRTab.Checked            = RegulatedNoiseSettings.AutoActivateOCRTab;
+            txtlastStationCount.Text = RegulatedNoiseSettings.lastStationCount.ToString();
+            cbLightYears.Text = RegulatedNoiseSettings.lastLightYears.ToString();
+            cblastVisitedFirst.Checked = RegulatedNoiseSettings.lastStationCountActive;
+            cbLimitLightYears.Checked = RegulatedNoiseSettings.limitLightYears;
+            cbPerLightYearRoundTrip.Checked = RegulatedNoiseSettings.PerLightYearRoundTrip;
+            cbAutoActivateOCRTab.Checked = RegulatedNoiseSettings.AutoActivateOCRTab;
 
             switch (RegulatedNoiseSettings.CBSortingSelection)
             {
-            	case 1:
+                case 1:
                     rbSortBySystem.Checked = true;
                     break;
                 case 2:
@@ -685,10 +690,10 @@ namespace RegulatedNoise
                     break;
                 default:
                     rbSortBySystem.Checked = true;
-            		RegulatedNoiseSettings.CBSortingSelection = 1;
-            	    break;
+                    RegulatedNoiseSettings.CBSortingSelection = 1;
+                    break;
             }
-            
+
         }
 
         /// <summary>
@@ -819,8 +824,8 @@ namespace RegulatedNoise
                 {
                     var autoEvent = new AutoResetEvent(false);
                     _preOcrBufferTimer = new System.Threading.Timer(CheckOcrBuffer, autoEvent, 1000, 1000);
+                }
             }
-        }
         }
 
         private void CheckOcrBuffer(object sender)
@@ -842,8 +847,8 @@ namespace RegulatedNoise
                                       (_screenshotResultsBuffer.Count + ocr.ScreenshotBuffer.Count + _preOcrBuffer.Count) +
                                       " queued)");
                 }
-                }
             }
+        }
 
         public void ActivateOCRTab()
         {
@@ -1146,7 +1151,7 @@ namespace RegulatedNoise
 
                 if (!suspendDuplicateChecking)
                 {
-                    
+
                     if (StationDirectory.ContainsKey(currentRow.StationID))
                     {
                         var obsoleteData =
@@ -1169,13 +1174,13 @@ namespace RegulatedNoise
                                     x.StationID == currentRow.StationID && x.CommodityName == currentRow.CommodityName &&
                                     x.SampleDate > currentRow.SampleDate).ToList();
                         if (selfIsObsolete.Count > 0)
-                        { 
-                            ignoreThisRecord = true;  
+                        {
+                            ignoreThisRecord = true;
                         }
                     }
                 }
 
-                if (!ignoreThisRecord) 
+                if (!ignoreThisRecord)
                 {
                     if (!StationDirectory.ContainsKey(currentRow.StationID))
                         StationDirectory.Add(currentRow.StationID, new List<CsvRow>());
@@ -1286,7 +1291,7 @@ namespace RegulatedNoise
 
             return dist;
         }
-//        private Dictionary<string, Point3D>_chachedSystemLocations = new Dictionary<string, Point3D>();
+        //        private Dictionary<string, Point3D>_chachedSystemLocations = new Dictionary<string, Point3D>();
 
         private double DistanceInLightYears(string remoteSystemName, string homeSystemName)
         {
@@ -1295,8 +1300,8 @@ namespace RegulatedNoise
             Point3D HomeCoordinates = myMilkyway.getSystemCoordinates(homeSystemName);
 
             if (HomeCoordinates == null)
-            { 
-              return double.MaxValue;
+            {
+                return double.MaxValue;
             }
 
             retValue = DistanceInLightYears(remoteSystemName, HomeCoordinates);
@@ -1340,7 +1345,7 @@ namespace RegulatedNoise
             
         }
 
-        private void SetupGui(bool force= false)
+        private void SetupGui(bool force = false)
         {
             //_cbIncludeWithinRegionOfStation_IndexChanged = false;
 
@@ -1354,12 +1359,12 @@ namespace RegulatedNoise
 
 
             // notice the current selected items
-            string Key_cmbStation               = getCmbItemKey(cmbStation.SelectedItem);
-            string Key_cmbStationToStationFrom  = getCmbItemKey(cmbStationToStationFrom.SelectedItem);
-            string Key_cmbStationToStationTo    = getCmbItemKey(cmbStationToStationTo.SelectedItem);
+            string Key_cmbStation = getCmbItemKey(cmbStation.SelectedItem);
+            string Key_cmbStationToStationFrom = getCmbItemKey(cmbStationToStationFrom.SelectedItem);
+            string Key_cmbStationToStationTo = getCmbItemKey(cmbStationToStationTo.SelectedItem);
 
-            BindingList<System.Collections.Generic.KeyValuePair<string,string>> BaseList;
-            IFormatter formatter        = new BinaryFormatter();
+            BindingList<System.Collections.Generic.KeyValuePair<string, string>> BaseList;
+            IFormatter formatter = new BinaryFormatter();
             MemoryStream SerialListCopy = new MemoryStream();
 
             Cursor = Cursors.WaitCursor;
@@ -1369,15 +1374,15 @@ namespace RegulatedNoise
             formatter.Serialize(SerialListCopy, BaseList);
 
             _bs_Stations.DataSource = BaseList;
-            SerialListCopy.Seek(0,0);
-            _bs_StationsFrom.DataSource = (BindingList<System.Collections.Generic.KeyValuePair<string,string>>)formatter.Deserialize(SerialListCopy);
-            SerialListCopy.Seek(0,0);
-            _bs_StationsTo.DataSource = (BindingList<System.Collections.Generic.KeyValuePair<string,string>>)formatter.Deserialize(SerialListCopy);
+            SerialListCopy.Seek(0, 0);
+            _bs_StationsFrom.DataSource = (BindingList<System.Collections.Generic.KeyValuePair<string, string>>)formatter.Deserialize(SerialListCopy);
+            SerialListCopy.Seek(0, 0);
+            _bs_StationsTo.DataSource = (BindingList<System.Collections.Generic.KeyValuePair<string, string>>)formatter.Deserialize(SerialListCopy);
 
             SerialListCopy.Dispose();
 
             if (!_InitDone)
-            { 
+            {
                 cmbStation.DataSource = _bs_Stations;
                 cmbStation.DisplayMember = "Value";
                 cmbStation.ValueMember = "Key";
@@ -1411,7 +1416,7 @@ namespace RegulatedNoise
 
             int ListIndex;
 
-            
+
 
             if ((Key_cmbStation != null) && _StationIndices.TryGetValue(Key_cmbStation, out ListIndex))
                 cmbStation.SelectedIndex = ListIndex;
@@ -1422,7 +1427,7 @@ namespace RegulatedNoise
             if ((Key_cmbStation != null) && _StationIndices.TryGetValue(Key_cmbStationToStationTo, out ListIndex))
                 cmbStationToStationTo.SelectedIndex = ListIndex;
 
-            
+
             cbCommodity.Items.Clear();
 
             foreach (var commodity in CommodityDirectory.OrderBy(x => x.Key))
@@ -1493,14 +1498,14 @@ namespace RegulatedNoise
 
         private int GetTextLengthInPixels(string myText)
         {
-                return TextRenderer.MeasureText(myText, cmbStation.Font).Width;
+            return TextRenderer.MeasureText(myText, cmbStation.Font).Width;
         }
 
-        private BindingList<System.Collections.Generic.KeyValuePair<string,string>> getDropDownStationsItems(ref Dictionary<string, int> StationIndices)
+        private BindingList<System.Collections.Generic.KeyValuePair<string, string>> getDropDownStationsItems(ref Dictionary<string, int> StationIndices)
         {
-            int SpaceWidth = GetTextLengthInPixels("                    ")/20;
+            int SpaceWidth = GetTextLengthInPixels("                    ") / 20;
             int maxLength = 0;
-            int Spaces= 0;
+            int Spaces = 0;
             int last_i = 0;
             List<int> LengthInfo1 = new List<int>();
             List<int> LengthInfo2 = new List<int>();
@@ -1508,13 +1513,13 @@ namespace RegulatedNoise
             // clear the old index list
             StationIndices.Clear();
 
-            BindingList<System.Collections.Generic.KeyValuePair<string,string>> DDItems = new BindingList<System.Collections.Generic.KeyValuePair<string,string>>();
-            List<KeyValuePair<string,List<CsvRow>>> SelectionRaw;
-            List<KeyValuePair<string,List<CsvRow>>> SelectionOrdered         = new List<KeyValuePair<string,List<CsvRow>>>();
-            List<KeyValuePair<string,List<CsvRow>>> SelectionPreordered;
+            BindingList<System.Collections.Generic.KeyValuePair<string, string>> DDItems = new BindingList<System.Collections.Generic.KeyValuePair<string, string>>();
+            List<KeyValuePair<string, List<CsvRow>>> SelectionRaw;
+            List<KeyValuePair<string, List<CsvRow>>> SelectionOrdered = new List<KeyValuePair<string, List<CsvRow>>>();
+            List<KeyValuePair<string, List<CsvRow>>> SelectionPreordered;
 
             // get the relevant stations
-            SelectionRaw = StationDirectory.Where(x => !cbLimitLightYears.Checked || 
+            SelectionRaw = StationDirectory.Where(x => !cbLimitLightYears.Checked ||
                                                         Distance(CombinedNameToSystemName(x.Key))).ToList();
 
             if (rbSortBySystem.Checked)
@@ -1538,34 +1543,34 @@ namespace RegulatedNoise
                     }
                     catch (Exception ex)
                     {
-                        throw new Exception("error while getting text length in pixels", ex);    
+                        throw new Exception("error while getting text length in pixels", ex);
                     }
                     if (maxLength < tempLength)
-                    { 
-                        if(MAX_NAME_LENGTH < tempLength)
+                    {
+                        if (MAX_NAME_LENGTH < tempLength)
                             tempLength = MAX_NAME_LENGTH;
                         maxLength = tempLength;
                     }
-                        
+
                     LengthInfo2.Add(tempLength);
                 }
 
                 last_i = 0;
 
                 if (cblastVisitedFirst.Checked)
-                { 
+                {
                     // insert get the visited (lengths are in LengthInfo1)
                     for (int i = 0; i < SelectionOrdered.Count(); i++)
                     {
                         Spaces = (int)Math.Ceiling((Double)(maxLength - LengthInfo1[i]) / (Double)SpaceWidth);
-                        DDItems.Add(new KeyValuePair<string, string>(SelectionOrdered[i].Key,String.Format("{0}{2}     {1}", SelectionOrdered[i].Value[0].SystemName, SelectionOrdered[i].Value[0].StationName, "".PadLeft(Spaces))));
+                        DDItems.Add(new KeyValuePair<string, string>(SelectionOrdered[i].Key, String.Format("{0}{2}     {1}", SelectionOrdered[i].Value[0].SystemName, SelectionOrdered[i].Value[0].StationName, "".PadLeft(Spaces))));
                         StationIndices.Add(SelectionOrdered[i].Key, i);
 
-                        last_i = i+1;
+                        last_i = i + 1;
                     }
-                
+
                     // insert separator
-                    DDItems.Add(new KeyValuePair<string, string>(ID_DELIMITER,String.Format("-----------------------")));
+                    DDItems.Add(new KeyValuePair<string, string>(ID_DELIMITER, String.Format("-----------------------")));
                     StationIndices.Add(ID_DELIMITER, last_i);
                     LengthInfo1.Add(0);
                     last_i++;
@@ -1575,14 +1580,14 @@ namespace RegulatedNoise
                 for (int i = 0; i < SelectionPreordered.Count(); i++)
                 {
                     Spaces = (int)Math.Ceiling((Double)(maxLength - LengthInfo2[i]) / (Double)SpaceWidth);
-                    DDItems.Add(new KeyValuePair<string, string>(SelectionPreordered[i].Key,String.Format("{0}{2}     {1}", SelectionPreordered[i].Value[0].SystemName, SelectionPreordered[i].Value[0].StationName, "".PadLeft(Spaces))));
-                    StationIndices.Add(SelectionPreordered[i].Key, i+last_i);
+                    DDItems.Add(new KeyValuePair<string, string>(SelectionPreordered[i].Key, String.Format("{0}{2}     {1}", SelectionPreordered[i].Value[0].SystemName, SelectionPreordered[i].Value[0].StationName, "".PadLeft(Spaces))));
+                    StationIndices.Add(SelectionPreordered[i].Key, i + last_i);
                 }
             }
             else if (rbSortByStation.Checked)
             {
                 // get the list ordered as wanted -> order by station
-                SelectionPreordered = SelectionRaw.OrderBy(x => CombinedNameToStationName(x.Key)).ToList();;
+                SelectionPreordered = SelectionRaw.OrderBy(x => CombinedNameToStationName(x.Key)).ToList(); ;
 
                 if (cblastVisitedFirst.Checked)
                 {
@@ -1591,11 +1596,11 @@ namespace RegulatedNoise
 
                 // be aware of the length of each string in the remaining list
                 for (int i = 0; i < SelectionPreordered.Count(); i++)
-                { 
+                {
                     int tempLength = GetTextLengthInPixels(SelectionPreordered[i].Value[0].StationName);
                     if (maxLength < tempLength)
-                    { 
-                        if(MAX_NAME_LENGTH < tempLength)
+                    {
+                        if (MAX_NAME_LENGTH < tempLength)
                             tempLength = MAX_NAME_LENGTH;
                         maxLength = tempLength;
                     }
@@ -1605,19 +1610,19 @@ namespace RegulatedNoise
                 last_i = 0;
 
                 if (cblastVisitedFirst.Checked)
-                { 
+                {
                     // insert get the visited (lengths are in LengthInfo1)
                     for (int i = 0; i < SelectionOrdered.Count(); i++)
                     {
                         Spaces = (int)Math.Ceiling((Double)(maxLength - LengthInfo1[i]) / (Double)SpaceWidth);
-                        DDItems.Add(new KeyValuePair<string, string>(SelectionOrdered[i].Key,String.Format("{1}{2}     {0}", SelectionOrdered[i].Value[0].SystemName, SelectionOrdered[i].Value[0].StationName, "".PadLeft(Spaces))));
+                        DDItems.Add(new KeyValuePair<string, string>(SelectionOrdered[i].Key, String.Format("{1}{2}     {0}", SelectionOrdered[i].Value[0].SystemName, SelectionOrdered[i].Value[0].StationName, "".PadLeft(Spaces))));
                         StationIndices.Add(SelectionOrdered[i].Key, i);
 
-                        last_i = i+1;
+                        last_i = i + 1;
                     }
-                
+
                     // insert separator
-                    DDItems.Add(new KeyValuePair<string, string>(ID_DELIMITER,String.Format("-----------------------")));
+                    DDItems.Add(new KeyValuePair<string, string>(ID_DELIMITER, String.Format("-----------------------")));
                     StationIndices.Add(ID_DELIMITER, last_i);
                     LengthInfo1.Add(0);
                     last_i++;
@@ -1627,8 +1632,8 @@ namespace RegulatedNoise
                 for (int i = 0; i < SelectionPreordered.Count(); i++)
                 {
                     Spaces = (int)Math.Ceiling((Double)(maxLength - LengthInfo2[i]) / (Double)SpaceWidth);
-                    DDItems.Add(new KeyValuePair<string, string>(SelectionPreordered[i].Key,String.Format("{1}{2}     {0}", SelectionPreordered[i].Value[0].SystemName, SelectionPreordered[i].Value[0].StationName, "".PadLeft(Spaces))));
-                    StationIndices.Add(SelectionPreordered[i].Key, i+last_i);
+                    DDItems.Add(new KeyValuePair<string, string>(SelectionPreordered[i].Key, String.Format("{1}{2}     {0}", SelectionPreordered[i].Value[0].SystemName, SelectionPreordered[i].Value[0].StationName, "".PadLeft(Spaces))));
+                    StationIndices.Add(SelectionPreordered[i].Key, i + last_i);
                 }
             }
             else if (rbSortByDistance.Checked)
@@ -1643,11 +1648,11 @@ namespace RegulatedNoise
 
                 // be aware of the length of each string in the remaining list
                 for (int i = 0; i < SelectionPreordered.Count(); i++)
-                { 
+                {
                     int tempLength = GetTextLengthInPixels(SelectionPreordered[i].Value[0].SystemName);
                     if (maxLength < tempLength)
-                    { 
-                        if(MAX_NAME_LENGTH < tempLength)
+                    {
+                        if (MAX_NAME_LENGTH < tempLength)
                             tempLength = MAX_NAME_LENGTH;
                         maxLength = tempLength;
                     }
@@ -1657,19 +1662,19 @@ namespace RegulatedNoise
                 last_i = 0;
 
                 if (cblastVisitedFirst.Checked)
-                { 
+                {
                     // insert get the visited (lengths are in LengthInfo1)
                     for (int i = 0; i < SelectionOrdered.Count(); i++)
                     {
                         Spaces = (int)Math.Ceiling((Double)(maxLength - LengthInfo1[i]) / (Double)SpaceWidth);
-                        DDItems.Add(new KeyValuePair<string, string>(SelectionOrdered[i].Key,String.Format("{0}{2}     \t{1}", SelectionOrdered[i].Value[0].SystemName, SelectionOrdered[i].Value[0].StationName, "".PadLeft(Spaces))));
+                        DDItems.Add(new KeyValuePair<string, string>(SelectionOrdered[i].Key, String.Format("{0}{2}     \t{1}", SelectionOrdered[i].Value[0].SystemName, SelectionOrdered[i].Value[0].StationName, "".PadLeft(Spaces))));
                         StationIndices.Add(SelectionOrdered[i].Key, i);
 
-                        last_i = i+1;
+                        last_i = i + 1;
                     }
-                
+
                     // insert separator
-                    DDItems.Add(new KeyValuePair<string, string>(ID_DELIMITER,String.Format("-----------------------")));
+                    DDItems.Add(new KeyValuePair<string, string>(ID_DELIMITER, String.Format("-----------------------")));
                     StationIndices.Add(ID_DELIMITER, last_i);
                     LengthInfo1.Add(0);
                     last_i++;
@@ -1679,13 +1684,13 @@ namespace RegulatedNoise
                 for (int i = 0; i < SelectionPreordered.Count(); i++)
                 {
                     Spaces = (int)Math.Ceiling((Double)(maxLength - LengthInfo2[i]) / (Double)SpaceWidth);
-                    DDItems.Add(new KeyValuePair<string, string>(SelectionPreordered[i].Key,String.Format("{0}{2}     \t{1}", SelectionPreordered[i].Value[0].SystemName, SelectionPreordered[i].Value[0].StationName, "".PadLeft(Spaces))));
-                    StationIndices.Add(SelectionPreordered[i].Key, i+last_i);
+                    DDItems.Add(new KeyValuePair<string, string>(SelectionPreordered[i].Key, String.Format("{0}{2}     \t{1}", SelectionPreordered[i].Value[0].SystemName, SelectionPreordered[i].Value[0].StationName, "".PadLeft(Spaces))));
+                    StationIndices.Add(SelectionPreordered[i].Key, i + last_i);
                 }
             }
-            
+
             return DDItems;
-            
+
         }
 
         /// <summary>
@@ -1705,7 +1710,7 @@ namespace RegulatedNoise
 
                 if (foundIndex >= 0)
                 {
-                    int tempLength=0;
+                    int tempLength = 0;
 
                     // put the found item in the lastvisited list
                     SelectionOrdered.Add(SelectionPreordered[foundIndex]);
@@ -1713,14 +1718,14 @@ namespace RegulatedNoise
                     // be aware of the length of each string
                     if (rbSortBySystem.Checked)
                         tempLength = GetTextLengthInPixels(SelectionPreordered[foundIndex].Value[0].SystemName);
-                    else if(rbSortByStation.Checked)
+                    else if (rbSortByStation.Checked)
                         tempLength = GetTextLengthInPixels(SelectionPreordered[foundIndex].Value[0].StationName);
-                    else if(rbSortByDistance.Checked)
+                    else if (rbSortByDistance.Checked)
                         tempLength = GetTextLengthInPixels(SelectionPreordered[foundIndex].Value[0].SystemName);
-                    
+
                     if (maxLength < tempLength)
-                    { 
-                        if(MAX_NAME_LENGTH < tempLength)
+                    {
+                        if (MAX_NAME_LENGTH < tempLength)
                             tempLength = MAX_NAME_LENGTH;
                         maxLength = tempLength;
                     }
@@ -1830,7 +1835,7 @@ namespace RegulatedNoise
             else
             {
                 tbStationRename.Text = String.Empty;
-                tbSystemRename.Text  = String.Empty;
+                tbSystemRename.Text = String.Empty;
                 cmdApplySystemRename.Enabled = false;
                 lbPrices.Items.Clear();
             }
@@ -2179,7 +2184,7 @@ namespace RegulatedNoise
         {
             var existingStationName = getCmbItemKey(cmbStation.SelectedItem);
 
-            tbStationRename.Text    = _textInfo.ToTitleCase(tbStationRename.Text.ToLower());
+            tbStationRename.Text = _textInfo.ToTitleCase(tbStationRename.Text.ToLower());
 
             var newStationName = tbStationRename.Text + " [" + tbSystemRename.Text + "]";
 
@@ -3209,15 +3214,15 @@ namespace RegulatedNoise
                     string[] values = s.Split(';');
                     CsvRow currentRow = new CsvRow();
 
-                    currentRow.SellPrice    = -1;
-                    currentRow.BuyPrice     = -1;
-                    currentRow.Demand       = -1;
-                    currentRow.Supply       = -1;
+                    currentRow.SellPrice = -1;
+                    currentRow.BuyPrice = -1;
+                    currentRow.Demand = -1;
+                    currentRow.Supply = -1;
 
-                    currentRow.SystemName       = values[0];
-                    currentRow.StationName      = _textInfo.ToTitleCase(values[1].ToLower());
-                    currentRow.StationID        = _textInfo.ToTitleCase(values[1].ToLower()) + " [" + currentRow.SystemName + "]";
-                    currentRow.CommodityName    = _textInfo.ToTitleCase(values[2].ToLower());
+                    currentRow.SystemName = values[0];
+                    currentRow.StationName = _textInfo.ToTitleCase(values[1].ToLower());
+                    currentRow.StationID = _textInfo.ToTitleCase(values[1].ToLower()) + " [" + currentRow.SystemName + "]";
+                    currentRow.CommodityName = _textInfo.ToTitleCase(values[2].ToLower());
 
                     if (!String.IsNullOrEmpty(values[3]))
                         Decimal.TryParse(values[3], out currentRow.SellPrice);
@@ -3228,41 +3233,41 @@ namespace RegulatedNoise
                     if (!String.IsNullOrEmpty(values[7]))
                         Decimal.TryParse(values[7], out currentRow.Supply);
 
-                    currentRow.DemandLevel      = _textInfo.ToTitleCase(values[6].ToLower());
-                    currentRow.SupplyLevel      = _textInfo.ToTitleCase(values[8].ToLower());
+                    currentRow.DemandLevel = _textInfo.ToTitleCase(values[6].ToLower());
+                    currentRow.SupplyLevel = _textInfo.ToTitleCase(values[8].ToLower());
 
                     DateTime.TryParse(values[9], out currentRow.SampleDate);
 
                     EDCommoditiesExt CommodityData = myMilkyway.getCommodity(getCommodityBasename(RegulatedNoiseSettings.Language, currentRow.CommodityName));
-    
+
                     if (currentRow.CommodityName == "Panik")
                         Debug.Print("STOP");
-                            
+
                     if (CommodityData != null)
-                    { 
+                    {
                         if ((!String.IsNullOrEmpty(currentRow.SupplyLevel)) && (!String.IsNullOrEmpty(currentRow.DemandLevel)))
                         {
                             // demand AND supply !?
                             implausible = true;
                         }
                         else if (!String.IsNullOrEmpty(currentRow.SupplyLevel))
-                        { 
+                        {
                             // check supply data             
 
                             if ((currentRow.SellPrice <= 0) || (currentRow.BuyPrice <= 0))
-                            { 
+                            {
                                 // both on 0 is not plausible
                                 implausible = true;
                             }
 
-                            if (((CommodityData.PriceWarningLevel_Supply_Sell_Low  >= 0) && (currentRow.SellPrice < CommodityData.PriceWarningLevel_Supply_Sell_Low)) ||
+                            if (((CommodityData.PriceWarningLevel_Supply_Sell_Low >= 0) && (currentRow.SellPrice < CommodityData.PriceWarningLevel_Supply_Sell_Low)) ||
                                 ((CommodityData.PriceWarningLevel_Supply_Sell_High >= 0) && (currentRow.SellPrice > CommodityData.PriceWarningLevel_Supply_Sell_High)))
                             {
                                 // sell price is out of range
                                 implausible = true;
                             }
 
-                            if (((CommodityData.PriceWarningLevel_Supply_Buy_Low  >= 0) && (currentRow.BuyPrice  < CommodityData.PriceWarningLevel_Supply_Buy_Low)) ||
+                            if (((CommodityData.PriceWarningLevel_Supply_Buy_Low >= 0) && (currentRow.BuyPrice < CommodityData.PriceWarningLevel_Supply_Buy_Low)) ||
                                 ((CommodityData.PriceWarningLevel_Supply_Buy_High >= 0) && (currentRow.SellPrice > CommodityData.PriceWarningLevel_Supply_Buy_High)))
                             {
                                 // buy price is out of range
@@ -3270,14 +3275,14 @@ namespace RegulatedNoise
                             }
 
                             if (currentRow.Supply.Equals(-1))
-                            {   
+                            {
                                 // no supply quantity
                                 implausible = true;
                             }
 
                         }
                         else if (!String.IsNullOrEmpty(currentRow.DemandLevel))
-                        { 
+                        {
                             // check demand data
 
                             if (currentRow.SellPrice <= 0)
@@ -3286,15 +3291,15 @@ namespace RegulatedNoise
                                 implausible = true;
                             }
 
-                            if (((CommodityData.PriceWarningLevel_Demand_Sell_Low  >= 0) && (currentRow.SellPrice < CommodityData.PriceWarningLevel_Demand_Sell_Low)) ||
+                            if (((CommodityData.PriceWarningLevel_Demand_Sell_Low >= 0) && (currentRow.SellPrice < CommodityData.PriceWarningLevel_Demand_Sell_Low)) ||
                                 ((CommodityData.PriceWarningLevel_Demand_Sell_High >= 0) && (currentRow.SellPrice > CommodityData.PriceWarningLevel_Demand_Sell_High)))
                             {
                                 // buy price is out of range
                                 implausible = true;
                             }
 
-                            if (currentRow.BuyPrice >= 0) 
-                                if (((CommodityData.PriceWarningLevel_Demand_Buy_Low  >= 0) && (currentRow.BuyPrice < CommodityData.PriceWarningLevel_Demand_Buy_Low)) ||
+                            if (currentRow.BuyPrice >= 0)
+                                if (((CommodityData.PriceWarningLevel_Demand_Buy_Low >= 0) && (currentRow.BuyPrice < CommodityData.PriceWarningLevel_Demand_Buy_Low)) ||
                                     ((CommodityData.PriceWarningLevel_Demand_Buy_High >= 0) && (currentRow.BuyPrice > CommodityData.PriceWarningLevel_Demand_Buy_High)))
                                 {
                                     // buy price is out of range
@@ -3308,7 +3313,7 @@ namespace RegulatedNoise
                             }
                         }
                         else
-                        { 
+                        {
                             // nothing ?!
                             implausible = true;
                         }
@@ -3330,7 +3335,7 @@ namespace RegulatedNoise
             {
                 if (s.Contains(";"))
                 {
-                    
+
                     ImportCsvString(s, false, true, true);
                 }
             }
@@ -3823,8 +3828,8 @@ namespace RegulatedNoise
                     @"{""$schemaRef"": ""http://schemas.elite-markets.net/eddn/commodity/1"",""header"": {""uploaderID"": ""$0$"",""softwareName"": ""RegulatedNoise"",""softwareVersion"": ""v" +
                     RegulatedNoiseSettings.Version.ToString(CultureInfo.InvariantCulture) +
                     @"""},""message"": {""buyPrice"": $2$,""timestamp"": ""$3$"",""stationStock"": $4$,""stationName"": ""$5$"",""systemName"": ""$6$"",""demand"": $7$,""sellPrice"": $8$,""itemName"": ""$9$""}}";
-#endif           
-             }
+#endif
+            }
 
 
             string commodityJson = json.Replace("$0$", tbUsername.Text.Replace("$1$", ""))
@@ -4326,7 +4331,7 @@ namespace RegulatedNoise
             tabControl2.SelectedTab = tabStationToStation;
             tabControl2.SelectedTab = tabPage3;
             tabControl1.SelectedTab = tabHelpAndChangeLog;
-            
+
             Retheme();
 
             Clock = new System.Windows.Forms.Timer();
@@ -4357,10 +4362,10 @@ namespace RegulatedNoise
             {
                 // do all the things that must be done for the new versions
                 if ((RegulatedNoiseSettings.Version == 1.84m) && (RegulatedNoiseSettings.VersionDJ == 0.09m))
-                { 
+                {
                     // this value works much better
                     RegulatedNoiseSettings.EBPixelThreshold = 0.6f;
-                    RegulatedNoiseSettings.EBPixelAmount    = 22;
+                    RegulatedNoiseSettings.EBPixelAmount = 22;
                 }
             }
         }
@@ -4411,7 +4416,7 @@ namespace RegulatedNoise
 
         int animPhase;
         int phaseCtr;
-        
+
         private void OnTick(object sender, EventArgs args)
         {
             switch (animPhase)
@@ -4487,9 +4492,9 @@ namespace RegulatedNoise
         {
             string ComboboxKey = getCmbItemKey(cmbStation.SelectedItem);
 
-            var csvrow  = StationDirectory[ComboboxKey].First(x => x.CommodityName == lbPrices.SelectedItems[0].Text);
+            var csvrow = StationDirectory[ComboboxKey].First(x => x.CommodityName == lbPrices.SelectedItems[0].Text);
             var csvrow2 = CommodityDirectory[lbPrices.SelectedItems[0].Text].First(x => x.StationID == ComboboxKey);
-            
+
             var f = new EditPriceData(csvrow, CommodityDirectory.Keys.ToList());
             var q = f.ShowDialog();
 
@@ -4580,7 +4585,7 @@ namespace RegulatedNoise
 
         private void bCommodityDeleteRow_Click(object sender, EventArgs e)
         {
-           foreach (ListViewItem item in lbCommodities.SelectedItems)
+            foreach (ListViewItem item in lbCommodities.SelectedItems)
             {
                 var csvrow =
                     StationDirectory[item.Text].First(
@@ -4634,7 +4639,7 @@ namespace RegulatedNoise
                         else
                         {
                             key1 = b.Key;
-                            key2 = a.Key;                            
+                            key2 = a.Key;
                         }
 
                         string credits;
@@ -4655,9 +4660,9 @@ namespace RegulatedNoise
 
                         allRoundTrips.Add(
                             new Tuple<string, double>(
-                                credits.PadRight(13) + " :" + 
+                                credits.PadRight(13) + " :" +
                                 key1
-                                + "..." + 
+                                + "..." +
                                 key2
                                 , creditsDouble));
 
@@ -4673,7 +4678,7 @@ namespace RegulatedNoise
             var ordered = allRoundTrips.OrderByDescending(x => x.Item2).Select(x => x.Item1).Distinct().ToList().Cast<object>().ToArray();
 
             lbAllRoundTrips.Items.AddRange(ordered);
-            if(lbAllRoundTrips.Items.Count > 0)
+            if (lbAllRoundTrips.Items.Count > 0)
                 lbAllRoundTrips.SelectedIndex = 0;
 
             //if (bestRoundTrip > 0)
@@ -4720,8 +4725,8 @@ namespace RegulatedNoise
         private static ObjectDirectory PurgeEddnFromDirectory(ObjectDirectory directory)
         {
             ObjectDirectory newDirectory;
-            
-            if(directory.GetType() == typeof(StationDirectory))
+
+            if (directory.GetType() == typeof(StationDirectory))
                 newDirectory = new StationDirectory();
             else
                 newDirectory = new CommodityDirectory();
@@ -4733,7 +4738,7 @@ namespace RegulatedNoise
                     if (y.SourceFileName != "<From EDDN>")
                         newList.Add(y);
 
-                if(newList.Count > 0)
+                if (newList.Count > 0)
                     newDirectory.Add(x.Key, newList);
             }
             return newDirectory;
@@ -4757,7 +4762,7 @@ namespace RegulatedNoise
             fromStation = fromStation.Substring(0, fromStation.IndexOf("..."));
             var toStation = t.Substring(t.IndexOf("...") + 3);
 
-//            Debug.Print("v : " + fromStation + " / c:" + cmbStationToStationFrom.SelectedValue+ " / c:" + cmbStationToStationFrom.SelectedItem, cmbStationToStationFrom.SelectedIndex);
+            //            Debug.Print("v : " + fromStation + " / c:" + cmbStationToStationFrom.SelectedValue+ " / c:" + cmbStationToStationFrom.SelectedItem, cmbStationToStationFrom.SelectedIndex);
             int fromIndex = -1;
             int toIndex = -1;
 
@@ -4776,8 +4781,8 @@ namespace RegulatedNoise
             {
                 throw ex;
             }
-            
-            Debug.Print("n : " + fromStation + " / c:" + cmbStationToStationFrom.SelectedValue+ " / c:" + cmbStationToStationFrom.SelectedItem, cmbStationToStationFrom.SelectedIndex);
+
+            Debug.Print("n : " + fromStation + " / c:" + cmbStationToStationFrom.SelectedValue + " / c:" + cmbStationToStationFrom.SelectedItem, cmbStationToStationFrom.SelectedIndex);
             Debug.Print("");
 
             UpdateStationToStation();
@@ -4833,7 +4838,7 @@ namespace RegulatedNoise
             tbCommoditiesOcrOutput.Text = "Finished!";
 
             tbOcrStationName.Text = "";
-            tbOcrSystemName .Text = "";
+            tbOcrSystemName.Text = "";
             pbOcrCurrent.Image = null;
             UpdateOriginalImage(null);
             UpdateTrimmedImage(null, null);
@@ -4866,7 +4871,7 @@ namespace RegulatedNoise
 
             OCRFile.Filter = "Tesseract-Files|*.traineddata|All Files|*.*";
             OCRFile.FileName = RegulatedNoiseSettings.TraineddataFile;
-            OCRFile.InitialDirectory = System.IO.Path.GetFullPath("./tessdata");  
+            OCRFile.InitialDirectory = System.IO.Path.GetFullPath("./tessdata");
             OCRFile.Title = "select Tesseract Traineddata-File...";
 
             if (OCRFile.ShowDialog(this) == DialogResult.OK)
@@ -4877,11 +4882,11 @@ namespace RegulatedNoise
                 SaveSettings();
             }
 
-                
+
 
         }
-         
-   
+
+
         /// <summary>
         /// direct submitting of the commodities with "Enter" if changed 
         /// </summary>
@@ -4889,10 +4894,10 @@ namespace RegulatedNoise
         /// <param name="e"></param>
         private void tbCommoditiesOcrOutput_Keypress(object sender, KeyPressEventArgs e)
         {
-            if(e.KeyChar == (char)Keys.Return)
+            if (e.KeyChar == (char)Keys.Return)
             {
                 if (bContinueOcr.Enabled)
-                { 
+                {
                     bContinueOcr_Click(sender, new EventArgs());
                 }
             }
@@ -4945,7 +4950,7 @@ namespace RegulatedNoise
                 SaveSettings();
 
                 updateEDDNSetting(RegulatedNoiseSettings.Language);
-                
+
             }
         }
 
@@ -5019,7 +5024,7 @@ namespace RegulatedNoise
                 OCRTabPage = tabControl3.TabPages["OCR_Calibration"];
                 OCRTabPage.Enabled = (GameSettings.Display != null);
                 TabControl = (OcrCalibratorTab)(OCRTabPage.Controls[0]);
-                TabControl.lblWarning.Visible = (GameSettings.Display == null); 
+                TabControl.lblWarning.Visible = (GameSettings.Display == null);
             }
         }
 
@@ -5118,8 +5123,8 @@ namespace RegulatedNoise
         private void txtlastStationCount_KeyPress(object sender, System.Windows.Forms.KeyPressEventArgs e)
         {
             if (e.KeyChar == (char)Keys.Return)
-            { 
-                checkLastStationCountInput();   
+            {
+                checkLastStationCountInput();
             }
         }
 
@@ -5155,14 +5160,14 @@ namespace RegulatedNoise
         private void cbLightYearsInput_KeyPress(object sender, System.Windows.Forms.KeyPressEventArgs e)
         {
             if (e.KeyChar == (char)Keys.Return)
-            { 
-                checkcbLightYearsInput();   
+            {
+                checkcbLightYearsInput();
             }
         }
 
         private void cbLightYears_SelectedIndexChanged(object sender, EventArgs e)
         {
-            checkcbLightYearsInput();   
+            checkcbLightYearsInput();
         }
 
         private void checkcbLightYearsInput()
@@ -5219,10 +5224,10 @@ namespace RegulatedNoise
             FTest.ShowDialog(this);
 
             if (FTest.DialogResult == System.Windows.Forms.DialogResult.OK)
-            { 
+            {
                 txtGUIColorCutoffLevel.Text = FTest.CutoffLevel.ToString();
                 RegulatedNoiseSettings.GUIColorCutoffLevel = FTest.CutoffLevel;
-                SaveSettings();            
+                SaveSettings();
             }
         }
 
@@ -5250,7 +5255,7 @@ namespace RegulatedNoise
                 {
                     return getReferenceScreenshot();
                 }
-                
+
                 return bmp;
             }
             return null;
@@ -5275,13 +5280,13 @@ namespace RegulatedNoise
         private void cmdDonate_Click(object sender, EventArgs e)
         {
             string url = "";
- 
-            string ButtonID     = "CMH6HZK37VGHY";  // your paypal email
- 
+
+            string ButtonID = "CMH6HZK37VGHY";  // your paypal email
+
             url += "https://www.paypal.com/cgi-bin/webscr" +
                 "?cmd=" + "_s-xclick" +
                 "&hosted_button_id=" + ButtonID;
- 
+
             System.Diagnostics.Process.Start(url);
 
         }
@@ -5305,6 +5310,26 @@ namespace RegulatedNoise
             {
                  Clipboard.SetText(m_RightMouseSelectedLogEvent.System);
             }
+        }
+
+        private void InitializeExternalData()
+        {
+            ExternalDataManager = new ExternalDataManager();
+            
+            // Set data binding for availabe external data sources
+            dataSourceBindingSource.DataSource = ExternalDataManager.DataSources;
+            ExternalDataManager.SelectedDataSource = cb_DataSource.SelectedItem as DataSource;
+        }
+
+        async private void btn_TestDataSourceConnection_Click(object sender, EventArgs e)
+        {
+            string res = await ExternalDataManager.TestAuthentication("");
+            tb_ExternalDataLog.AppendText(res);
+        }
+
+        private void cb_DataSource_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            ExternalDataManager.SelectedDataSource = cb_DataSource.SelectedItem as DataSource;
         }
 
     }

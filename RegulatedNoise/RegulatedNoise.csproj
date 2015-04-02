@@ -614,6 +614,7 @@
       <DependentUpon>dsCommodities.xsd</DependentUpon>
     </None>
     <None Include="packages.config" />
+    <None Include="Properties\DataSources\ExternalData.DataSource.datasource" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -745,6 +746,10 @@
     <ProjectReference Include="..\EdClasses\EdClasses.csproj">
       <Project>{236a934b-5543-4751-baa2-018dfa825271}</Project>
       <Name>EdClasses</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ExternalData\ExternalData.csproj">
+      <Project>{346f68dc-bcb6-4647-a21d-cf78deef1f95}</Project>
+      <Name>ExternalData</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
