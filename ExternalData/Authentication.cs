@@ -7,7 +7,7 @@
         Login   // Login with creadentials (coming soon)
     }
 
-    public class Authenticator
+    public class Authentication
     {
         public AuthenticatorTypes Type { get; set; }
         public string Name { get; set; }

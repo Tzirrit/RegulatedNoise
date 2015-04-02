@@ -748,7 +748,7 @@
             this.lblRegulatedNoise.Font = new System.Drawing.Font("Segoe UI", 60F, System.Drawing.FontStyle.Bold);
             this.lblRegulatedNoise.Location = new System.Drawing.Point(12, 0);
             this.lblRegulatedNoise.Name = "lblRegulatedNoise";
-            this.lblRegulatedNoise.Size = new System.Drawing.Size(639, 106);
+            this.lblRegulatedNoise.Size = new System.Drawing.Size(641, 106);
             this.lblRegulatedNoise.TabIndex = 2;
             this.lblRegulatedNoise.Text = "RegulatedNoise";
             // 
@@ -938,7 +938,7 @@
             // 
             this.splitContainer1.Panel2.Controls.Add(this.label9);
             this.splitContainer1.Panel2.Controls.Add(this.chart2);
-            this.splitContainer1.Size = new System.Drawing.Size(174, 521);
+            this.splitContainer1.Size = new System.Drawing.Size(172, 521);
             this.splitContainer1.SplitterDistance = 237;
             this.splitContainer1.SplitterWidth = 6;
             this.splitContainer1.TabIndex = 7;
@@ -965,7 +965,7 @@
             series1.ChartArea = "ChartArea1";
             series1.Name = "Series1";
             this.chart1.Series.Add(series1);
-            this.chart1.Size = new System.Drawing.Size(169, 235);
+            this.chart1.Size = new System.Drawing.Size(167, 235);
             this.chart1.TabIndex = 5;
             this.chart1.Text = "chart1";
             this.chart1.MouseMove += new System.Windows.Forms.MouseEventHandler(this.chart1_MouseMove);
@@ -992,7 +992,7 @@
             series2.ChartArea = "ChartArea1";
             series2.Name = "Series1";
             this.chart2.Series.Add(series2);
-            this.chart2.Size = new System.Drawing.Size(164, 225);
+            this.chart2.Size = new System.Drawing.Size(162, 223);
             this.chart2.TabIndex = 6;
             this.chart2.Text = "chart2";
             this.chart2.MouseMove += new System.Windows.Forms.MouseEventHandler(this.chart1_MouseMove);
@@ -2983,9 +2983,9 @@
             this.lbl_DataSourceConnectionStatus.BackColor = System.Drawing.Color.Transparent;
             this.lbl_DataSourceConnectionStatus.Location = new System.Drawing.Point(238, 24);
             this.lbl_DataSourceConnectionStatus.Name = "lbl_DataSourceConnectionStatus";
-            this.lbl_DataSourceConnectionStatus.Size = new System.Drawing.Size(22, 13);
+            this.lbl_DataSourceConnectionStatus.Size = new System.Drawing.Size(37, 13);
             this.lbl_DataSourceConnectionStatus.TabIndex = 2;
-            this.lbl_DataSourceConnectionStatus.Text = "OK";
+            this.lbl_DataSourceConnectionStatus.Text = "Status";
             // 
             // btn_TestDataSourceConnection
             // 
