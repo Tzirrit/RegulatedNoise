@@ -337,11 +337,11 @@
             this.groupBox6.SuspendLayout();
             this.groupBox9.SuspendLayout();
             this.groupBox11.SuspendLayout();
-            this.contextMenuStrip1.SuspendLayout();
             this.tabExternalData.SuspendLayout();
             this.groupBox14.SuspendLayout();
             this.groupBox13.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataSourceBindingSource)).BeginInit();
+            this.contextMenuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // openFileDialog1
@@ -507,8 +507,8 @@
             this.tabControl1.Controls.Add(this.tabWebserver);
             this.tabControl1.Controls.Add(this.tabEDDN);
             this.tabControl1.Controls.Add(this.tabSettings);
-            this.tabControl1.Location = new System.Drawing.Point(18, 64);
             this.tabControl1.Controls.Add(this.tabExternalData);
+            this.tabControl1.Location = new System.Drawing.Point(18, 64);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
             this.tabControl1.Size = new System.Drawing.Size(1067, 619);
@@ -816,9 +816,9 @@
             this.lblRegulatedNoise.Font = new System.Drawing.Font("Segoe UI", 60F, System.Drawing.FontStyle.Bold);
             this.lblRegulatedNoise.Location = new System.Drawing.Point(12, 0);
             this.lblRegulatedNoise.Name = "lblRegulatedNoise";
-            this.lblRegulatedNoise.Size = new System.Drawing.Size(641, 106);
+            this.lblRegulatedNoise.Size = new System.Drawing.Size(841, 106);
             this.lblRegulatedNoise.TabIndex = 2;
-            this.lblRegulatedNoise.Text = "RegulatedNoise";
+            this.lblRegulatedNoise.Text = "RegulatedNoise [EIC]";
             // 
             // tabPriceAnalysis
             // 
@@ -1006,7 +1006,7 @@
             // 
             this.splitContainer1.Panel2.Controls.Add(this.label9);
             this.splitContainer1.Panel2.Controls.Add(this.chart2);
-            this.splitContainer1.Size = new System.Drawing.Size(170, 521);
+            this.splitContainer1.Size = new System.Drawing.Size(164, 521);
             this.splitContainer1.SplitterDistance = 237;
             this.splitContainer1.SplitterWidth = 6;
             this.splitContainer1.TabIndex = 7;
@@ -1033,7 +1033,7 @@
             series1.ChartArea = "ChartArea1";
             series1.Name = "Series1";
             this.chart1.Series.Add(series1);
-            this.chart1.Size = new System.Drawing.Size(165, 235);
+            this.chart1.Size = new System.Drawing.Size(159, 235);
             this.chart1.TabIndex = 5;
             this.chart1.Text = "chart1";
             this.chart1.MouseMove += new System.Windows.Forms.MouseEventHandler(this.chart1_MouseMove);
@@ -1060,7 +1060,7 @@
             series2.ChartArea = "ChartArea1";
             series2.Name = "Series1";
             this.chart2.Series.Add(series2);
-            this.chart2.Size = new System.Drawing.Size(160, 221);
+            this.chart2.Size = new System.Drawing.Size(154, 215);
             this.chart2.TabIndex = 6;
             this.chart2.Text = "chart2";
             this.chart2.MouseMove += new System.Windows.Forms.MouseEventHandler(this.chart1_MouseMove);
@@ -1738,7 +1738,6 @@
             this.lvCommandersLog.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.lvCommandersLog_ColumnClick);
             this.lvCommandersLog.SelectedIndexChanged += new System.EventHandler(this.lvCommandersLog_SelectedIndexChanged);
             this.lvCommandersLog.MouseClick += new System.Windows.Forms.MouseEventHandler(this.lvCommandersLog_MouseClick);
-            
             // 
             // cbLogSystemName
             // 
@@ -3000,9 +2999,11 @@
             // 
             // groupBox14
             // 
+            this.groupBox14.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox14.Controls.Add(this.tb_ExternalDataLog);
-            this.groupBox14.Dock = System.Windows.Forms.DockStyle.Right;
-            this.groupBox14.Location = new System.Drawing.Point(298, 6);
+            this.groupBox14.Location = new System.Drawing.Point(295, 6);
             this.groupBox14.Name = "groupBox14";
             this.groupBox14.Size = new System.Drawing.Size(755, 581);
             this.groupBox14.TabIndex = 1;
@@ -3021,13 +3022,16 @@
             // 
             // groupBox13
             // 
+            this.groupBox13.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
             this.groupBox13.Controls.Add(this.cb_DataSource);
             this.groupBox13.Controls.Add(this.lbl_DataSourceConnectionStatus);
             this.groupBox13.Controls.Add(this.btn_TestDataSourceConnection);
-            this.groupBox13.Dock = System.Windows.Forms.DockStyle.Left;
             this.groupBox13.Location = new System.Drawing.Point(6, 6);
+            this.groupBox13.MaximumSize = new System.Drawing.Size(280, 0);
+            this.groupBox13.MinimumSize = new System.Drawing.Size(280, 100);
             this.groupBox13.Name = "groupBox13";
-            this.groupBox13.Size = new System.Drawing.Size(280, 581);
+            this.groupBox13.Size = new System.Drawing.Size(280, 100);
             this.groupBox13.TabIndex = 0;
             this.groupBox13.TabStop = false;
             this.groupBox13.Text = "Data Source";
@@ -3199,13 +3203,13 @@
             this.groupBox9.PerformLayout();
             this.groupBox11.ResumeLayout(false);
             this.groupBox11.PerformLayout();
-            this.contextMenuStrip1.ResumeLayout(false);
             this.tabExternalData.ResumeLayout(false);
             this.groupBox14.ResumeLayout(false);
             this.groupBox14.PerformLayout();
             this.groupBox13.ResumeLayout(false);
             this.groupBox13.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataSourceBindingSource)).EndInit();
+            this.contextMenuStrip1.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
