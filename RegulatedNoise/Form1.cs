@@ -25,6 +25,7 @@ using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text.RegularExpressions;
 using ExternalData;
+using Newtonsoft.Json.Linq;
 
 namespace RegulatedNoise
 {
@@ -5313,24 +5314,42 @@ namespace RegulatedNoise
         }
 
         /// <summary>
-        /// 
+        /// Initializes the external data manager and loads available data sources from the config file
         /// </summary>
         private void InitializeExternalData()
         {
             ExternalDataManager = new ExternalDataManager();
 
+            lbl_DataSourceConnectionStatus.Text = string.Empty;
+            btn_DownloadData.Enabled = false;
+            btn_UploadData.Enabled = false;
+
             // Set data binding for availabe external data sources
             dataSourceBindingSource.DataSource = ExternalDataManager.DataSources;
+            if (ExternalDataManager.DataSources.Capacity == 0)
+            {
+                tb_ExternalDataLog.AppendText(string.Format("Could not load data sources from config file '{0}'!\n", ExternalDataManager.CONFIG_FILE));
+                cb_DataSource.Enabled = false;
+                return;
+            }
             ExternalDataManager.SelectedDataSource = cb_DataSource.SelectedItem as DataSource;
         }
 
         /// <summary>
-        /// 
+        /// Test the connection to the selected data source
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        async private void btn_TestDataSourceConnection_Click(object sender, EventArgs e)
+        private async void btn_TestDataSourceConnection_Click(object sender, EventArgs e)
         {
+            if (ExternalDataManager.SelectedDataSource == null)
+            {
+                tb_ExternalDataLog.AppendText("No valid data source selected!\n");
+                lbl_DataSourceConnectionStatus.Text = "Invalid";
+                return;
+            }
+
+            lbl_DataSourceConnectionStatus.Text = "Connecting";
             tb_ExternalDataLog.AppendText(string.Format("Testing connection to '{0}' at {1} (authentication type: {2}): ",
                 ExternalDataManager.SelectedDataSource.Name,
                 ExternalDataManager.SelectedDataSource.Url,
@@ -5338,25 +5357,92 @@ namespace RegulatedNoise
 
             try
             {
-                string res = await ExternalDataManager.TestAuthentication("");
-                tb_ExternalDataLog.AppendText(string.Format("{0}\n", res));
+                Response res = await ExternalDataManager.GetDataAsync("");
+                tb_ExternalDataLog.AppendText(string.Format("{0}\n", res.Status));
+                lbl_DataSourceConnectionStatus.Text = res.Status;
+
+                if (res.Status == "OK")
+                {
+                    btn_DownloadData.Enabled = true;
+                    btn_UploadData.Enabled = true;
+                }
             }
             catch (Exception ex)
             {
                 tb_ExternalDataLog.AppendText(string.Format("{0} ({1})\n", ex.Message, ex.InnerException.Message));
+                lbl_DataSourceConnectionStatus.Text = "Failed";
             }
-
         }
 
         /// <summary>
-        /// 
+        /// Selected data source was changed
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void cb_DataSource_SelectedIndexChanged(object sender, EventArgs e)
         {
             ExternalDataManager.SelectedDataSource = cb_DataSource.SelectedItem as DataSource;
+
+            btn_DownloadData.Enabled = false;
+            btn_UploadData.Enabled = false;
+            lbl_DataSourceConnectionStatus.Text = string.Empty;
+            if (ExternalDataManager.SelectedDataSource != null)
+            {
+                tb_ExternalDataLog.AppendText(string.Format("Selected data source '{0}'. Please test connection.\n", ExternalDataManager.SelectedDataSource.Name));
+            }
         }
 
+        /// <summary>
+        /// Downloads trade data from selected data source
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void btn_DownloadData_Click(object sender, EventArgs e)
+        {
+            lbl_DataSourceConnectionStatus.Text = "Connecting";
+
+            try
+            {
+                lbl_DataSourceConnectionStatus.Text = "Downloading";
+
+                Response res = await ExternalDataManager.GetDataAsync("regulated-noise");
+                if (res.ContentType != ContentTypes.Empty)
+                {
+                    // Expecting valid json
+                    foreach (var json in JArray.Parse(res.Content))
+                    {
+                        tb_ExternalDataLog.AppendText(string.Format("{0}\n", json));
+                    }
+                }
+
+                lbl_DataSourceConnectionStatus.Text = res.Status;
+            }
+            catch (Exception ex)
+            {
+                tb_ExternalDataLog.AppendText(string.Format("{0} ({1})\n", ex.Message, ex.InnerException.Message));
+                lbl_DataSourceConnectionStatus.Text = "Failed";
+            }
+        }
+
+        /// <summary>
+        /// Uploads trade data to selected data source
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void btn_UploadData_Click(object sender, EventArgs e)
+        {
+            lbl_DataSourceConnectionStatus.Text = "Connecting";
+
+            try
+            {
+                Response res = await ExternalDataManager.GetDataAsync("regulated-noise");
+                lbl_DataSourceConnectionStatus.Text = res.Status;
+            }
+            catch (Exception ex)
+            {
+                tb_ExternalDataLog.AppendText(string.Format("{0} ({1})\n", ex.Message, ex.InnerException.Message));
+                lbl_DataSourceConnectionStatus.Text = "Failed";
+            }
+        }
     }
 }

@@ -13,6 +13,7 @@ namespace ExternalData
 {
     public class ExternalDataManager
     {
+        public const string CONFIG_FILE = "datasources.json";
         public List<DataSource> DataSources { get; private set; }
         public DataSource SelectedDataSource { get; set; }
 
@@ -23,40 +24,19 @@ namespace ExternalData
         {
             DataSources = new List<DataSource>();
             // Load available data sources from json file
-            LoadAvailableDataSources("datasources.json");
+            LoadAvailableDataSources(CONFIG_FILE);
         }
 
         /// <summary>
-        /// Test connection to given requestPath for set Url and AuthenticationHeader
-        /// </summary>
-        /// <param name="requestPath"></param>
-        /// <returns></returns>
-        public async Task<string> TestAuthentication(string requestPath)
-        {
-            using (HttpClient client = new HttpClient())
-            {
-                client.BaseAddress = new Uri(SelectedDataSource.Url);
-
-                // Add authentication header
-                client.DefaultRequestHeaders.Add(SelectedDataSource.Authentication.Name, SelectedDataSource.Authentication.Value);
-
-                // Add an Accept header for JSON format
-                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-                // Make GET call and handle response
-                HttpResponseMessage response = await client.GetAsync(requestPath);
-                return response.StatusCode.ToString();
-            }
-        }
-
-        /// <summary>
-        /// 
+        /// Gets all from requestPath and saves it to destinationFile
         /// </summary>
         /// <param name="requestPath"></param>
         /// <param name="destinationFile"></param>
         /// <returns></returns>
-        public async Task<string> GetDataAndSaveToFileAsync(string requestPath, string destinationFile)
+        public async Task<Response> GetDataAndSaveToFileAsync(string requestPath, string destinationFile)
         {
+            Response response = new Response();
+
             using (HttpClient client = new HttpClient())
             {
                 client.BaseAddress = new Uri(SelectedDataSource.Url);
@@ -68,105 +48,80 @@ namespace ExternalData
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
                 // Make GET call and handle response
-                HttpResponseMessage response = await client.GetAsync(requestPath);
-                if (response.IsSuccessStatusCode)
+                HttpResponseMessage responseMessage = await client.GetAsync(requestPath);
+                response.Status = responseMessage.StatusCode.ToString();
+                if (responseMessage.IsSuccessStatusCode)
                 {
                     using (StreamWriter destinationStream = File.CreateText(destinationFile))
                     {
-                        await destinationStream.WriteAsync(response.Content.ReadAsStringAsync().Result);
+                        await destinationStream.WriteAsync(responseMessage.Content.ReadAsStringAsync().Result);
                     }
                 }
-                return response.StatusCode.ToString();
             }
+            return response;
         }
 
         /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="requestPath"></param>
-        /// <param name="json"></param>
-        /// <returns></returns>
-        public async Task<string> PostDataAsync(string requestPath, string json)
-        {
-            using (HttpClient client = new HttpClient())
-            {
-                client.BaseAddress = new Uri(SelectedDataSource.Url);
-
-                // Add authentication & content header
-                client.DefaultRequestHeaders.Add(SelectedDataSource.Authentication.Name, SelectedDataSource.Authentication.Value);
-                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-                // Make POST call and handle response
-                HttpResponseMessage response = await client.PostAsync(
-                    requestPath,
-                    new StringContent(json.ToString(), Encoding.UTF8, "application/json"));
-
-                return response.StatusCode.ToString();
-            }
-        }
-
-        /*
-        /// <summary>
-        /// 
+        /// Gets all data from requestPath and returns it as Response
         /// </summary>
         /// <param name="requestPath"></param>
         /// <returns></returns>
         public async Task<Response> GetDataAsync(string requestPath)
         {
-            Response res = new Response();
+            Response response = new Response();
 
             using (HttpClient client = new HttpClient())
             {
-                client.BaseAddress = new Uri(Url);
+                client.BaseAddress = new Uri(SelectedDataSource.Url);
 
                 // Add authentication & content header
-                client.DefaultRequestHeaders.Add(AuthenticationHeader.Header, AuthenticationHeader.Value);
+                client.DefaultRequestHeaders.Add(SelectedDataSource.Authentication.Name, SelectedDataSource.Authentication.Value);
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
                 // Make GET call and handle response
-                HttpResponseMessage response = await client.GetAsync(requestPath);
-                res.StatusCode = response.StatusCode.ToString();
-                if (response.IsSuccessStatusCode)
+                HttpResponseMessage responseMessage = await client.GetAsync(requestPath);
+                response.Status = responseMessage.StatusCode.ToString();
+                if (responseMessage.IsSuccessStatusCode)
                 {
-                    res.Content = await response.Content.ReadAsStringAsync();
+                    response.Content = await responseMessage.Content.ReadAsStringAsync();
                 }
             }
-            return res;
+            return response;
         }
 
         /// <summary>
-        /// 
+        /// Posts given json to requestPath and returns Response
         /// </summary>
         /// <param name="requestPath"></param>
         /// <param name="json"></param>
         /// <returns></returns>
         public async Task<Response> PostDataAsync(string requestPath, string json)
         {
-            Response res = new Response();
+            Response response = new Response();
 
             using (HttpClient client = new HttpClient())
             {
-                client.BaseAddress = new Uri(Url);
+                client.BaseAddress = new Uri(SelectedDataSource.Url);
 
                 // Add authentication & content header
-                client.DefaultRequestHeaders.Add(AuthenticationHeader.Header, AuthenticationHeader.Value);
+                client.DefaultRequestHeaders.Add(SelectedDataSource.Authentication.Name, SelectedDataSource.Authentication.Value);
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
                 // Make POST call and handle response
-                HttpResponseMessage response = await client.PostAsync(
-                    requestPath, 
+                HttpResponseMessage responseMessage = await client.PostAsync(
+                    requestPath,
                     new StringContent(json.ToString(), Encoding.UTF8, "application/json"));
 
-                res.StatusCode = response.StatusCode.ToString();
-                res.Content = await response.Content.ReadAsStringAsync();
+                response.Status = responseMessage.StatusCode.ToString();
+                response.Content = await responseMessage.Content.ReadAsStringAsync();
+                response.ContentType = ContentTypes.JSON;
             }
 
-            return res;
+            return response;
         }
-         */
 
         /// <summary>
-        /// 
+        /// Loads all data sources from json file
         /// </summary>
         /// <param name="fileName"></param>
         private void LoadAvailableDataSources(string fileName)
@@ -177,10 +132,17 @@ namespace ExternalData
             {
                 using (StreamReader streamReader = new StreamReader(sourceFile))
                 {
-                    foreach (var json in JArray.Parse(streamReader.ReadToEnd()))
+                    try
                     {
-                        DataSource dataSource = JsonConvert.DeserializeObject<DataSource>(json.ToString());
-                        DataSources.Add(dataSource);
+                        foreach (var json in JArray.Parse(streamReader.ReadToEnd()))
+                        {
+                            DataSource dataSource = JsonConvert.DeserializeObject<DataSource>(json.ToString());
+                            DataSources.Add(dataSource);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        // todo: log exception
                     }
                 }
             }

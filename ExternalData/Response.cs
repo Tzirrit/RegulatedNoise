@@ -6,17 +6,47 @@ using System.Threading.Tasks;
 
 namespace ExternalData
 {
-    public enum ContentType
+    public enum ContentTypes
     {
-        None,   // expect anything or nothing
-        JSON,   // expect content string to be valid json
-        HTML    // expect content string to be valid html
+        Empty,      // no content   
+        JSON,       // expect content string to be valid json
+        HTML,       // expect content string to be valid html
+        Undefined   // expect anything or nothing
     }
 
     public class Response
     {
-        public string Status { get; private set; }
-        public string Content { get; private set; }
-        public ContentType ContentType { get; private set; }
+        public string Status { get; set; }
+
+        string content;
+        public string Content
+        {
+            get
+            {
+                return content;
+            }
+            set
+            {
+                content = value;
+                if (value != null && value.Length > 0)
+                {
+                    this.ContentType = ContentTypes.Undefined;
+                }
+                else
+                {
+                    this.ContentType = ContentTypes.Empty;
+                }
+            }
+        }
+
+        public ContentTypes ContentType { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public Response()
+        {
+            ContentType = ContentTypes.Empty;
+        }
     }
 }

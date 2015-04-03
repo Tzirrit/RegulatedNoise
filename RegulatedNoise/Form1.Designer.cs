@@ -270,6 +270,9 @@
             this.groupBox14 = new System.Windows.Forms.GroupBox();
             this.tb_ExternalDataLog = new System.Windows.Forms.TextBox();
             this.groupBox13 = new System.Windows.Forms.GroupBox();
+            this.btn_UploadData = new System.Windows.Forms.Button();
+            this.btn_DownloadData = new System.Windows.Forms.Button();
+            this.label55 = new System.Windows.Forms.Label();
             this.cb_DataSource = new System.Windows.Forms.ComboBox();
             this.dataSourceBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.lbl_DataSourceConnectionStatus = new System.Windows.Forms.Label();
@@ -1006,7 +1009,7 @@
             // 
             this.splitContainer1.Panel2.Controls.Add(this.label9);
             this.splitContainer1.Panel2.Controls.Add(this.chart2);
-            this.splitContainer1.Size = new System.Drawing.Size(164, 521);
+            this.splitContainer1.Size = new System.Drawing.Size(154, 521);
             this.splitContainer1.SplitterDistance = 237;
             this.splitContainer1.SplitterWidth = 6;
             this.splitContainer1.TabIndex = 7;
@@ -1033,7 +1036,7 @@
             series1.ChartArea = "ChartArea1";
             series1.Name = "Series1";
             this.chart1.Series.Add(series1);
-            this.chart1.Size = new System.Drawing.Size(159, 235);
+            this.chart1.Size = new System.Drawing.Size(149, 235);
             this.chart1.TabIndex = 5;
             this.chart1.Text = "chart1";
             this.chart1.MouseMove += new System.Windows.Forms.MouseEventHandler(this.chart1_MouseMove);
@@ -1060,7 +1063,7 @@
             series2.ChartArea = "ChartArea1";
             series2.Name = "Series1";
             this.chart2.Series.Add(series2);
-            this.chart2.Size = new System.Drawing.Size(154, 215);
+            this.chart2.Size = new System.Drawing.Size(144, 205);
             this.chart2.TabIndex = 6;
             this.chart2.Text = "chart2";
             this.chart2.MouseMove += new System.Windows.Forms.MouseEventHandler(this.chart1_MouseMove);
@@ -3003,9 +3006,9 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox14.Controls.Add(this.tb_ExternalDataLog);
-            this.groupBox14.Location = new System.Drawing.Point(295, 6);
+            this.groupBox14.Location = new System.Drawing.Point(252, 6);
             this.groupBox14.Name = "groupBox14";
-            this.groupBox14.Size = new System.Drawing.Size(755, 581);
+            this.groupBox14.Size = new System.Drawing.Size(798, 581);
             this.groupBox14.TabIndex = 1;
             this.groupBox14.TabStop = false;
             this.groupBox14.Text = "Log";
@@ -3017,24 +3020,57 @@
             this.tb_ExternalDataLog.Multiline = true;
             this.tb_ExternalDataLog.Name = "tb_ExternalDataLog";
             this.tb_ExternalDataLog.ReadOnly = true;
-            this.tb_ExternalDataLog.Size = new System.Drawing.Size(749, 562);
+            this.tb_ExternalDataLog.Size = new System.Drawing.Size(792, 562);
             this.tb_ExternalDataLog.TabIndex = 0;
             // 
             // groupBox13
             // 
             this.groupBox13.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
+            this.groupBox13.Controls.Add(this.btn_UploadData);
+            this.groupBox13.Controls.Add(this.btn_DownloadData);
+            this.groupBox13.Controls.Add(this.label55);
             this.groupBox13.Controls.Add(this.cb_DataSource);
             this.groupBox13.Controls.Add(this.lbl_DataSourceConnectionStatus);
             this.groupBox13.Controls.Add(this.btn_TestDataSourceConnection);
             this.groupBox13.Location = new System.Drawing.Point(6, 6);
-            this.groupBox13.MaximumSize = new System.Drawing.Size(280, 0);
-            this.groupBox13.MinimumSize = new System.Drawing.Size(280, 100);
+            this.groupBox13.MaximumSize = new System.Drawing.Size(240, 105);
+            this.groupBox13.MinimumSize = new System.Drawing.Size(240, 105);
             this.groupBox13.Name = "groupBox13";
-            this.groupBox13.Size = new System.Drawing.Size(280, 100);
+            this.groupBox13.Size = new System.Drawing.Size(240, 105);
             this.groupBox13.TabIndex = 0;
             this.groupBox13.TabStop = false;
             this.groupBox13.Text = "Data Source";
+            // 
+            // btn_UploadData
+            // 
+            this.btn_UploadData.Location = new System.Drawing.Point(122, 72);
+            this.btn_UploadData.Name = "btn_UploadData";
+            this.btn_UploadData.Size = new System.Drawing.Size(110, 23);
+            this.btn_UploadData.TabIndex = 4;
+            this.btn_UploadData.Text = "Upload Data";
+            this.btn_UploadData.UseVisualStyleBackColor = true;
+            this.btn_UploadData.Click += new System.EventHandler(this.btn_UploadData_Click);
+            // 
+            // btn_DownloadData
+            // 
+            this.btn_DownloadData.Location = new System.Drawing.Point(10, 72);
+            this.btn_DownloadData.Name = "btn_DownloadData";
+            this.btn_DownloadData.Size = new System.Drawing.Size(110, 23);
+            this.btn_DownloadData.TabIndex = 3;
+            this.btn_DownloadData.Text = "Download Data";
+            this.btn_DownloadData.UseVisualStyleBackColor = true;
+            this.btn_DownloadData.Click += new System.EventHandler(this.btn_DownloadData_Click);
+            // 
+            // label55
+            // 
+            this.label55.AutoSize = true;
+            this.label55.Location = new System.Drawing.Point(10, 50);
+            this.label55.Margin = new System.Windows.Forms.Padding(3);
+            this.label55.Name = "label55";
+            this.label55.Size = new System.Drawing.Size(97, 13);
+            this.label55.TabIndex = 4;
+            this.label55.Text = "Connection Status:";
             // 
             // cb_DataSource
             // 
@@ -3044,7 +3080,7 @@
             this.cb_DataSource.Location = new System.Drawing.Point(10, 20);
             this.cb_DataSource.Name = "cb_DataSource";
             this.cb_DataSource.Size = new System.Drawing.Size(120, 21);
-            this.cb_DataSource.TabIndex = 3;
+            this.cb_DataSource.TabIndex = 1;
             this.cb_DataSource.SelectedIndexChanged += new System.EventHandler(this.cb_DataSource_SelectedIndexChanged);
             // 
             // dataSourceBindingSource
@@ -3055,9 +3091,10 @@
             // 
             this.lbl_DataSourceConnectionStatus.AutoSize = true;
             this.lbl_DataSourceConnectionStatus.BackColor = System.Drawing.Color.Transparent;
-            this.lbl_DataSourceConnectionStatus.Location = new System.Drawing.Point(238, 24);
+            this.lbl_DataSourceConnectionStatus.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lbl_DataSourceConnectionStatus.Location = new System.Drawing.Point(105, 50);
             this.lbl_DataSourceConnectionStatus.Name = "lbl_DataSourceConnectionStatus";
-            this.lbl_DataSourceConnectionStatus.Size = new System.Drawing.Size(37, 13);
+            this.lbl_DataSourceConnectionStatus.Size = new System.Drawing.Size(43, 13);
             this.lbl_DataSourceConnectionStatus.TabIndex = 2;
             this.lbl_DataSourceConnectionStatus.Text = "Status";
             // 
@@ -3065,8 +3102,8 @@
             // 
             this.btn_TestDataSourceConnection.Location = new System.Drawing.Point(136, 20);
             this.btn_TestDataSourceConnection.Name = "btn_TestDataSourceConnection";
-            this.btn_TestDataSourceConnection.Size = new System.Drawing.Size(96, 21);
-            this.btn_TestDataSourceConnection.TabIndex = 1;
+            this.btn_TestDataSourceConnection.Size = new System.Drawing.Size(96, 23);
+            this.btn_TestDataSourceConnection.TabIndex = 2;
             this.btn_TestDataSourceConnection.Text = "Test Connection";
             this.btn_TestDataSourceConnection.UseVisualStyleBackColor = true;
             this.btn_TestDataSourceConnection.Click += new System.EventHandler(this.btn_TestDataSourceConnection_Click);
@@ -3461,6 +3498,9 @@
         private System.Windows.Forms.ComboBox cb_DataSource;
         private System.Windows.Forms.GroupBox groupBox14;
         private System.Windows.Forms.TextBox tb_ExternalDataLog;
+        private System.Windows.Forms.Label label55;
+        private System.Windows.Forms.Button btn_UploadData;
+        private System.Windows.Forms.Button btn_DownloadData;
     }
 }
 
