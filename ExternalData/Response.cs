@@ -3,50 +3,25 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
 
 namespace ExternalData
 {
-    public enum ContentTypes
-    {
-        Empty,      // no content   
-        JSON,       // expect content string to be valid json
-        HTML,       // expect content string to be valid html
-        Undefined   // expect anything or nothing
-    }
-
     public class Response
     {
+        /// <summary>
+        /// String describing the response status (e.g. HTTP status phrase).
+        /// </summary>
         public string Status { get; set; }
 
-        string content;
-        public string Content
-        {
-            get
-            {
-                return content;
-            }
-            set
-            {
-                content = value;
-                if (value != null && value.Length > 0)
-                {
-                    this.ContentType = ContentTypes.Undefined;
-                }
-                else
-                {
-                    this.ContentType = ContentTypes.Empty;
-                }
-            }
-        }
-
-        public ContentTypes ContentType { get; set; }
+        /// <summary>
+        /// Wether or not the request leading to the response was successful.
+        /// </summary>
+        public bool IsSuccessStatus { get; set; }
 
         /// <summary>
-        /// 
+        /// String containg the response content (e.g. JSON encoded, raw text, etc.).
         /// </summary>
-        public Response()
-        {
-            ContentType = ContentTypes.Empty;
-        }
+        public string Content { get; set; }
     }
 }

@@ -5324,14 +5324,17 @@ namespace RegulatedNoise
             btn_DownloadData.Enabled = false;
             btn_UploadData.Enabled = false;
 
-            // Set data binding for availabe external data sources
-            dataSourceBindingSource.DataSource = ExternalDataManager.DataSources;
-            if (ExternalDataManager.DataSources.Capacity == 0)
+            // Initialize ExternalDataManager
+            Response res = ExternalDataManager.Initialize();
+            if (!res.IsSuccessStatus)
             {
-                tb_ExternalDataLog.AppendText(string.Format("Could not load data sources from config file '{0}'!\n", ExternalDataManager.CONFIG_FILE));
+                tb_ExternalDataLog.AppendText(string.Format("Could not load data sources from config file '{0}': {1}\n", ExternalDataManager.CONFIG_FILE, res.Content));
                 cb_DataSource.Enabled = false;
                 return;
             }
+
+            // Set data binding for availabe external data sources
+            dataSourceBindingSource.DataSource = ExternalDataManager.DataSources;
             ExternalDataManager.SelectedDataSource = cb_DataSource.SelectedItem as DataSource;
         }
 
@@ -5406,15 +5409,31 @@ namespace RegulatedNoise
                 lbl_DataSourceConnectionStatus.Text = "Downloading";
 
                 Response res = await ExternalDataManager.GetDataAsync("regulated-noise");
-                if (res.ContentType != ContentTypes.Empty)
+                if (res.IsSuccessStatus && res.Content != null)
                 {
-                    // Expecting valid json
+                    lbl_DataSourceConnectionStatus.Text = "Importing";
+
                     foreach (var json in JArray.Parse(res.Content))
                     {
                         tb_ExternalDataLog.AppendText(string.Format("{0}\n", json));
+
+                        // Build and import csvRow entry           
+                        string csvRow = string.Format("{0};{1};{2};{3};{4};{5};{6};{7};{8};{9};<From {10}>;",
+                            json["systemName"],
+                            json["stationName"],
+                            json["commodityName"],
+                            json["sellPrice"],
+                            json["buyPrice"],
+                            json["demand"],
+                            json["demandLevel"],
+                            json["supply"],
+                            json["supplyLevel"],
+                            json["updatedAt"],
+                            ExternalDataManager.SelectedDataSource.Name);
+
+                        ImportCsvString(csvRow);
                     }
                 }
-
                 lbl_DataSourceConnectionStatus.Text = res.Status;
             }
             catch (Exception ex)
@@ -5437,6 +5456,8 @@ namespace RegulatedNoise
             {
                 Response res = await ExternalDataManager.GetDataAsync("regulated-noise");
                 lbl_DataSourceConnectionStatus.Text = res.Status;
+
+
             }
             catch (Exception ex)
             {

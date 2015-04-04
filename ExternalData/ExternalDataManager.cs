@@ -18,13 +18,15 @@ namespace ExternalData
         public DataSource SelectedDataSource { get; set; }
 
         /// <summary>
-        /// 
+        /// Initialize ExternalDataManager
         /// </summary>
-        public ExternalDataManager()
+        /// <returns></returns>
+        public Response Initialize()
         {
             DataSources = new List<DataSource>();
-            // Load available data sources from json file
-            LoadAvailableDataSources(CONFIG_FILE);
+
+            // Load available data sources from json file and return response
+            return LoadAvailableDataSources(CONFIG_FILE);
         }
 
         /// <summary>
@@ -49,7 +51,6 @@ namespace ExternalData
 
                 // Make GET call and handle response
                 HttpResponseMessage responseMessage = await client.GetAsync(requestPath);
-                response.Status = responseMessage.StatusCode.ToString();
                 if (responseMessage.IsSuccessStatusCode)
                 {
                     using (StreamWriter destinationStream = File.CreateText(destinationFile))
@@ -57,6 +58,8 @@ namespace ExternalData
                         await destinationStream.WriteAsync(responseMessage.Content.ReadAsStringAsync().Result);
                     }
                 }
+                response.Status = responseMessage.StatusCode.ToString();
+                response.IsSuccessStatus = responseMessage.IsSuccessStatusCode;
             }
             return response;
         }
@@ -80,11 +83,12 @@ namespace ExternalData
 
                 // Make GET call and handle response
                 HttpResponseMessage responseMessage = await client.GetAsync(requestPath);
-                response.Status = responseMessage.StatusCode.ToString();
                 if (responseMessage.IsSuccessStatusCode)
                 {
                     response.Content = await responseMessage.Content.ReadAsStringAsync();
                 }
+                response.Status = responseMessage.StatusCode.ToString();
+                response.IsSuccessStatus = responseMessage.IsSuccessStatusCode;
             }
             return response;
         }
@@ -112,11 +116,10 @@ namespace ExternalData
                     requestPath,
                     new StringContent(json.ToString(), Encoding.UTF8, "application/json"));
 
-                response.Status = responseMessage.StatusCode.ToString();
                 response.Content = await responseMessage.Content.ReadAsStringAsync();
-                response.ContentType = ContentTypes.JSON;
+                response.Status = responseMessage.StatusCode.ToString();
+                response.IsSuccessStatus = responseMessage.IsSuccessStatusCode;
             }
-
             return response;
         }
 
@@ -124,10 +127,11 @@ namespace ExternalData
         /// Loads all data sources from json file
         /// </summary>
         /// <param name="fileName"></param>
-        private void LoadAvailableDataSources(string fileName)
+        private Response LoadAvailableDataSources(string fileName)
         {
-            string sourceFile = Path.GetFullPath(fileName);
+            Response response = new Response();
 
+            string sourceFile = Path.GetFullPath(fileName);
             if (File.Exists(sourceFile))
             {
                 using (StreamReader streamReader = new StreamReader(sourceFile))
@@ -139,13 +143,17 @@ namespace ExternalData
                             DataSource dataSource = JsonConvert.DeserializeObject<DataSource>(json.ToString());
                             DataSources.Add(dataSource);
                         }
+                        response.IsSuccessStatus = true;
                     }
                     catch (Exception ex)
                     {
-                        // todo: log exception
+                        response.IsSuccessStatus = false;
+                        response.Status = "Failed";
+                        response.Content = ex.Message.ToString();
                     }
                 }
             }
+            return response;
         }
     }
 }
