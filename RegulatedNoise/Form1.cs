@@ -5409,14 +5409,17 @@ namespace RegulatedNoise
                 lbl_DataSourceConnectionStatus.Text = "Downloading";
 
                 Response res = await ExternalDataManager.GetDataAsync("regulated-noise");
-                if (res.IsSuccessStatus && res.Content != null)
+                if (res.IsSuccessStatus && res.Content.Length == 0)
+                {
+                    lbl_DataSourceConnectionStatus.Text = res.Status;
+                    tb_ExternalDataLog.AppendText("Nothing to import!\n");
+                }
+                else if (res.IsSuccessStatus)
                 {
                     lbl_DataSourceConnectionStatus.Text = "Importing";
 
                     foreach (var json in JArray.Parse(res.Content))
                     {
-                        tb_ExternalDataLog.AppendText(string.Format("{0}\n", json));
-
                         // Build and import csvRow entry           
                         string csvRow = string.Format("{0};{1};{2};{3};{4};{5};{6};{7};{8};{9};<From {10}>;",
                             json["systemName"],
@@ -5431,14 +5434,20 @@ namespace RegulatedNoise
                             json["updatedAt"],
                             ExternalDataManager.SelectedDataSource.Name);
 
+                        tb_ExternalDataLog.AppendText(string.Format("Importing: {0} ", csvRow));
+                        tb_ExternalDataLog.AppendText(string.Format(" {0}\n", res.Status));
+
                         ImportCsvString(csvRow);
                     }
                 }
-                lbl_DataSourceConnectionStatus.Text = res.Status;
+                lbl_DataSourceConnectionStatus.Text = "Done";
+
+                // Update listings (hack)
+                cbStation_SelectedIndexChanged(cmbStation, null);
             }
             catch (Exception ex)
             {
-                tb_ExternalDataLog.AppendText(string.Format("{0} ({1})\n", ex.Message, ex.InnerException.Message));
+                tb_ExternalDataLog.AppendText(string.Format("{0}\n", ex.Message));
                 lbl_DataSourceConnectionStatus.Text = "Failed";
             }
         }
@@ -5454,16 +5463,47 @@ namespace RegulatedNoise
 
             try
             {
-                Response res = await ExternalDataManager.GetDataAsync("regulated-noise");
-                lbl_DataSourceConnectionStatus.Text = res.Status;
+                // Iterate over all csvRow entires
+                foreach (var station in StationDirectory)
+                {
+                    foreach (var commodity in station.Value)
+                    {
+                        lbl_DataSourceConnectionStatus.Text = "Uploading";
 
+                        // Build json object
+                        JObject json = new JObject();
 
+                        json.Add("systemName", commodity.SystemName);
+                        json.Add("stationName", commodity.StationName);
+                        json.Add("commodityName", commodity.CommodityName);
+                        if (commodity.SellPrice != 0) json.Add("sellPrice", commodity.SellPrice.ToString(CultureInfo.InvariantCulture));
+                        if (commodity.BuyPrice != 0) json.Add("buyPrice", commodity.BuyPrice.ToString(CultureInfo.InvariantCulture));
+                        if (commodity.Demand != 0) json.Add("demand", commodity.Demand.ToString(CultureInfo.InvariantCulture));
+                        if (commodity.DemandLevel.Length > 0) json.Add("demandLevel", commodity.DemandLevel);
+                        if (commodity.Supply != 0) json.Add("supply", commodity.Supply.ToString(CultureInfo.InvariantCulture));
+                        if (commodity.SupplyLevel.Length > 0) json.Add("supplyLevel", commodity.SupplyLevel);
+                        json.Add("updatedAt", commodity.SampleDate);
+
+                        tb_ExternalDataLog.AppendText(string.Format("Uploading: {0}", json));
+
+                        // Post json
+                        Response res = await ExternalDataManager.PostDataAsync("regulated-noise", json.ToString());
+                        tb_ExternalDataLog.AppendText(string.Format(" {0}\n", res.Status));
+                        lbl_DataSourceConnectionStatus.Text = res.Status;
+                    }
+                }
+                lbl_DataSourceConnectionStatus.Text = "Done";
             }
             catch (Exception ex)
             {
-                tb_ExternalDataLog.AppendText(string.Format("{0} ({1})\n", ex.Message, ex.InnerException.Message));
+                tb_ExternalDataLog.AppendText(string.Format("{0}\n", ex.Message));
                 lbl_DataSourceConnectionStatus.Text = "Failed";
             }
+        }
+
+        private void tb_ExternalDataLog_TextChanged(object sender, EventArgs e)
+        {
+            tb_ExternalDataLog.ScrollToCaret();
         }
     }
 }
