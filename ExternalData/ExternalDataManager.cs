@@ -14,8 +14,11 @@ namespace ExternalData
     public class ExternalDataManager
     {
         public const string CONFIG_FILE = "datasources.json";
+        public const int FRESHNESS_DAYS_THERESHOLD = 5;
+
         public List<DataSource> DataSources { get; private set; }
         public DataSource SelectedDataSource { get; set; }
+        public TimeSpan FreshnessTimeTreshold { get; set; }
 
         /// <summary>
         /// Initialize ExternalDataManager
@@ -24,6 +27,7 @@ namespace ExternalData
         public Response Initialize()
         {
             DataSources = new List<DataSource>();
+            FreshnessTimeTreshold = new TimeSpan(FRESHNESS_DAYS_THERESHOLD, 0, 0, 0);
 
             // Load available data sources from json file and return response
             return LoadAvailableDataSources(CONFIG_FILE);

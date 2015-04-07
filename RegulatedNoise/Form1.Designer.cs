@@ -30,10 +30,10 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea3 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Series series3 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea4 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Series series4 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.rbSortByDistance = new System.Windows.Forms.RadioButton();
@@ -267,11 +267,15 @@
             this.cmdSelectTraineddataFile = new System.Windows.Forms.Button();
             this.label12 = new System.Windows.Forms.Label();
             this.tabExternalData = new System.Windows.Forms.TabPage();
-            this.groupBox14 = new System.Windows.Forms.GroupBox();
-            this.tb_ExternalDataLog = new System.Windows.Forms.TextBox();
-            this.groupBox13 = new System.Windows.Forms.GroupBox();
+            this.gb_UploadData = new System.Windows.Forms.GroupBox();
             this.btn_UploadData = new System.Windows.Forms.Button();
+            this.gb_DownloadData = new System.Windows.Forms.GroupBox();
             this.btn_DownloadData = new System.Windows.Forms.Button();
+            this.gb_Log = new System.Windows.Forms.GroupBox();
+            this.tb_ExternalDataLog = new System.Windows.Forms.TextBox();
+            this.db_DataSource = new System.Windows.Forms.GroupBox();
+            this.btn_ClearLog = new System.Windows.Forms.Button();
+            this.cb_VerboseLogging = new System.Windows.Forms.CheckBox();
             this.label55 = new System.Windows.Forms.Label();
             this.cb_DataSource = new System.Windows.Forms.ComboBox();
             this.dataSourceBindingSource = new System.Windows.Forms.BindingSource(this.components);
@@ -280,6 +284,7 @@
             this.bOpen = new System.Windows.Forms.Button();
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.copySystenmameToClipboardToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.cb_LimitUpload = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.dsCommodities)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.namesBindingSource)).BeginInit();
             this.tabControl1.SuspendLayout();
@@ -341,8 +346,10 @@
             this.groupBox9.SuspendLayout();
             this.groupBox11.SuspendLayout();
             this.tabExternalData.SuspendLayout();
-            this.groupBox14.SuspendLayout();
-            this.groupBox13.SuspendLayout();
+            this.gb_UploadData.SuspendLayout();
+            this.gb_DownloadData.SuspendLayout();
+            this.gb_Log.SuspendLayout();
+            this.db_DataSource.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataSourceBindingSource)).BeginInit();
             this.contextMenuStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -819,7 +826,7 @@
             this.lblRegulatedNoise.Font = new System.Drawing.Font("Segoe UI", 60F, System.Drawing.FontStyle.Bold);
             this.lblRegulatedNoise.Location = new System.Drawing.Point(12, 0);
             this.lblRegulatedNoise.Name = "lblRegulatedNoise";
-            this.lblRegulatedNoise.Size = new System.Drawing.Size(841, 106);
+            this.lblRegulatedNoise.Size = new System.Drawing.Size(839, 106);
             this.lblRegulatedNoise.TabIndex = 2;
             this.lblRegulatedNoise.Text = "RegulatedNoise [EIC]";
             // 
@@ -1009,7 +1016,7 @@
             // 
             this.splitContainer1.Panel2.Controls.Add(this.label9);
             this.splitContainer1.Panel2.Controls.Add(this.chart2);
-            this.splitContainer1.Size = new System.Drawing.Size(152, 521);
+            this.splitContainer1.Size = new System.Drawing.Size(146, 521);
             this.splitContainer1.SplitterDistance = 237;
             this.splitContainer1.SplitterWidth = 6;
             this.splitContainer1.TabIndex = 7;
@@ -1029,14 +1036,14 @@
             this.chart1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            chartArea3.Name = "ChartArea1";
-            this.chart1.ChartAreas.Add(chartArea3);
+            chartArea1.Name = "ChartArea1";
+            this.chart1.ChartAreas.Add(chartArea1);
             this.chart1.Location = new System.Drawing.Point(0, -1);
             this.chart1.Name = "chart1";
-            series3.ChartArea = "ChartArea1";
-            series3.Name = "Series1";
-            this.chart1.Series.Add(series3);
-            this.chart1.Size = new System.Drawing.Size(147, 235);
+            series1.ChartArea = "ChartArea1";
+            series1.Name = "Series1";
+            this.chart1.Series.Add(series1);
+            this.chart1.Size = new System.Drawing.Size(141, 235);
             this.chart1.TabIndex = 5;
             this.chart1.Text = "chart1";
             this.chart1.MouseMove += new System.Windows.Forms.MouseEventHandler(this.chart1_MouseMove);
@@ -1056,14 +1063,14 @@
             this.chart2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            chartArea4.Name = "ChartArea1";
-            this.chart2.ChartAreas.Add(chartArea4);
+            chartArea2.Name = "ChartArea1";
+            this.chart2.ChartAreas.Add(chartArea2);
             this.chart2.Location = new System.Drawing.Point(3, 18);
             this.chart2.Name = "chart2";
-            series4.ChartArea = "ChartArea1";
-            series4.Name = "Series1";
-            this.chart2.Series.Add(series4);
-            this.chart2.Size = new System.Drawing.Size(142, 203);
+            series2.ChartArea = "ChartArea1";
+            series2.Name = "Series1";
+            this.chart2.Series.Add(series2);
+            this.chart2.Size = new System.Drawing.Size(136, 197);
             this.chart2.TabIndex = 6;
             this.chart2.Text = "chart2";
             this.chart2.MouseMove += new System.Windows.Forms.MouseEventHandler(this.chart1_MouseMove);
@@ -2990,8 +2997,10 @@
             // 
             // tabExternalData
             // 
-            this.tabExternalData.Controls.Add(this.groupBox14);
-            this.tabExternalData.Controls.Add(this.groupBox13);
+            this.tabExternalData.Controls.Add(this.gb_UploadData);
+            this.tabExternalData.Controls.Add(this.gb_DownloadData);
+            this.tabExternalData.Controls.Add(this.gb_Log);
+            this.tabExternalData.Controls.Add(this.db_DataSource);
             this.tabExternalData.Location = new System.Drawing.Point(4, 22);
             this.tabExternalData.Name = "tabExternalData";
             this.tabExternalData.Padding = new System.Windows.Forms.Padding(6);
@@ -3000,18 +3009,59 @@
             this.tabExternalData.Text = "External Data";
             this.tabExternalData.UseVisualStyleBackColor = true;
             // 
-            // groupBox14
+            // gb_UploadData
             // 
-            this.groupBox14.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.gb_UploadData.Controls.Add(this.cb_LimitUpload);
+            this.gb_UploadData.Controls.Add(this.btn_UploadData);
+            this.gb_UploadData.Location = new System.Drawing.Point(6, 223);
+            this.gb_UploadData.Name = "gb_UploadData";
+            this.gb_UploadData.Size = new System.Drawing.Size(240, 74);
+            this.gb_UploadData.TabIndex = 3;
+            this.gb_UploadData.TabStop = false;
+            this.gb_UploadData.Text = "Upload";
+            // 
+            // btn_UploadData
+            // 
+            this.btn_UploadData.Location = new System.Drawing.Point(10, 45);
+            this.btn_UploadData.Name = "btn_UploadData";
+            this.btn_UploadData.Size = new System.Drawing.Size(110, 23);
+            this.btn_UploadData.TabIndex = 4;
+            this.btn_UploadData.Text = "Upload Data";
+            this.btn_UploadData.UseVisualStyleBackColor = true;
+            this.btn_UploadData.Click += new System.EventHandler(this.btn_UploadData_Click);
+            // 
+            // gb_DownloadData
+            // 
+            this.gb_DownloadData.Controls.Add(this.btn_DownloadData);
+            this.gb_DownloadData.Location = new System.Drawing.Point(6, 117);
+            this.gb_DownloadData.Name = "gb_DownloadData";
+            this.gb_DownloadData.Size = new System.Drawing.Size(240, 72);
+            this.gb_DownloadData.TabIndex = 2;
+            this.gb_DownloadData.TabStop = false;
+            this.gb_DownloadData.Text = "Download";
+            // 
+            // btn_DownloadData
+            // 
+            this.btn_DownloadData.Location = new System.Drawing.Point(6, 37);
+            this.btn_DownloadData.Name = "btn_DownloadData";
+            this.btn_DownloadData.Size = new System.Drawing.Size(110, 23);
+            this.btn_DownloadData.TabIndex = 6;
+            this.btn_DownloadData.Text = "Download Data";
+            this.btn_DownloadData.UseVisualStyleBackColor = true;
+            this.btn_DownloadData.Click += new System.EventHandler(this.btn_DownloadData_Click);
+            // 
+            // gb_Log
+            // 
+            this.gb_Log.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.groupBox14.Controls.Add(this.tb_ExternalDataLog);
-            this.groupBox14.Location = new System.Drawing.Point(252, 6);
-            this.groupBox14.Name = "groupBox14";
-            this.groupBox14.Size = new System.Drawing.Size(798, 581);
-            this.groupBox14.TabIndex = 1;
-            this.groupBox14.TabStop = false;
-            this.groupBox14.Text = "Log";
+            this.gb_Log.Controls.Add(this.tb_ExternalDataLog);
+            this.gb_Log.Location = new System.Drawing.Point(252, 6);
+            this.gb_Log.Name = "gb_Log";
+            this.gb_Log.Size = new System.Drawing.Size(798, 581);
+            this.gb_Log.TabIndex = 1;
+            this.gb_Log.TabStop = false;
+            this.gb_Log.Text = "Log";
             // 
             // tb_ExternalDataLog
             // 
@@ -3025,44 +3075,44 @@
             this.tb_ExternalDataLog.TabIndex = 0;
             this.tb_ExternalDataLog.TextChanged += new System.EventHandler(this.tb_ExternalDataLog_TextChanged);
             // 
-            // groupBox13
+            // db_DataSource
             // 
-            this.groupBox13.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.db_DataSource.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
-            this.groupBox13.Controls.Add(this.btn_UploadData);
-            this.groupBox13.Controls.Add(this.btn_DownloadData);
-            this.groupBox13.Controls.Add(this.label55);
-            this.groupBox13.Controls.Add(this.cb_DataSource);
-            this.groupBox13.Controls.Add(this.lbl_DataSourceConnectionStatus);
-            this.groupBox13.Controls.Add(this.btn_TestDataSourceConnection);
-            this.groupBox13.Location = new System.Drawing.Point(6, 6);
-            this.groupBox13.MaximumSize = new System.Drawing.Size(240, 105);
-            this.groupBox13.MinimumSize = new System.Drawing.Size(240, 105);
-            this.groupBox13.Name = "groupBox13";
-            this.groupBox13.Size = new System.Drawing.Size(240, 105);
-            this.groupBox13.TabIndex = 0;
-            this.groupBox13.TabStop = false;
-            this.groupBox13.Text = "Data Source";
+            this.db_DataSource.Controls.Add(this.btn_ClearLog);
+            this.db_DataSource.Controls.Add(this.cb_VerboseLogging);
+            this.db_DataSource.Controls.Add(this.label55);
+            this.db_DataSource.Controls.Add(this.cb_DataSource);
+            this.db_DataSource.Controls.Add(this.lbl_DataSourceConnectionStatus);
+            this.db_DataSource.Controls.Add(this.btn_TestDataSourceConnection);
+            this.db_DataSource.Location = new System.Drawing.Point(6, 6);
+            this.db_DataSource.MaximumSize = new System.Drawing.Size(240, 105);
+            this.db_DataSource.MinimumSize = new System.Drawing.Size(240, 105);
+            this.db_DataSource.Name = "db_DataSource";
+            this.db_DataSource.Size = new System.Drawing.Size(240, 105);
+            this.db_DataSource.TabIndex = 0;
+            this.db_DataSource.TabStop = false;
+            this.db_DataSource.Text = "Data Source";
             // 
-            // btn_UploadData
+            // btn_ClearLog
             // 
-            this.btn_UploadData.Location = new System.Drawing.Point(122, 72);
-            this.btn_UploadData.Name = "btn_UploadData";
-            this.btn_UploadData.Size = new System.Drawing.Size(110, 23);
-            this.btn_UploadData.TabIndex = 4;
-            this.btn_UploadData.Text = "Upload Data";
-            this.btn_UploadData.UseVisualStyleBackColor = true;
-            this.btn_UploadData.Click += new System.EventHandler(this.btn_UploadData_Click);
+            this.btn_ClearLog.Location = new System.Drawing.Point(122, 71);
+            this.btn_ClearLog.Name = "btn_ClearLog";
+            this.btn_ClearLog.Size = new System.Drawing.Size(110, 23);
+            this.btn_ClearLog.TabIndex = 4;
+            this.btn_ClearLog.Text = "Clear Log";
+            this.btn_ClearLog.UseVisualStyleBackColor = true;
+            this.btn_ClearLog.Click += new System.EventHandler(this.btn_ClearLog_Click);
             // 
-            // btn_DownloadData
+            // cb_VerboseLogging
             // 
-            this.btn_DownloadData.Location = new System.Drawing.Point(10, 72);
-            this.btn_DownloadData.Name = "btn_DownloadData";
-            this.btn_DownloadData.Size = new System.Drawing.Size(110, 23);
-            this.btn_DownloadData.TabIndex = 3;
-            this.btn_DownloadData.Text = "Download Data";
-            this.btn_DownloadData.UseVisualStyleBackColor = true;
-            this.btn_DownloadData.Click += new System.EventHandler(this.btn_DownloadData_Click);
+            this.cb_VerboseLogging.AutoSize = true;
+            this.cb_VerboseLogging.Location = new System.Drawing.Point(10, 75);
+            this.cb_VerboseLogging.Name = "cb_VerboseLogging";
+            this.cb_VerboseLogging.Size = new System.Drawing.Size(106, 17);
+            this.cb_VerboseLogging.TabIndex = 3;
+            this.cb_VerboseLogging.Text = "Verbose Logging";
+            this.cb_VerboseLogging.UseVisualStyleBackColor = true;
             // 
             // label55
             // 
@@ -3133,6 +3183,18 @@
             this.copySystenmameToClipboardToolStripMenuItem.Size = new System.Drawing.Size(245, 22);
             this.copySystenmameToClipboardToolStripMenuItem.Text = "Copy Systemname To Clipboard";
             this.copySystenmameToClipboardToolStripMenuItem.Click += new System.EventHandler(this.copySystenmameToClipboardToolStripMenuItem_Click);
+            // 
+            // cb_LimitUpload
+            // 
+            this.cb_LimitUpload.AutoSize = true;
+            this.cb_LimitUpload.Checked = true;
+            this.cb_LimitUpload.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.cb_LimitUpload.Location = new System.Drawing.Point(10, 20);
+            this.cb_LimitUpload.Name = "cb_LimitUpload";
+            this.cb_LimitUpload.Size = new System.Drawing.Size(139, 17);
+            this.cb_LimitUpload.TabIndex = 5;
+            this.cb_LimitUpload.Text = "Upload recent data only";
+            this.cb_LimitUpload.UseVisualStyleBackColor = true;
             // 
             // Form1
             // 
@@ -3243,10 +3305,13 @@
             this.groupBox11.ResumeLayout(false);
             this.groupBox11.PerformLayout();
             this.tabExternalData.ResumeLayout(false);
-            this.groupBox14.ResumeLayout(false);
-            this.groupBox14.PerformLayout();
-            this.groupBox13.ResumeLayout(false);
-            this.groupBox13.PerformLayout();
+            this.gb_UploadData.ResumeLayout(false);
+            this.gb_UploadData.PerformLayout();
+            this.gb_DownloadData.ResumeLayout(false);
+            this.gb_Log.ResumeLayout(false);
+            this.gb_Log.PerformLayout();
+            this.db_DataSource.ResumeLayout(false);
+            this.db_DataSource.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataSourceBindingSource)).EndInit();
             this.contextMenuStrip1.ResumeLayout(false);
             this.ResumeLayout(false);
@@ -3493,16 +3558,21 @@
         private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
         private System.Windows.Forms.ToolStripMenuItem copySystenmameToClipboardToolStripMenuItem;
         private System.Windows.Forms.TabPage tabExternalData;
-        private System.Windows.Forms.GroupBox groupBox13;
+        private System.Windows.Forms.GroupBox db_DataSource;
         private System.Windows.Forms.Label lbl_DataSourceConnectionStatus;
         private System.Windows.Forms.Button btn_TestDataSourceConnection;
         private System.Windows.Forms.BindingSource dataSourceBindingSource;
         private System.Windows.Forms.ComboBox cb_DataSource;
-        private System.Windows.Forms.GroupBox groupBox14;
+        private System.Windows.Forms.GroupBox gb_Log;
         private System.Windows.Forms.TextBox tb_ExternalDataLog;
         private System.Windows.Forms.Label label55;
         private System.Windows.Forms.Button btn_UploadData;
         private System.Windows.Forms.Button btn_DownloadData;
+        private System.Windows.Forms.GroupBox gb_DownloadData;
+        private System.Windows.Forms.GroupBox gb_UploadData;
+        private System.Windows.Forms.Button btn_ClearLog;
+        private System.Windows.Forms.CheckBox cb_VerboseLogging;
+        private System.Windows.Forms.CheckBox cb_LimitUpload;
     }
 }
 

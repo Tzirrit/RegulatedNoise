@@ -26,6 +26,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Text.RegularExpressions;
 using ExternalData;
 using Newtonsoft.Json.Linq;
+using System.Threading.Tasks;
 
 namespace RegulatedNoise
 {
@@ -5407,8 +5408,9 @@ namespace RegulatedNoise
             try
             {
                 lbl_DataSourceConnectionStatus.Text = "Downloading";
-
                 Response res = await ExternalDataManager.GetDataAsync("regulated-noise");
+                lbl_DataSourceConnectionStatus.Text = "Importing";
+
                 if (res.IsSuccessStatus && res.Content.Length == 0)
                 {
                     lbl_DataSourceConnectionStatus.Text = res.Status;
@@ -5416,8 +5418,6 @@ namespace RegulatedNoise
                 }
                 else if (res.IsSuccessStatus)
                 {
-                    lbl_DataSourceConnectionStatus.Text = "Importing";
-
                     foreach (var json in JArray.Parse(res.Content))
                     {
                         // Build and import csvRow entry           
@@ -5434,8 +5434,11 @@ namespace RegulatedNoise
                             json["updatedAt"],
                             ExternalDataManager.SelectedDataSource.Name);
 
-                        tb_ExternalDataLog.AppendText(string.Format("Importing: {0} ", csvRow));
-                        tb_ExternalDataLog.AppendText(string.Format(" {0}\n", res.Status));
+                        if (cb_VerboseLogging.Checked)
+                        {
+                            tb_ExternalDataLog.AppendText(string.Format("Importing: {0} ", csvRow));
+                            tb_ExternalDataLog.AppendText(string.Format(" {0}\n", res.Status));
+                        }
 
                         ImportCsvString(csvRow);
                     }
@@ -5463,47 +5466,81 @@ namespace RegulatedNoise
 
             try
             {
-                // Iterate over all csvRow entires
                 foreach (var station in StationDirectory)
                 {
                     foreach (var commodity in station.Value)
                     {
-                        lbl_DataSourceConnectionStatus.Text = "Uploading";
+                        if (!cb_LimitUpload.Checked || (cb_LimitUpload.Checked && DateTime.Now - commodity.SampleDate < ExternalDataManager.FreshnessTimeTreshold))
+                        {
+                            lbl_DataSourceConnectionStatus.Text = "Uploading";
 
-                        // Build json object
-                        JObject json = new JObject();
+                            // Build json object
+                            JObject json = new JObject();
 
-                        json.Add("systemName", commodity.SystemName);
-                        json.Add("stationName", commodity.StationName);
-                        json.Add("commodityName", commodity.CommodityName);
-                        if (commodity.SellPrice != 0) json.Add("sellPrice", commodity.SellPrice.ToString(CultureInfo.InvariantCulture));
-                        if (commodity.BuyPrice != 0) json.Add("buyPrice", commodity.BuyPrice.ToString(CultureInfo.InvariantCulture));
-                        if (commodity.Demand != 0) json.Add("demand", commodity.Demand.ToString(CultureInfo.InvariantCulture));
-                        if (commodity.DemandLevel.Length > 0) json.Add("demandLevel", commodity.DemandLevel);
-                        if (commodity.Supply != 0) json.Add("supply", commodity.Supply.ToString(CultureInfo.InvariantCulture));
-                        if (commodity.SupplyLevel.Length > 0) json.Add("supplyLevel", commodity.SupplyLevel);
-                        json.Add("updatedAt", commodity.SampleDate);
+                            json.Add("systemName", commodity.SystemName);
+                            json.Add("stationName", commodity.StationName);
+                            json.Add("commodityName", commodity.CommodityName);
+                            if (commodity.SellPrice != 0) json.Add("sellPrice", commodity.SellPrice.ToString(CultureInfo.InvariantCulture));
+                            if (commodity.BuyPrice != 0) json.Add("buyPrice", commodity.BuyPrice.ToString(CultureInfo.InvariantCulture));
+                            if (commodity.Demand != 0) json.Add("demand", commodity.Demand.ToString(CultureInfo.InvariantCulture));
+                            if (commodity.DemandLevel.Length > 0) json.Add("demandLevel", commodity.DemandLevel);
+                            if (commodity.Supply != 0) json.Add("supply", commodity.Supply.ToString(CultureInfo.InvariantCulture));
+                            if (commodity.SupplyLevel.Length > 0) json.Add("supplyLevel", commodity.SupplyLevel);
+                            json.Add("updatedAt", commodity.SampleDate);
 
-                        tb_ExternalDataLog.AppendText(string.Format("Uploading: {0}", json));
+                            if (cb_VerboseLogging.Checked)
+                            {
+                                AppendExternalDataLog(string.Format("Uploading: {0}", json), false);
+                                //tb_ExternalDataLog.AppendText(string.Format("Uploading: {0}", json));
+                            }
 
-                        // Post json
-                        Response res = await ExternalDataManager.PostDataAsync("regulated-noise", json.ToString());
-                        tb_ExternalDataLog.AppendText(string.Format(" {0}\n", res.Status));
-                        lbl_DataSourceConnectionStatus.Text = res.Status;
+                            // Post json
+                            Response res = await ExternalDataManager.PostDataAsync("regulated-noise", json.ToString());
+                            if (cb_VerboseLogging.Checked)
+                            {
+                                AppendExternalDataLog(res.Status);
+                                //tb_ExternalDataLog.AppendText(string.Format(" {0}\n", res.Status));
+                            }
+                            lbl_DataSourceConnectionStatus.Text = res.Status;
+                        }
                     }
                 }
+
                 lbl_DataSourceConnectionStatus.Text = "Done";
             }
             catch (Exception ex)
             {
-                tb_ExternalDataLog.AppendText(string.Format("{0}\n", ex.Message));
+                AppendExternalDataLog(ex.Message);
+                //tb_ExternalDataLog.AppendText(string.Format("{0}\n", ex.Message));
                 lbl_DataSourceConnectionStatus.Text = "Failed";
             }
+        }
+
+
+        protected void AppendExternalDataLog(string value, bool linebreak = true)
+        {
+            if (InvokeRequired)
+            {
+                this.Invoke(new Action<string, bool>(AppendExternalDataLog), new object[] { value, linebreak });
+                return;
+            }
+            
+            if (linebreak)
+            {
+                tb_ExternalDataLog.AppendText(string.Format("{0}\n", value));
+                return;
+            }
+            tb_ExternalDataLog.AppendText(value);
         }
 
         private void tb_ExternalDataLog_TextChanged(object sender, EventArgs e)
         {
             tb_ExternalDataLog.ScrollToCaret();
+        }
+
+        private void btn_ClearLog_Click(object sender, EventArgs e)
+        {
+            tb_ExternalDataLog.Clear();
         }
     }
 }
