@@ -5321,7 +5321,7 @@ namespace RegulatedNoise
         {
             ExternalDataManager = new ExternalDataManager();
 
-            lbl_DataSourceConnectionStatus.Text = string.Empty;
+            UpdateConnectionStatus(string.Empty);
             btn_DownloadData.Enabled = false;
             btn_UploadData.Enabled = false;
 
@@ -5329,7 +5329,7 @@ namespace RegulatedNoise
             Response res = ExternalDataManager.Initialize();
             if (!res.IsSuccessStatus)
             {
-                tb_ExternalDataLog.AppendText(string.Format("Could not load data sources from config file '{0}': {1}\n", ExternalDataManager.CONFIG_FILE, res.Content));
+                AppendExternalDataLog(string.Format("Could not load data sources from config file '{0}': {1}", ExternalDataManager.CONFIG_FILE, res.Content));
                 cb_DataSource.Enabled = false;
                 return;
             }
@@ -5348,24 +5348,24 @@ namespace RegulatedNoise
         {
             if (ExternalDataManager.SelectedDataSource == null)
             {
-                tb_ExternalDataLog.AppendText("No valid data source selected!\n");
-                lbl_DataSourceConnectionStatus.Text = "Invalid";
+                AppendExternalDataLog("No valid data source selected!");
+                UpdateConnectionStatus("Invalid");
                 return;
             }
 
-            lbl_DataSourceConnectionStatus.Text = "Connecting";
-            tb_ExternalDataLog.AppendText(string.Format("Testing connection to '{0}' at {1} (authentication type: {2}): ",
+            UpdateConnectionStatus("Connecting");
+            AppendExternalDataLog(string.Format("Testing connection to '{0}' at {1} (authentication type: {2}): ",
                 ExternalDataManager.SelectedDataSource.Name,
                 ExternalDataManager.SelectedDataSource.Url,
-                ExternalDataManager.SelectedDataSource.Authentication.Type));
+                ExternalDataManager.SelectedDataSource.Authentication.Type),false);
 
             try
             {
                 Response res = await ExternalDataManager.GetDataAsync("");
-                tb_ExternalDataLog.AppendText(string.Format("{0}\n", res.Status));
-                lbl_DataSourceConnectionStatus.Text = res.Status;
+                AppendExternalDataLog(res.Status);
+                UpdateConnectionStatus(res.Status);
 
-                if (res.Status == "OK")
+                if (res.IsSuccessStatus)
                 {
                     btn_DownloadData.Enabled = true;
                     btn_UploadData.Enabled = true;
@@ -5373,8 +5373,8 @@ namespace RegulatedNoise
             }
             catch (Exception ex)
             {
-                tb_ExternalDataLog.AppendText(string.Format("{0} ({1})\n", ex.Message, ex.InnerException.Message));
-                lbl_DataSourceConnectionStatus.Text = "Failed";
+                AppendExternalDataLog(ex.Message);
+                UpdateConnectionStatus("Failed");
             }
         }
 
@@ -5389,10 +5389,10 @@ namespace RegulatedNoise
 
             btn_DownloadData.Enabled = false;
             btn_UploadData.Enabled = false;
-            lbl_DataSourceConnectionStatus.Text = string.Empty;
+            UpdateConnectionStatus(string.Empty);
             if (ExternalDataManager.SelectedDataSource != null)
             {
-                tb_ExternalDataLog.AppendText(string.Format("Selected data source '{0}'. Please test connection.\n", ExternalDataManager.SelectedDataSource.Name));
+                AppendExternalDataLog(string.Format("Selected data source '{0}'. Please test connection.", ExternalDataManager.SelectedDataSource.Name));
             }
         }
 
@@ -5403,18 +5403,33 @@ namespace RegulatedNoise
         /// <param name="e"></param>
         private async void btn_DownloadData_Click(object sender, EventArgs e)
         {
-            lbl_DataSourceConnectionStatus.Text = "Connecting";
-
+            btn_UploadData.Enabled = false;
+            btn_DownloadData.Enabled = false;
+            btn_TestDataSourceConnection.Enabled = false;
+            UpdateConnectionStatus("Connecting");
+            AppendExternalDataLog(string.Format("Downloading all data from the last {0} days...", tb_DownloadDayLimit.Text));
             try
             {
-                lbl_DataSourceConnectionStatus.Text = "Downloading";
-                Response res = await ExternalDataManager.GetDataAsync("regulated-noise");
-                lbl_DataSourceConnectionStatus.Text = "Importing";
+                UpdateConnectionStatus("Downloading");
+                
+                // set requestPath with ageLimit for request
+                string requestPath = "regulated-noise";
+                if(cb_LimitDownload.Checked)
+                {
+                    int days;
+                    if(!int.TryParse(tb_DownloadDayLimit.Text, out days))
+                        days = 5;
+
+                    requestPath = string.Format("{0}/?dayLimit={1}", requestPath, days);
+                }
+
+                Response res = await ExternalDataManager.GetDataAsync(requestPath);
+                UpdateConnectionStatus("Importing");
 
                 if (res.IsSuccessStatus && res.Content.Length == 0)
                 {
-                    lbl_DataSourceConnectionStatus.Text = res.Status;
-                    tb_ExternalDataLog.AppendText("Nothing to import!\n");
+                    UpdateConnectionStatus(res.Status);
+                    AppendExternalDataLog("Nothing to import!");
                 }
                 else if (res.IsSuccessStatus)
                 {
@@ -5436,23 +5451,26 @@ namespace RegulatedNoise
 
                         if (cb_VerboseLogging.Checked)
                         {
-                            tb_ExternalDataLog.AppendText(string.Format("Importing: {0} ", csvRow));
-                            tb_ExternalDataLog.AppendText(string.Format(" {0}\n", res.Status));
+                            AppendExternalDataLog(string.Format("Importing: {0} ", csvRow), false);
+                            AppendExternalDataLog(res.Status);
                         }
 
                         ImportCsvString(csvRow);
                     }
                 }
-                lbl_DataSourceConnectionStatus.Text = "Done";
-
+                UpdateConnectionStatus("Done");
+                AppendExternalDataLog("Done downloading.");
                 // Update listings (hack)
                 cbStation_SelectedIndexChanged(cmbStation, null);
             }
             catch (Exception ex)
             {
-                tb_ExternalDataLog.AppendText(string.Format("{0}\n", ex.Message));
-                lbl_DataSourceConnectionStatus.Text = "Failed";
+                AppendExternalDataLog(ex.Message);
+                UpdateConnectionStatus("Failed");
             }
+            btn_UploadData.Enabled = true;
+            btn_DownloadData.Enabled = true;
+            btn_TestDataSourceConnection.Enabled = true;
         }
 
         /// <summary>
@@ -5462,8 +5480,11 @@ namespace RegulatedNoise
         /// <param name="e"></param>
         private async void btn_UploadData_Click(object sender, EventArgs e)
         {
-            lbl_DataSourceConnectionStatus.Text = "Connecting";
-
+            btn_UploadData.Enabled = false;
+            btn_DownloadData.Enabled = false;
+            btn_TestDataSourceConnection.Enabled = false;
+            UpdateConnectionStatus("Connecting");
+            AppendExternalDataLog(string.Format("Uploading all data from the last {0} days...", tb_UploadDayLimit.Text));
             try
             {
                 foreach (var station in StationDirectory)
@@ -5472,7 +5493,7 @@ namespace RegulatedNoise
                     {
                         if (!cb_LimitUpload.Checked || (cb_LimitUpload.Checked && DateTime.Now - commodity.SampleDate < ExternalDataManager.FreshnessTimeTreshold))
                         {
-                            lbl_DataSourceConnectionStatus.Text = "Uploading";
+                            UpdateConnectionStatus("Uploading");
 
                             // Build json object
                             JObject json = new JObject();
@@ -5488,34 +5509,46 @@ namespace RegulatedNoise
                             if (commodity.SupplyLevel.Length > 0) json.Add("supplyLevel", commodity.SupplyLevel);
                             json.Add("updatedAt", commodity.SampleDate);
 
-                            if (cb_VerboseLogging.Checked)
-                            {
-                                AppendExternalDataLog(string.Format("Uploading: {0}", json), false);
-                                //tb_ExternalDataLog.AppendText(string.Format("Uploading: {0}", json));
-                            }
-
                             // Post json
                             Response res = await ExternalDataManager.PostDataAsync("regulated-noise", json.ToString());
                             if (cb_VerboseLogging.Checked)
                             {
-                                AppendExternalDataLog(res.Status);
-                                //tb_ExternalDataLog.AppendText(string.Format(" {0}\n", res.Status));
+                                AppendExternalDataLog(string.Format("Uploading: {0}: ", json), false);
+                                if (res.Status == "208")
+                                {
+                                    AppendExternalDataLog("Server-side data was more recent.");
+                                }
+                                else
+                                {
+                                    AppendExternalDataLog(res.Status);
+                                }
                             }
-                            lbl_DataSourceConnectionStatus.Text = res.Status;
+                            UpdateConnectionStatus(res.Status);
                         }
                     }
                 }
-
-                lbl_DataSourceConnectionStatus.Text = "Done";
+                UpdateConnectionStatus("Done");
+                AppendExternalDataLog("Done uploading.");
             }
             catch (Exception ex)
             {
                 AppendExternalDataLog(ex.Message);
-                //tb_ExternalDataLog.AppendText(string.Format("{0}\n", ex.Message));
-                lbl_DataSourceConnectionStatus.Text = "Failed";
+                UpdateConnectionStatus("Failed");
             }
+            btn_UploadData.Enabled = true;
+            btn_DownloadData.Enabled = true;
+            btn_TestDataSourceConnection.Enabled = true;
         }
 
+        protected void UpdateConnectionStatus(string value)
+        {
+            if (InvokeRequired)
+            {
+                this.Invoke(new Action<string>(UpdateConnectionStatus), new object[] { value });
+                return;
+            }
+            tb_ConnectionStatus.Text = value;
+        }
 
         protected void AppendExternalDataLog(string value, bool linebreak = true)
         {
@@ -5541,6 +5574,63 @@ namespace RegulatedNoise
         private void btn_ClearLog_Click(object sender, EventArgs e)
         {
             tb_ExternalDataLog.Clear();
+        }
+
+        /// <summary>
+        /// Parses input string into valid number of maximum days
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        private int GetValidMaximumAge(string input)
+        {
+            int days = 5;
+
+            if (int.TryParse(input, out days))
+            {
+                if (days < 1) days = 1;
+
+                if (days > 32) days = 32;
+            }
+
+            return days;
+        }
+
+        private void ValidateUploadDayLimit()
+        {
+            int days = GetValidMaximumAge(tb_UploadDayLimit.Text);
+            tb_UploadDayLimit.Text = days.ToString();
+
+            ExternalDataManager.FreshnessTimeTreshold = new TimeSpan(days, 0, 0, 0);
+        }
+        private void tb_UploadDayLimit_Validating(object sender, CancelEventArgs e)
+        {
+            ValidateUploadDayLimit();
+        }
+        private void tb_UploadDayLimit_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            // tab or enter pressed
+            if (e.KeyChar == (char)13 || e.KeyChar == (char)11)
+            {
+                ValidateUploadDayLimit();
+            }
+        }
+
+        private void ValidateDownloadDayLimit()
+        {
+            int days = GetValidMaximumAge(tb_DownloadDayLimit.Text);
+            tb_DownloadDayLimit.Text = days.ToString();
+        }
+        private void tb_DownloadDayLimit_Validating(object sender, CancelEventArgs e)
+        {
+            ValidateDownloadDayLimit();
+        }
+        private void tb_DownloadDayLimit_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            // tab or enter pressed
+            if (e.KeyChar == (char)13 || e.KeyChar == (char)11)
+            {
+                ValidateDownloadDayLimit();
+            }
         }
     }
 }
