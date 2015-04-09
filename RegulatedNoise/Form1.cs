@@ -5719,88 +5719,6 @@ namespace RegulatedNoise
         }
 
         /// <summary>
-        /// Initializes the external data manager and loads available data sources from the config file
-        /// </summary>
-        private void InitializeExternalData()
-        {
-            ExternalDataManager = new ExternalDataManager();
-
-            UpdateConnectionStatus(string.Empty);
-            btn_DownloadData.Enabled = false;
-            btn_UploadData.Enabled = false;
-
-            // Initialize ExternalDataManager
-            Response res = ExternalDataManager.Initialize();
-            if (!res.IsSuccessStatus)
-            {
-                AppendExternalDataLog(string.Format("Could not load data sources from config file '{0}': {1}", ExternalDataManager.CONFIG_FILE, res.Content));
-                cb_DataSource.Enabled = false;
-                return;
-            }
-
-            // Set data binding for availabe external data sources
-            dataSourceBindingSource.DataSource = ExternalDataManager.DataSources;
-            ExternalDataManager.SelectedDataSource = cb_DataSource.SelectedItem as DataSource;
-        }
-
-        /// <summary>
-        /// Test the connection to the selected data source
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private async void btn_TestDataSourceConnection_Click(object sender, EventArgs e)
-        {
-            if (ExternalDataManager.SelectedDataSource == null)
-            {
-                AppendExternalDataLog("No valid data source selected!");
-                UpdateConnectionStatus("Invalid");
-                return;
-            }
-
-            UpdateConnectionStatus("Connecting");
-            AppendExternalDataLog(string.Format("Testing connection to '{0}' at {1} (authentication type: {2}): ",
-                ExternalDataManager.SelectedDataSource.Name,
-                ExternalDataManager.SelectedDataSource.Url,
-                ExternalDataManager.SelectedDataSource.Authentication.Type),false);
-
-            try
-            {
-                Response res = await ExternalDataManager.GetDataAsync("");
-                AppendExternalDataLog(res.Status);
-                UpdateConnectionStatus(res.Status);
-
-                if (res.IsSuccessStatus)
-                {
-                    btn_DownloadData.Enabled = true;
-                    btn_UploadData.Enabled = true;
-                }
-            }
-            catch (Exception ex)
-            {
-                AppendExternalDataLog(ex.Message);
-                UpdateConnectionStatus("Failed");
-            }
-        }
-
-        /// <summary>
-        /// Selected data source was changed
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void cb_DataSource_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            ExternalDataManager.SelectedDataSource = cb_DataSource.SelectedItem as DataSource;
-
-            btn_DownloadData.Enabled = false;
-            btn_UploadData.Enabled = false;
-            UpdateConnectionStatus(string.Empty);
-            if (ExternalDataManager.SelectedDataSource != null)
-            {
-                AppendExternalDataLog(string.Format("Selected data source '{0}'. Please test connection.", ExternalDataManager.SelectedDataSource.Name));
-            }
-        }
-
-        /// <summary>
         /// gets the reduced selection of station due to lightyear limit and distance to star limit
         /// </summary>
         /// <param name="x"></param>
@@ -6212,8 +6130,9 @@ namespace RegulatedNoise
 
             
         }
-        
-		 /// <summary>
+
+        #region ExternalData
+        /// <summary>
         /// Initializes the external data manager and loads available data sources from the config file
         /// </summary>
         private void InitializeExternalData()
@@ -6226,6 +6145,7 @@ namespace RegulatedNoise
 
             // Initialize ExternalDataManager
             Response res = ExternalDataManager.Initialize();
+
             if (!res.IsSuccessStatus)
             {
                 AppendExternalDataLog(string.Format("Could not load data sources from config file '{0}': {1}", ExternalDataManager.CONFIG_FILE, res.Content));
@@ -6256,7 +6176,7 @@ namespace RegulatedNoise
             AppendExternalDataLog(string.Format("Testing connection to '{0}' at {1} (authentication type: {2}): ",
                 ExternalDataManager.SelectedDataSource.Name,
                 ExternalDataManager.SelectedDataSource.Url,
-                ExternalDataManager.SelectedDataSource.Authentication.Type),false);
+                ExternalDataManager.SelectedDataSource.Authentication.Type), false);
 
             try
             {
@@ -6306,7 +6226,7 @@ namespace RegulatedNoise
             btn_DownloadData.Enabled = false;
             btn_TestDataSourceConnection.Enabled = false;
             UpdateConnectionStatus("Connecting");
-            
+
             try
             {
                 UpdateConnectionStatus("Downloading");
@@ -6314,14 +6234,14 @@ namespace RegulatedNoise
 
                 // set requestPath with ageLimit for request
                 string requestPath = "regulated-noise";
-                if(cb_LimitDownload.Checked)
+                if (cb_LimitDownload.Checked)
                 {
                     int days;
-                    if(!int.TryParse(tb_DownloadDayLimit.Text, out days))
+                    if (!int.TryParse(tb_DownloadDayLimit.Text, out days))
                         days = 5;
 
-                    requestPath = string.Format("{0}/?dayLimit={1}", 
-                        requestPath, 
+                    requestPath = string.Format("{0}/?dayLimit={1}",
+                        requestPath,
                         days);
 
                     AppendExternalDataLog(string.Format(" from the last {0} days", days), false);
@@ -6394,10 +6314,10 @@ namespace RegulatedNoise
             btn_TestDataSourceConnection.Enabled = false;
             UpdateConnectionStatus("Connecting");
             AppendExternalDataLog("Uploading all data", false);
-            if(cb_LimitUpload.Checked) 
+            if (cb_LimitUpload.Checked)
                 AppendExternalDataLog(string.Format(" from the last {0} days", tb_UploadDayLimit.Text), false);
             AppendExternalDataLog("...");
-            
+
             try
             {
                 int entryCount = 0;
@@ -6476,7 +6396,7 @@ namespace RegulatedNoise
                 this.BeginInvoke(new Action<string, bool>(AppendExternalDataLog), new object[] { value, linebreak });
                 return;
             }
-            
+
             if (linebreak)
             {
                 tb_ExternalDataLog.AppendText(string.Format("{0}\n", value));
@@ -6551,6 +6471,6 @@ namespace RegulatedNoise
                 ValidateDownloadDayLimit();
             }
         }
-
+        #endregion
     }
 }

@@ -395,7 +395,6 @@
             this.gb_Log.SuspendLayout();
             this.db_DataSource.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataSourceBindingSource)).BeginInit();
-            this.contextMenuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // openFileDialog1
@@ -576,6 +575,7 @@
             this.tabCtrlMain.Controls.Add(this.tabWebserver);
             this.tabCtrlMain.Controls.Add(this.tabEDDN);
             this.tabCtrlMain.Controls.Add(this.tabSettings);
+            this.tabCtrlMain.Controls.Add(this.tabExternalData);
             this.tabCtrlMain.Location = new System.Drawing.Point(18, 64);
             this.tabCtrlMain.Name = "tabCtrlMain";
             this.tabCtrlMain.SelectedIndex = 0;
@@ -1452,7 +1452,7 @@
             // 
             this.splitContainer1.Panel2.Controls.Add(this.label9);
             this.splitContainer1.Panel2.Controls.Add(this.chart2);
-            this.splitContainer1.Size = new System.Drawing.Size(180, 501);
+            this.splitContainer1.Size = new System.Drawing.Size(178, 501);
             this.splitContainer1.SplitterDistance = 227;
             this.splitContainer1.SplitterWidth = 6;
             this.splitContainer1.TabIndex = 7;
@@ -1479,7 +1479,7 @@
             series1.ChartArea = "ChartArea1";
             series1.Name = "Series1";
             this.chart1.Series.Add(series1);
-            this.chart1.Size = new System.Drawing.Size(175, 225);
+            this.chart1.Size = new System.Drawing.Size(173, 225);
             this.chart1.TabIndex = 5;
             this.chart1.Text = "chart1";
             this.chart1.MouseMove += new System.Windows.Forms.MouseEventHandler(this.chart1_MouseMove);
@@ -1506,7 +1506,7 @@
             series2.ChartArea = "ChartArea1";
             series2.Name = "Series1";
             this.chart2.Series.Add(series2);
-            this.chart2.Size = new System.Drawing.Size(170, 163);
+            this.chart2.Size = new System.Drawing.Size(168, 161);
             this.chart2.TabIndex = 6;
             this.chart2.Text = "chart2";
             this.chart2.MouseMove += new System.Windows.Forms.MouseEventHandler(this.chart1_MouseMove);
@@ -3821,6 +3821,16 @@
             this.groupBox9.PerformLayout();
             this.groupBox11.ResumeLayout(false);
             this.groupBox11.PerformLayout();
+            this.tabExternalData.ResumeLayout(false);
+            this.gb_UploadData.ResumeLayout(false);
+            this.gb_UploadData.PerformLayout();
+            this.gb_DownloadData.ResumeLayout(false);
+            this.gb_DownloadData.PerformLayout();
+            this.gb_Log.ResumeLayout(false);
+            this.gb_Log.PerformLayout();
+            this.db_DataSource.ResumeLayout(false);
+            this.db_DataSource.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dataSourceBindingSource)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
