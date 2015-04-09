@@ -5407,11 +5407,12 @@ namespace RegulatedNoise
             btn_DownloadData.Enabled = false;
             btn_TestDataSourceConnection.Enabled = false;
             UpdateConnectionStatus("Connecting");
-            AppendExternalDataLog(string.Format("Downloading all data from the last {0} days...", tb_DownloadDayLimit.Text));
+            
             try
             {
                 UpdateConnectionStatus("Downloading");
-                
+                AppendExternalDataLog("Downloading all data", false);
+
                 // set requestPath with ageLimit for request
                 string requestPath = "regulated-noise";
                 if(cb_LimitDownload.Checked)
@@ -5420,11 +5421,15 @@ namespace RegulatedNoise
                     if(!int.TryParse(tb_DownloadDayLimit.Text, out days))
                         days = 5;
 
-                    requestPath = string.Format("{0}/?dayLimit={1}", requestPath, days);
+                    requestPath = string.Format("{0}/?dayLimit={1}", 
+                        requestPath, 
+                        days);
+
+                    AppendExternalDataLog(string.Format(" from the last {0} days", days), false);
                 }
+                AppendExternalDataLog("...");
 
                 Response res = await ExternalDataManager.GetDataAsync(requestPath);
-                UpdateConnectionStatus("Importing");
 
                 if (res.IsSuccessStatus && res.Content.Length == 0)
                 {
@@ -5433,6 +5438,10 @@ namespace RegulatedNoise
                 }
                 else if (res.IsSuccessStatus)
                 {
+                    UpdateConnectionStatus("Importing");
+                    AppendExternalDataLog("Done downloading. Importing market entries...");
+                    int entryCount = 0;
+
                     foreach (var json in JArray.Parse(res.Content))
                     {
                         // Build and import csvRow entry           
@@ -5449,17 +5458,18 @@ namespace RegulatedNoise
                             json["updatedAt"],
                             ExternalDataManager.SelectedDataSource.Name);
 
+                        entryCount++;
+
                         if (cb_VerboseLogging.Checked)
                         {
-                            AppendExternalDataLog(string.Format("Importing: {0} ", csvRow), false);
-                            AppendExternalDataLog(res.Status);
+                            AppendExternalDataLog(string.Format("Importing: {0} ", csvRow));
                         }
 
                         ImportCsvString(csvRow);
                     }
+                    AppendExternalDataLog(string.Format("Done importing. Imported {0} entries.", entryCount));
                 }
                 UpdateConnectionStatus("Done");
-                AppendExternalDataLog("Done downloading.");
                 // Update listings (hack)
                 cbStation_SelectedIndexChanged(cmbStation, null);
             }
@@ -5484,9 +5494,16 @@ namespace RegulatedNoise
             btn_DownloadData.Enabled = false;
             btn_TestDataSourceConnection.Enabled = false;
             UpdateConnectionStatus("Connecting");
-            AppendExternalDataLog(string.Format("Uploading all data from the last {0} days...", tb_UploadDayLimit.Text));
+            AppendExternalDataLog("Uploading all data", false);
+            if(cb_LimitUpload.Checked) 
+                AppendExternalDataLog(string.Format(" from the last {0} days", tb_UploadDayLimit.Text), false);
+            AppendExternalDataLog("...");
+            
             try
             {
+                int entryCount = 0;
+                int storedCount = 0;
+
                 foreach (var station in StationDirectory)
                 {
                     foreach (var commodity in station.Value)
@@ -5509,6 +5526,8 @@ namespace RegulatedNoise
                             if (commodity.SupplyLevel.Length > 0) json.Add("supplyLevel", commodity.SupplyLevel);
                             json.Add("updatedAt", commodity.SampleDate);
 
+                            entryCount++;
+
                             // Post json
                             Response res = await ExternalDataManager.PostDataAsync("regulated-noise", json.ToString());
                             if (cb_VerboseLogging.Checked)
@@ -5521,6 +5540,7 @@ namespace RegulatedNoise
                                 else
                                 {
                                     AppendExternalDataLog(res.Status);
+                                    storedCount++;
                                 }
                             }
                             UpdateConnectionStatus(res.Status);
@@ -5528,7 +5548,7 @@ namespace RegulatedNoise
                     }
                 }
                 UpdateConnectionStatus("Done");
-                AppendExternalDataLog("Done uploading.");
+                AppendExternalDataLog(string.Format("Done uploading. Uploaded {0} entries. Saved {1} entries.", entryCount, storedCount));
             }
             catch (Exception ex)
             {
@@ -5544,7 +5564,7 @@ namespace RegulatedNoise
         {
             if (InvokeRequired)
             {
-                this.Invoke(new Action<string>(UpdateConnectionStatus), new object[] { value });
+                this.BeginInvoke(new Action<string>(UpdateConnectionStatus), new object[] { value });
                 return;
             }
             tb_ConnectionStatus.Text = value;
@@ -5554,7 +5574,7 @@ namespace RegulatedNoise
         {
             if (InvokeRequired)
             {
-                this.Invoke(new Action<string, bool>(AppendExternalDataLog), new object[] { value, linebreak });
+                this.BeginInvoke(new Action<string, bool>(AppendExternalDataLog), new object[] { value, linebreak });
                 return;
             }
             

@@ -30,10 +30,10 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea3 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Series series3 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea4 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Series series4 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.rbSortByDistance = new System.Windows.Forms.RadioButton();
@@ -1018,7 +1018,7 @@
             // 
             this.splitContainer1.Panel2.Controls.Add(this.label9);
             this.splitContainer1.Panel2.Controls.Add(this.chart2);
-            this.splitContainer1.Size = new System.Drawing.Size(126, 521);
+            this.splitContainer1.Size = new System.Drawing.Size(124, 521);
             this.splitContainer1.SplitterDistance = 237;
             this.splitContainer1.SplitterWidth = 6;
             this.splitContainer1.TabIndex = 7;
@@ -1038,14 +1038,14 @@
             this.chart1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            chartArea3.Name = "ChartArea1";
-            this.chart1.ChartAreas.Add(chartArea3);
+            chartArea1.Name = "ChartArea1";
+            this.chart1.ChartAreas.Add(chartArea1);
             this.chart1.Location = new System.Drawing.Point(0, -1);
             this.chart1.Name = "chart1";
-            series3.ChartArea = "ChartArea1";
-            series3.Name = "Series1";
-            this.chart1.Series.Add(series3);
-            this.chart1.Size = new System.Drawing.Size(121, 235);
+            series1.ChartArea = "ChartArea1";
+            series1.Name = "Series1";
+            this.chart1.Series.Add(series1);
+            this.chart1.Size = new System.Drawing.Size(119, 235);
             this.chart1.TabIndex = 5;
             this.chart1.Text = "chart1";
             this.chart1.MouseMove += new System.Windows.Forms.MouseEventHandler(this.chart1_MouseMove);
@@ -1065,14 +1065,14 @@
             this.chart2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            chartArea4.Name = "ChartArea1";
-            this.chart2.ChartAreas.Add(chartArea4);
+            chartArea2.Name = "ChartArea1";
+            this.chart2.ChartAreas.Add(chartArea2);
             this.chart2.Location = new System.Drawing.Point(3, 18);
             this.chart2.Name = "chart2";
-            series4.ChartArea = "ChartArea1";
-            series4.Name = "Series1";
-            this.chart2.Series.Add(series4);
-            this.chart2.Size = new System.Drawing.Size(116, 177);
+            series2.ChartArea = "ChartArea1";
+            series2.Name = "Series1";
+            this.chart2.Series.Add(series2);
+            this.chart2.Size = new System.Drawing.Size(114, 175);
             this.chart2.TabIndex = 6;
             this.chart2.Text = "chart2";
             this.chart2.MouseMove += new System.Windows.Forms.MouseEventHandler(this.chart1_MouseMove);
@@ -3013,12 +3013,16 @@
             // 
             // gb_UploadData
             // 
+            this.gb_UploadData.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
             this.gb_UploadData.Controls.Add(this.tb_UploadDayLimit);
             this.gb_UploadData.Controls.Add(this.cb_LimitUpload);
             this.gb_UploadData.Controls.Add(this.btn_UploadData);
-            this.gb_UploadData.Location = new System.Drawing.Point(6, 223);
+            this.gb_UploadData.Location = new System.Drawing.Point(6, 208);
+            this.gb_UploadData.MaximumSize = new System.Drawing.Size(240, 80);
+            this.gb_UploadData.MinimumSize = new System.Drawing.Size(240, 80);
             this.gb_UploadData.Name = "gb_UploadData";
-            this.gb_UploadData.Size = new System.Drawing.Size(240, 74);
+            this.gb_UploadData.Size = new System.Drawing.Size(240, 80);
             this.gb_UploadData.TabIndex = 3;
             this.gb_UploadData.TabStop = false;
             this.gb_UploadData.Text = "Upload";
@@ -3029,7 +3033,7 @@
             this.tb_UploadDayLimit.MaxLength = 2;
             this.tb_UploadDayLimit.Name = "tb_UploadDayLimit";
             this.tb_UploadDayLimit.Size = new System.Drawing.Size(18, 20);
-            this.tb_UploadDayLimit.TabIndex = 1;
+            this.tb_UploadDayLimit.TabIndex = 9;
             this.tb_UploadDayLimit.Text = "5";
             this.tb_UploadDayLimit.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.tb_UploadDayLimit.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.tb_UploadDayLimit_KeyPress);
@@ -3043,28 +3047,32 @@
             this.cb_LimitUpload.Location = new System.Drawing.Point(10, 20);
             this.cb_LimitUpload.Name = "cb_LimitUpload";
             this.cb_LimitUpload.Size = new System.Drawing.Size(191, 17);
-            this.cb_LimitUpload.TabIndex = 5;
+            this.cb_LimitUpload.TabIndex = 8;
             this.cb_LimitUpload.Text = "Only upload data from last       days";
             this.cb_LimitUpload.UseVisualStyleBackColor = true;
             // 
             // btn_UploadData
             // 
-            this.btn_UploadData.Location = new System.Drawing.Point(124, 45);
+            this.btn_UploadData.Location = new System.Drawing.Point(124, 51);
             this.btn_UploadData.Name = "btn_UploadData";
             this.btn_UploadData.Size = new System.Drawing.Size(110, 23);
-            this.btn_UploadData.TabIndex = 4;
+            this.btn_UploadData.TabIndex = 10;
             this.btn_UploadData.Text = "Upload Data";
             this.btn_UploadData.UseVisualStyleBackColor = true;
             this.btn_UploadData.Click += new System.EventHandler(this.btn_UploadData_Click);
             // 
             // gb_DownloadData
             // 
+            this.gb_DownloadData.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
             this.gb_DownloadData.Controls.Add(this.tb_DownloadDayLimit);
             this.gb_DownloadData.Controls.Add(this.cb_LimitDownload);
             this.gb_DownloadData.Controls.Add(this.btn_DownloadData);
             this.gb_DownloadData.Location = new System.Drawing.Point(6, 122);
+            this.gb_DownloadData.MaximumSize = new System.Drawing.Size(240, 80);
+            this.gb_DownloadData.MinimumSize = new System.Drawing.Size(240, 80);
             this.gb_DownloadData.Name = "gb_DownloadData";
-            this.gb_DownloadData.Size = new System.Drawing.Size(240, 83);
+            this.gb_DownloadData.Size = new System.Drawing.Size(240, 80);
             this.gb_DownloadData.TabIndex = 2;
             this.gb_DownloadData.TabStop = false;
             this.gb_DownloadData.Text = "Download";
@@ -3089,16 +3097,16 @@
             this.cb_LimitDownload.Location = new System.Drawing.Point(10, 19);
             this.cb_LimitDownload.Name = "cb_LimitDownload";
             this.cb_LimitDownload.Size = new System.Drawing.Size(205, 17);
-            this.cb_LimitDownload.TabIndex = 6;
+            this.cb_LimitDownload.TabIndex = 5;
             this.cb_LimitDownload.Text = "Only download data from last       days";
             this.cb_LimitDownload.UseVisualStyleBackColor = true;
             // 
             // btn_DownloadData
             // 
-            this.btn_DownloadData.Location = new System.Drawing.Point(122, 54);
+            this.btn_DownloadData.Location = new System.Drawing.Point(124, 51);
             this.btn_DownloadData.Name = "btn_DownloadData";
             this.btn_DownloadData.Size = new System.Drawing.Size(110, 23);
-            this.btn_DownloadData.TabIndex = 6;
+            this.btn_DownloadData.TabIndex = 7;
             this.btn_DownloadData.Text = "Download Data";
             this.btn_DownloadData.UseVisualStyleBackColor = true;
             this.btn_DownloadData.Click += new System.EventHandler(this.btn_DownloadData_Click);
@@ -3154,7 +3162,8 @@
             this.tb_ConnectionStatus.Name = "tb_ConnectionStatus";
             this.tb_ConnectionStatus.ReadOnly = true;
             this.tb_ConnectionStatus.Size = new System.Drawing.Size(100, 20);
-            this.tb_ConnectionStatus.TabIndex = 1;
+            this.tb_ConnectionStatus.TabIndex = 42;
+            this.tb_ConnectionStatus.TabStop = false;
             this.tb_ConnectionStatus.Text = "Status";
             this.tb_ConnectionStatus.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
