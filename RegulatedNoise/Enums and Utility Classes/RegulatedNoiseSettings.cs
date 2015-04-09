@@ -29,6 +29,28 @@ namespace RegulatedNoise
         public FormWindowState State;
     }
 
+    [Serializable]
+    public class ColumnData
+    {
+        public ColumnData()
+        { 
+            ColumnName          = "";
+            Width               = -1;
+            Visible             = true;
+        }
+
+        public ColumnData(string Name)
+        {
+            ColumnName          = Name;
+            Width               = -1;
+            Visible             = true;
+        }
+
+        public string ColumnName;
+        public Int32 Width;
+        public Boolean Visible;
+    }
+
 
     [Serializable]
     public class RegulatedNoiseSettings
@@ -37,7 +59,7 @@ namespace RegulatedNoise
 
 #if DukeJones
 
-        public readonly decimal VersionDJ = 0.12m;
+        public readonly decimal VersionDJ = 0.14m;
 #endif
         private int _isFirstRun = -1;
 
@@ -72,13 +94,18 @@ namespace RegulatedNoise
         public bool lastStationCountActive                              = false;
         public bool limitLightYears                                     = false;
         public int lastLightYears                                       = 25;
+        public bool StationToStar                                       = false;
+        public int lastStationToStar                                    = 500;
         public int CBSortingSelection                                   = 1;
+        public bool MaxRouteDistance                                     = false;
+        public int lastMaxRouteDistance                                  = 20;
         public bool PerLightYearRoundTrip                               = false;
         public decimal lastVersion                                      = 0.00m;
         public decimal lastVersionDJ                                    = 0.00m;
         public int GUIColorCutoffLevel                                  = 150;
         public bool AutoActivateOCRTab                                  = true;
         public string PilotsName                                        = String.Empty;
+        public bool IncludeUnknownDTS                                   = false;
 
         public SerializableDictionary<string, WindowData> WindowBaseData = new SerializableDictionary<string, WindowData>() { 
                                                                                                                   {"Form1",                 new WindowData()},
@@ -90,7 +117,25 @@ namespace RegulatedNoise
                                                                                                                   {"FilterTest",            new WindowData()},
                                                                                                                   {"HelpOCR",               new WindowData()},
                                                                                                                   {"HelpCommodities",       new WindowData()},
-                                                                                                                  {"EBPixeltest",           new WindowData()}
+                                                                                                                  {"EBPixeltest",           new WindowData()},
+                                                                                                                  {"ProgressView",          new WindowData()}
+                                                                                                                };
+
+        public SerializableDictionary<string, List<ColumnData>> ListViewColumnData = new SerializableDictionary<string, List<ColumnData>>() { 
+                                                                                                                  {"lvCommandersLog",       new List<ColumnData>() { 
+                                                                                                                                                     new ColumnData("EventDate"), 
+                                                                                                                                                     new ColumnData("EventType"), 
+                                                                                                                                                     new ColumnData("Station"), 
+                                                                                                                                                     new ColumnData("System"), 
+                                                                                                                                                     new ColumnData("Cargo"), 
+                                                                                                                                                     new ColumnData("CargoAction"), 
+                                                                                                                                                     new ColumnData("CargoVolume"), 
+                                                                                                                                                     new ColumnData("Notes"), 
+                                                                                                                                                     new ColumnData("EventID"), 
+                                                                                                                                                     new ColumnData("TransactionAmount"), 
+                                                                                                                                                     new ColumnData("Credits") }},
+                                                                                                                  {"lvAllComms",            new List<ColumnData>() { new ColumnData("") }},
+                                                                                                                  {"lbPrices",              new List<ColumnData>() { new ColumnData("") }}
                                                                                                                 };
 
         public void CheckVersion()

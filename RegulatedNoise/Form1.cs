@@ -38,6 +38,10 @@ namespace RegulatedNoise
 
         const string ID_DELIMITER = "empty";
         const int MAX_NAME_LENGTH = 120;
+        const long SEARCH_MAXLENGTH = 160;
+        const long SEARCH_MINLENGTH = 5;
+
+        const string ID_NEWITEM = "<NEW>";
 
         private delegate void delButtonInvoker(Button myButton, bool enable);
         private delegate void delCheckboxInvoker(CheckBox myCheckbox, bool setChecked);
@@ -76,17 +80,26 @@ namespace RegulatedNoise
         // Added external data sources for EIC edition
         public ExternalDataManager ExternalDataManager;
 
-        private BindingSource _bs_Stations = new BindingSource();
-        private BindingSource _bs_StationsFrom = new BindingSource();
-        private BindingSource _bs_StationsTo = new BindingSource();
-        private Dictionary<string, int> _StationIndices = new Dictionary<string, int>();
-        private bool _InitDone = false;
-        private StationHistory _StationHistory = new StationHistory();
-        //bool _cbIncludeWithinRegionOfStation_IndexChanged               = false;
+        private BindingSource _bs_Stations                              = new BindingSource();
+        private BindingSource _bs_StationsFrom                          = new BindingSource();
+        private BindingSource _bs_StationsTo                            = new BindingSource();
+        private Dictionary<string, int> _StationIndices                 = new Dictionary<string,int>();
+        private bool _InitDone                                          = false;
+        private StationHistory _StationHistory                          = new StationHistory();
+        //bool _cbIncludeWithinRegionOfStation_IndexChanged             = false;
 
         private String m_lastestStationInfo = String.Empty;
         private System.Windows.Forms.Timer Clock;
         private CommandersLogEvent m_RightMouseSelectedLogEvent = null;
+        private bool m_Closing = false;
+        private AutoResetEvent m_LogfileScanner_ARE                     = new AutoResetEvent(false);
+        private Thread m_LogfileScanner_Thread;
+        private EDSystem m_loadedSystemdata                             = null;
+        private EDSystem m_currentSystemdata                            = new EDSystem();
+        private string m_lastSystemValue                                = String.Empty;
+        private Boolean m_SystemLoadingValues                           = false;
+        private Boolean m_SystemIsNew                                   = false;
+        private DateTime m_SystemWarningTime                            = DateTime.Now;
 
         [SecurityPermission(SecurityAction.Demand, ControlAppDomain = true)]
         public Form1()
@@ -160,7 +173,7 @@ namespace RegulatedNoise
                 OcrCalibratorTabPage.Name = "OCR_Calibration";
                 var oct = new OcrCalibratorTab { Dock = DockStyle.Fill };
                 OcrCalibratorTabPage.Controls.Add(oct);
-                tabControl3.Controls.Add(OcrCalibratorTabPage);
+                tabCtrlOCR.Controls.Add(OcrCalibratorTabPage);
 
                 _logger.Log("  - initialised Ocr Calibrator");
 
@@ -212,7 +225,7 @@ namespace RegulatedNoise
                     var testtab = new TabPage("MRmP Test Tab");
                     var testtb = new MRmPTestTab.MRmPTestTab { Dock = DockStyle.Fill };
                     testtab.Controls.Add(testtb);
-                    tabControl1.Controls.Add(testtab);
+                    tabCtrlMain.Controls.Add(testtab);
                 }
 
                 var edl = new EdLogWatcher();
@@ -231,8 +244,8 @@ namespace RegulatedNoise
                 _commodities.ReadXml(".//Data//Commodities.xml");
 
                 // depending of the language this will be removed
-                _EDDNTabPageIndex = tabControl1.TabPages.IndexOfKey("tabEDDN");
-                _EDDNTabPage = tabControl1.TabPages[_EDDNTabPageIndex];
+                _EDDNTabPageIndex = tabCtrlMain.TabPages.IndexOfKey("tabEDDN");
+                _EDDNTabPage = tabCtrlMain.TabPages[_EDDNTabPageIndex];
 
                 // set language
                 setLanguageCombobox();
@@ -244,6 +257,8 @@ namespace RegulatedNoise
                 setOCRCalibrationTabVisibility();
 
                 loadToolTips();
+
+                prePrepareSystemFields();
 
                 SetupGui(true);
 
@@ -329,8 +344,52 @@ namespace RegulatedNoise
             }
             catch (Exception ex)
             {
-                throw new Exception("Error while reading system and station data", ex);
+                throw new Exception("Error while reading system and station data", ex);   
             }
+        }
+
+        private void setColumns(ListView currentListView)
+        {
+            List<ColumnData> currentData = RegulatedNoiseSettings.ListViewColumnData[currentListView.Name];
+
+            switch (currentListView.Name)
+            {
+                case "lvCommandersLog":
+                    currentListView.Columns[0].Width 	=  113;
+                    currentListView.Columns[1].Width 	=  119;
+                    currentListView.Columns[2].Width 	=  122;
+                    currentListView.Columns[3].Width 	=  141;
+                    currentListView.Columns[4].Width 	=   96;
+                    currentListView.Columns[5].Width 	=   72;
+                    currentListView.Columns[6].Width 	=   77;
+                    currentListView.Columns[7].Width 	=  127;
+                    currentListView.Columns[8].Width 	=   60;
+                    currentListView.Columns[9].Width 	=   63;
+                    currentListView.Columns[10].Width 	=   60;
+                    break;
+            }
+
+            foreach (ColumnHeader currentHeader in currentListView.Columns)
+            {
+                ColumnData Data = currentData.Find(x => x.ColumnName.Equals(currentHeader.Name, StringComparison.InvariantCultureIgnoreCase));
+                if (Data.Width > -1)
+                    currentHeader.Width = Data.Width;
+            }
+
+            currentListView.ColumnWidthChanged += lvCommandersLog_ColumnWidthChanged;
+        }
+
+        private void saveColumns(ListView currentListView)
+        {
+            List<ColumnData> currentData = RegulatedNoiseSettings.ListViewColumnData[currentListView.Name];
+
+            foreach (ColumnHeader currentHeader in currentListView.Columns)
+            {
+                ColumnData Data = currentData.Find(x => x.ColumnName.Equals(currentHeader.Name, StringComparison.InvariantCultureIgnoreCase));
+                Data.Width = currentHeader.Width;
+            }
+
+            SaveSettings();
         }
 
         private void SetListViewColumnsAndSorters()
@@ -381,12 +440,8 @@ namespace RegulatedNoise
                     lvCommandersLog.Columns.Add(c);
                 }
             }
-            lvCommandersLog.Columns[0].Width = 130;
-            lvCommandersLog.Columns[1].Width = 130;
-            lvCommandersLog.Columns[2].Width = 150;
-            lvCommandersLog.Columns[3].Width = 150;
-            lvCommandersLog.Columns[4].Width = 80;
-            lvCommandersLog.Columns[5].Width = 80;
+
+            setColumns(lvCommandersLog);
 
             // Create an instance of a ListView column sorter and assign it 
             // to the ListView control.
@@ -424,7 +479,7 @@ namespace RegulatedNoise
 
             string returnValue = null;
             foreach (var directory in autoSearchdir)
-            {
+            { 
                 if (directory == null) continue;
                 foreach (var dir in Directory.GetDirectories(directory))
                 {
@@ -436,7 +491,7 @@ namespace RegulatedNoise
             }
             if (returnValue != null) return returnValue;
 
-            if (Directory.Exists(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\Frontier_Developments\Products\"))
+            if(Directory.Exists(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\Frontier_Developments\Products\"))
                 return Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\Frontier_Developments\Products\";
 
             // nothing found ? then lets have a try with the MUICache
@@ -672,12 +727,19 @@ namespace RegulatedNoise
             // perform the sort with the last sort options.
             this.lvCommandersLog.Sort();
 
-            txtlastStationCount.Text = RegulatedNoiseSettings.lastStationCount.ToString();
-            cbLightYears.Text = RegulatedNoiseSettings.lastLightYears.ToString();
-            cblastVisitedFirst.Checked = RegulatedNoiseSettings.lastStationCountActive;
-            cbLimitLightYears.Checked = RegulatedNoiseSettings.limitLightYears;
-            cbPerLightYearRoundTrip.Checked = RegulatedNoiseSettings.PerLightYearRoundTrip;
-            cbAutoActivateOCRTab.Checked = RegulatedNoiseSettings.AutoActivateOCRTab;
+            txtlastStationCount.Text                = RegulatedNoiseSettings.lastStationCount.ToString();
+            cmbLightYears.Text                      = RegulatedNoiseSettings.lastLightYears.ToString();
+            cblastVisitedFirst.Checked              = RegulatedNoiseSettings.lastStationCountActive;
+            cbLimitLightYears.Checked               = RegulatedNoiseSettings.limitLightYears;
+            cbPerLightYearRoundTrip.Checked         = RegulatedNoiseSettings.PerLightYearRoundTrip;
+            cbAutoActivateOCRTab.Checked            = RegulatedNoiseSettings.AutoActivateOCRTab;
+            cbIncludeUnknownDTS.Checked             = RegulatedNoiseSettings.IncludeUnknownDTS;
+
+            cmbStationToStar.Text                   = RegulatedNoiseSettings.lastStationToStar.ToString();
+            cbStationToStar.Checked                 = RegulatedNoiseSettings.StationToStar;
+
+            cmbMaxRouteDistance.Text                = RegulatedNoiseSettings.lastMaxRouteDistance.ToString();
+            cbMaxRouteDistance.Checked              = RegulatedNoiseSettings.MaxRouteDistance;
 
             switch (RegulatedNoiseSettings.CBSortingSelection)
             {
@@ -863,7 +925,8 @@ namespace RegulatedNoise
             if (cbAutoActivateOCRTab.Checked && !cbCheckAOne.Checked)
                 try
                 {
-                    tabControl1.SelectedTab = tabControl1.TabPages["tabOCRGroup"];
+                    tabCtrlMain.SelectedTab = tabCtrlMain.TabPages["tabOCRGroup"];
+                    tabCtrlOCR.SelectedTab  = tabCtrlOCR.TabPages["tabOCR"];
                 }
                 catch (Exception)
                 {
@@ -902,6 +965,9 @@ namespace RegulatedNoise
 
         void Application_ApplicationExit(object sender, EventArgs e)
         {
+            m_Closing = true;
+            m_LogfileScanner_ARE.Set();
+
             if (stateTimer != null) stateTimer.Dispose();
             if (_eddnSubscriberThread != null) _eddnSubscriberThread.Abort();
 
@@ -972,7 +1038,7 @@ namespace RegulatedNoise
                             DemandLevel + ";" +
                             (Supply != 0 ? Supply.ToString(CultureInfo.InvariantCulture) : "") + ";" +
                             SupplyLevel + ";" +
-                            SampleDate.ToString("s").Substring(0, 16) + ";" +
+                            SampleDate.ToString("s", CultureInfo.CurrentCulture).Substring(0, 16) + ";" +
                             SourceFileName;
             }
         }
@@ -1040,7 +1106,7 @@ namespace RegulatedNoise
                             commodity.DemandLevel,
                             commodity.Supply != 0 ? commodity.Supply.ToString(CultureInfo.InvariantCulture) : "",
                             commodity.SupplyLevel,
-                            commodity.SampleDate.ToString("s").Substring(0, 16),
+                            commodity.SampleDate.ToString("s", CultureInfo.CurrentCulture).Substring(0, 16),
                             cbExtendedInfoInCSV.Checked ? commodity.SourceFileName : ""
                         });
 
@@ -1214,13 +1280,43 @@ namespace RegulatedNoise
             {
                 double dist;
 
-                if (cbLightYears.Text == "")
+                if (cmbLightYears.Text == "")
                     return false;
 
                 dist = DistanceInLightYears(remoteSystemName);
 
-                var limit = float.Parse(cbLightYears.Text);
+                var limit = float.Parse(cmbLightYears.Text);
                 if (dist < limit)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        private bool StationDistance(string SystemName, string StationName)
+        {
+            try
+            {
+                int? dist;
+
+                if (cmbStationToStar.Text == "")
+                    return false;
+
+                dist = _Milkyway.getStationDistance(SystemName, StationName);
+
+                if((!RegulatedNoiseSettings.IncludeUnknownDTS) && (dist == -1))
+                    return false;
+
+                var limit = int.Parse(cmbStationToStar.Text);
+                if ((dist == null) || (dist < limit))
                 {
                     return true;
                 }
@@ -1521,8 +1617,7 @@ namespace RegulatedNoise
             List<KeyValuePair<string, List<CsvRow>>> SelectionPreordered;
 
             // get the relevant stations
-            SelectionRaw = StationDirectory.Where(x => !cbLimitLightYears.Checked ||
-                                                        Distance(CombinedNameToSystemName(x.Key))).ToList();
+            SelectionRaw = StationDirectory.Where(x => getStationSelection(x)).ToList();
 
             if (rbSortBySystem.Checked)
             {
@@ -1804,7 +1899,7 @@ namespace RegulatedNoise
                             bestBuy, 
                             bestSell,
                             bestSell!= "" && bestBuy != "" ? (bestSellPrice-bestBuyPrice).ToString(CultureInfo.InvariantCulture) : "",
-                            row.SampleDate.ToString(CultureInfo.InvariantCulture) ,
+                            row.SampleDate.ToString(CultureInfo.CurrentCulture) ,
                             row.SourceFileName
                         });
                         newItem.UseItemStyleForSubItems = false;
@@ -1852,7 +1947,7 @@ namespace RegulatedNoise
             bestSell = "";
 
 
-            var l = CommodityDirectory[commodityName].Where(x => x.Supply != 0 && x.BuyPrice != 0).Where(x => !cbLimitLightYears.Checked || Distance(CombinedNameToSystemName(x.SystemName))).ToList();
+            var l = CommodityDirectory[commodityName].Where(x => x.Supply != 0 && x.BuyPrice != 0).Where(x => getStationSelection(x)).ToList();
             buyers = l.Count();
 
             if (l.Count() != 0)
@@ -1862,7 +1957,7 @@ namespace RegulatedNoise
                 bestBuy = string.Join(" ", l.Where(x => x.BuyPrice == bestBuyPriceCopy).Select(x => x.StationID + " (" + x.BuyPrice + ")"));
             }
 
-            var m = CommodityDirectory[commodityName].Where(x => x.SellPrice != 0 && x.Demand != 0).Where(x => !cbLimitLightYears.Checked || Distance(CombinedNameToSystemName(x.SystemName))).ToList();
+            var m = CommodityDirectory[commodityName].Where(x => x.SellPrice != 0 && x.Demand != 0).Where(x => getStationSelection(x)).ToList();
             sellers = m.Count();
             if (m.Count() != 0)
             {
@@ -1987,8 +2082,8 @@ namespace RegulatedNoise
             lbCommodities.Items.Clear();
 
             if (selectedCmbItem != null)
-            {
-                foreach (var row in CommodityDirectory[(selectedCmbItem.ToString())].Where(x => !cbLimitLightYears.Checked || Distance(CombinedNameToSystemName(x.SystemName))))
+            { 
+                foreach (var row in CommodityDirectory[(selectedCmbItem.ToString())].Where(x => getStationSelection(x)))
                 {
                     lbCommodities.Items.Add(new ListViewItem(new[] 
                     {   row.StationID,
@@ -1998,11 +2093,11 @@ namespace RegulatedNoise
                         row.DemandLevel,
                         row.Supply.ToString(CultureInfo.InvariantCulture) != "0" ? row.Supply.ToString(CultureInfo.InvariantCulture) : "",
                         row.SupplyLevel,
-                        row.SampleDate.ToString(CultureInfo.InvariantCulture) 
+                        row.SampleDate.ToString(CultureInfo.CurrentCulture) 
                     }));
                 }
 
-                var l = CommodityDirectory[(selectedCmbItem.ToString())].Where(x => x.BuyPrice != 0 && x.Supply > 0).Where(x => !cbLimitLightYears.Checked || Distance(CombinedNameToSystemName(x.SystemName))).ToList();
+                var l = CommodityDirectory[(selectedCmbItem.ToString())].Where(x => x.BuyPrice != 0 && x.Supply > 0).Where(x => getStationSelection(x)).ToList();
                 if (l.Count() > 0)
                 {
                     lblMin.Text = l.Min(x => x.BuyPrice).ToString(CultureInfo.InvariantCulture);
@@ -2016,7 +2111,7 @@ namespace RegulatedNoise
                     lblAvg.Text = "N/A";
                 }
 
-                l = CommodityDirectory[(selectedCmbItem.ToString())].Where(x => x.SellPrice != 0 && x.Demand > 0).Where(x => !cbLimitLightYears.Checked || Distance(CombinedNameToSystemName(x.SystemName))).ToList();
+                l = CommodityDirectory[(selectedCmbItem.ToString())].Where(x => x.SellPrice != 0 && x.Demand > 0).Where(x => getStationSelection(x)).ToList();
                 if (l.Count() > 0)
                 {
                     lblMinSell.Text = l.Min(x => x.SellPrice).ToString(CultureInfo.InvariantCulture);
@@ -2045,7 +2140,7 @@ namespace RegulatedNoise
         {
             if (lblMin.Text != "N/A")
             {
-                var l = CommodityDirectory[cbCommodity.SelectedItem.ToString()].Where(x => x.BuyPrice != 0).Where(x => !cbLimitLightYears.Checked || Distance(CombinedNameToSystemName(x.SystemName))).ToList();
+                var l = CommodityDirectory[cbCommodity.SelectedItem.ToString()].Where(x => x.BuyPrice != 0).Where(x => getStationSelection(x)).ToList();
                 var m = l.Where(x => x.BuyPrice == l.Min(y => y.BuyPrice));
                 MessageBox.Show(string.Join(", ", m.Select(x => x.StationID)));
             }
@@ -2055,7 +2150,7 @@ namespace RegulatedNoise
         {
             if (lblMinSell.Text != "N/A")
             {
-                var l = CommodityDirectory[cbCommodity.SelectedItem.ToString()].Where(x => x.SellPrice != 0).Where(x => !cbLimitLightYears.Checked || Distance(CombinedNameToSystemName(x.SystemName))).ToList();
+                var l = CommodityDirectory[cbCommodity.SelectedItem.ToString()].Where(x => x.SellPrice != 0).Where(x => getStationSelection(x)).ToList();
                 var m = l.Where(x => x.SellPrice == l.Min(y => y.SellPrice));
                 MessageBox.Show(string.Join(", ", m.Select(x => x.StationID)));
             }
@@ -2065,7 +2160,7 @@ namespace RegulatedNoise
         {
             if (lblMax.Text != "N/A")
             {
-                var l = CommodityDirectory[cbCommodity.SelectedItem.ToString()].Where(x => x.BuyPrice != 0).Where(x => !cbLimitLightYears.Checked || Distance(CombinedNameToSystemName(x.SystemName))).ToList();
+                var l = CommodityDirectory[cbCommodity.SelectedItem.ToString()].Where(x => x.BuyPrice != 0).Where(x => getStationSelection(x)).ToList();
                 var m = l.Where(x => x.BuyPrice == l.Max(y => y.BuyPrice));
                 MessageBox.Show(string.Join(", ", m.Select(x => x.StationID)));
             }
@@ -2075,7 +2170,7 @@ namespace RegulatedNoise
         {
             if (lblMaxSell.Text != "N/A")
             {
-                var l = CommodityDirectory[cbCommodity.SelectedItem.ToString()].Where(x => x.SellPrice != 0).Where(x => !cbLimitLightYears.Checked || Distance(CombinedNameToSystemName(x.SystemName))).ToList();
+                var l = CommodityDirectory[cbCommodity.SelectedItem.ToString()].Where(x => x.SellPrice != 0).Where(x => getStationSelection(x)).ToList();
                 var m = l.Where(x => x.SellPrice == l.Max(y => y.SellPrice));
                 MessageBox.Show(string.Join(", ", m.Select(x => x.StationID)));
             }
@@ -2106,7 +2201,7 @@ namespace RegulatedNoise
 
             chart1.Series.Add(series1);
 
-            foreach (var price in CommodityDirectory[senderName].Where(x => x.BuyPrice != 0 && x.Supply != 0).Where(x => !cbLimitLightYears.Checked || Distance(CombinedNameToSystemName(x.SystemName))).OrderBy(x => x.BuyPrice))
+            foreach (var price in CommodityDirectory[senderName].Where(x => x.BuyPrice != 0 && x.Supply != 0).Where(x => getStationSelection(x)).OrderBy(x => x.BuyPrice))
             {
                 series1.Points.AddXY(price.StationID, price.BuyPrice);
             }
@@ -2128,7 +2223,7 @@ namespace RegulatedNoise
 
             chart2.Series.Add(series2);
 
-            foreach (var price in CommodityDirectory[senderName].Where(x => x.SellPrice != 0 && x.Demand != 0).Where(x => !cbLimitLightYears.Checked || Distance(CombinedNameToSystemName(x.SystemName))).OrderByDescending(x => x.SellPrice))
+            foreach (var price in CommodityDirectory[senderName].Where(x => x.SellPrice != 0 && x.Demand != 0).Where(x => getStationSelection(x)).OrderByDescending(x => x.SellPrice))
             {
                 series2.Points.AddXY(price.StationID, price.SellPrice);
             }
@@ -3061,9 +3156,6 @@ namespace RegulatedNoise
                 case AppDelegateType.AddEventToLog:
                     CommandersLog.CreateEvent((CommandersLogEvent)o);
                     break;
-                case AppDelegateType.UpdateSystemNameLiveFromLog:
-                    UpdateSystemNameFromLogFile(false);
-                    break;
                 case AppDelegateType.ChangeGridSort:
                     ChangeGridSort((string)o);
                     break;
@@ -3836,7 +3928,7 @@ namespace RegulatedNoise
 
             string commodityJson = json.Replace("$0$", tbUsername.Text.Replace("$1$", ""))
                 .Replace("$2$", (rowToPost.BuyPrice.ToString(CultureInfo.InvariantCulture)))
-                .Replace("$3$", (rowToPost.SampleDate.ToString("s")))
+                .Replace("$3$", (rowToPost.SampleDate.ToString("s", CultureInfo.CurrentCulture)))
                 .Replace("$4$", (rowToPost.Supply.ToString(CultureInfo.InvariantCulture)))
                 .Replace("$5$", (rowToPost.StationID.Replace(" [" + rowToPost.SystemName + "]", "")))
                 .Replace("$6$", (rowToPost.SystemName))
@@ -3943,161 +4035,348 @@ namespace RegulatedNoise
 
         private System.Threading.Timer stateTimer;
 
-        public void UpdateSystemNameFromLogFile(bool updateCommandersLogUi = true)
+        public void UpdateSystemNameFromLogFile()
         {
-            string systemName = "";
-            string stationName = "";
-            string logLump;
-            Regex RegExTest = null;
-            Match m = null;
-
-            var appConfigPath = RegulatedNoiseSettings.ProductsPath;
-
-            if (Directory.Exists(appConfigPath))
+            if (m_LogfileScanner_Thread == null)
             {
-                var versions = Directory.GetDirectories(appConfigPath).ToList().OrderByDescending(x => x).ToList();
+                m_LogfileScanner_Thread = new Thread(() => this.UpdateSystemNameFromLogFile_worker());
+                m_LogfileScanner_Thread.Name = "LogfileScanner_Thread";
+                m_LogfileScanner_Thread.IsBackground = true;
+                m_LogfileScanner_Thread.Start();
+            }
 
-                if (versions[0].Contains("FORC-FDEV"))
+            if (stateTimer == null)
+            {
+                var autoEvent = new AutoResetEvent(false);
+                TimerCallback timerCallback = TimerCallback;
+                stateTimer = new System.Threading.Timer(timerCallback, autoEvent, 10000, 10000);
+            }
+
+
+            m_LogfileScanner_ARE.Set();
+        }
+
+        public void UpdateSystemNameFromLogFile_worker()
+        {
+            SingleThreadLogger logger = new SingleThreadLogger(ThreadLoggerType.FileScanner);
+
+            do
+            {
+                try
                 {
-                    // We'll just go right ahead and use the latest log...
-                    var netLogs =
-                        Directory.GetFiles(versions[0] + "\\Logs", "netLog*.log")
-                            .OrderByDescending(File.GetLastWriteTime)
-                            .ToArray();
+                    string systemName = "";
+                    string stationName = "";
+                    string logLump;
+                    Regex RegExTest = null;
+                    Match m = null;
+                    List<String> PossibleStations = new List<string>();
 
-                    if (netLogs.Length != 0)
+#if extScanLog
+                    logger.Log("start, RegEx = <" + String.Format("FindBestIsland:.+:.+:.+:.+", Regex.Escape(RegulatedNoiseSettings.PilotsName)) + ">");
+#endif
+                    RegExTest = new Regex(String.Format("FindBestIsland:.+:.+:.+:.+", Regex.Escape(RegulatedNoiseSettings.PilotsName)), RegexOptions.IgnoreCase);
+
+                    var appConfigPath = RegulatedNoiseSettings.ProductsPath;
+
+                    if (Directory.Exists(appConfigPath))
                     {
-                        var newestNetLog = netLogs[0];
+                        var versions = Directory.GetDirectories(appConfigPath).Where(x => x.Contains("FORC-FDEV")).ToList().OrderByDescending(x => x).ToList();
 
-                        FileStream Datei = new FileStream(newestNetLog, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                        Byte[] ByteBuffer = new Byte[1];
-                        Byte lastByte = 0;
-
-                        StringBuilder SBuilder = new StringBuilder();
-
-                        for (long Offset = Datei.Length - ByteBuffer.Length; Offset > -1; Offset -= ByteBuffer.Length)
+                        if (versions.Count() == 0)
                         {
-                            Datei.Seek(Offset, SeekOrigin.Begin);
-                            Datei.Read(ByteBuffer, 0, ByteBuffer.Length);
-
-                            if ((ByteBuffer[0] == 0x0D) && (lastByte == 0x0A) && (SBuilder.Length > 1))
-                            {
-                                // stop - we found the end of the previous line
-                                logLump = SBuilder.ToString();
-
-
-                                // first looking for the systemname
-                                if (logLump != null && logLump.Contains("System:") && String.IsNullOrEmpty(systemName))
+                            #if extScanLog
+                                logger.Log("no dirs with <FORC-FDEV> found");
+                                var versions2 = Directory.GetDirectories(appConfigPath).ToList().OrderByDescending(x => x).ToList();
+                                foreach (string SubPath in versions2)
                                 {
-                                    Debug.Print("Systemstring:" + logLump);
-                                    systemName = logLump.Substring(logLump.IndexOf("(", StringComparison.Ordinal) + 1);
-                                    systemName = systemName.Substring(0, systemName.IndexOf(")", StringComparison.Ordinal));
-
-                                    // preparing search for station info
-                                    //RegExTest = new Regex(String.Format("FindBestIsland:.+:.+:(?!{0}).+:{0}", systemName), RegexOptions.IgnoreCase);
-                                    if (String.IsNullOrEmpty(RegulatedNoiseSettings.PilotsName))
-                                        RegExTest = new Regex(String.Format("FindBestIsland:.+:.+:.+:{0}", systemName), RegexOptions.IgnoreCase);
-                                    else
-                                        RegExTest = new Regex(String.Format("{1}:.+:.+:{0}", systemName, RegulatedNoiseSettings.PilotsName), RegexOptions.IgnoreCase);
-
-                                    Debug.Print("System: " + systemName);
-                                    // start search at the beginning
-                                    Offset = Datei.Length - ByteBuffer.Length;
+                                    logger.Log("but found <" +  SubPath + ">");   
                                 }
+                            #endif
+                        }
+                        else
+                        {
+                            #if extScanLog
+                                logger.Log("lookin' for files in <" + versions[0] + ">");
+                            #endif
 
-                                // if we have the systemname we're looking for the stationname
-                                if (!string.IsNullOrEmpty(systemName))
+                            // We'll just go right ahead and use the latest log...
+                            var netLogs =
+                                Directory.GetFiles(versions[0] + "\\Logs", "netLog*.log")
+                                    .OrderByDescending(File.GetLastWriteTime)
+                                    .ToArray();
+
+                            if (netLogs.Length != 0)
+                            {
+                                var newestNetLog = netLogs[0];
+
+                                Debug.Print("File opened : <" + newestNetLog + ">");
+#if extScanLog
+                                logger.Log("File opened : <" + newestNetLog + ">");
+#endif
+                                FileStream Datei = new FileStream(newestNetLog, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                                Byte[] ByteBuffer = new Byte[1];
+                                Byte[] LineBuffer = new Byte[SEARCH_MAXLENGTH];
+
+                                Datei.Seek(0, SeekOrigin.End);
+
+                                while (String.IsNullOrEmpty(stationName) && (Datei.Position >= 2))
                                 {
-                                    m = RegExTest.Match(logLump);
-                                    //Debug.Print(logLump);
-                                    //if (logLump.Contains("Duke Jones"))
-                                    //    Debug.Print("Stop");
-                                    if (m.Success)
-                                    {
-                                        string[] parts = m.Groups[0].ToString().Split(':');
-                                        if (parts.GetUpperBound(0) >= 3)
-                                        {
-                                            Debug.Print("Stationstring:" + logLump);
-                                            if (parts[0].Equals("FindBestIsland", StringComparison.InvariantCultureIgnoreCase))
-                                            {
-                                                stationName = _textInfo.ToTitleCase(parts[3].ToLower());
-                                                if (String.IsNullOrEmpty(RegulatedNoiseSettings.PilotsName))
-                                                    RegulatedNoiseSettings.PilotsName = parts[1];
+                                    long StartPos = -1;
+                                    long EndPos = -1;
 
+                                    do
+                                    {
+                                        Datei.Read(ByteBuffer, 0, ByteBuffer.Length);
+
+                                        if ((ByteBuffer[0] == 0x0A) || (ByteBuffer[0] == 0x0D))
+                                            if (EndPos == -1)
+                                            {
+                                                if (ByteBuffer[0] == 0x0D)
+                                                    EndPos = Datei.Position + 1;
+                                                else
+                                                    EndPos = Datei.Position;
+
+                                                Datei.Seek(-3, SeekOrigin.Current);
                                             }
                                             else
                                             {
-                                                stationName = parts[2];
-                                                if (String.IsNullOrEmpty(RegulatedNoiseSettings.PilotsName))
-                                                    RegulatedNoiseSettings.PilotsName = parts[0];
+                                                if (ByteBuffer[0] == 0x0D)
+                                                    StartPos = Datei.Position + 1;
+                                                else
+                                                    StartPos = Datei.Position;
+                                            }
+                                        else
+                                            Datei.Seek(-3, SeekOrigin.Current);
+
+                                    } while (StartPos == -1 && Datei.Position >= 3);
+
+                                    if((StartPos == -1) && ((EndPos - StartPos) > SEARCH_MINLENGTH))
+                                        StartPos = 0;
+
+                                    if ((StartPos >= 0) && ((EndPos - StartPos) <= SEARCH_MAXLENGTH))
+                                    {
+                                        // found a line and it's not too long
+                                        // read
+                                        Datei.Read(LineBuffer, 0, (int)(EndPos - StartPos));
+                                        // and convert to string
+                                        logLump = Encoding.ASCII.GetString(LineBuffer, 0, (int)(EndPos - StartPos) );
+
+                                        // first looking for the systemname
+                                        if (logLump != null && String.IsNullOrEmpty(systemName))
+                                        {
+                                            if (logLump.Contains("System:"))
+                                            {
+                                                Debug.Print("Systemstring:" + logLump);
+#if extScanLog
+                                                logger.Log("Systemstring:" + logLump.Replace("\n", "").Replace("\r", ""));
+#endif
+                                                systemName = logLump.Substring(logLump.IndexOf("(", StringComparison.Ordinal) + 1);
+                                                systemName = systemName.Substring(0, systemName.IndexOf(")", StringComparison.Ordinal));
+
+                                                Debug.Print("System: " + systemName);
+#if extScanLog
+                                                logger.Log("System: " + systemName);
+#endif
+
+                                                // preparing search for station info
+                                                RegExTest = new Regex(String.Format("FindBestIsland:.+:.+:.+:{0}", Regex.Escape(systemName)), RegexOptions.IgnoreCase);
+#if extScanLog
+                                                logger.Log("new Regex : <" + String.Format("FindBestIsland:.+:.+:.+:{0}", Regex.Escape(systemName)) + ">");
+#endif
+
+                                                // start search at the beginning
+
+                                                if (RegExTest != null)
+                                                {
+                                                    // we may have candidates, check them and if nothing found search from the current position
+                                                    foreach (string candidate in PossibleStations)
+                                                    {
+                                                        Debug.Print("check candidate : " + candidate);
+#if extScanLog
+                                                        logger.Log("check candidate : " + candidate.Replace("\n", "").Replace("\r", ""));
+#endif
+                                                        m = RegExTest.Match(candidate);
+                                                        //Debug.Print(logLump);
+                                                        //if (logLump.Contains("Duke Jones"))
+                                                        //    Debug.Print("Stop");
+                                                        if (m.Success)
+                                                        {
+#if extScanLog
+                                                            logger.Log("Stationstring from candidate : " + candidate.Replace("\n", "").Replace("\r", ""));
+#endif
+                                                            Debug.Print("Stationstring from candidate : " + candidate);
+                                                            getStation(ref stationName, m);
+                                                            break;
+                                                        }
+
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    // we must start from the end
+                                                    Datei.Seek(0, SeekOrigin.End);
+                                                }
+                                            }
+                                            else if (RegExTest != null)
+                                            {
+                                                m = RegExTest.Match(logLump);
+                                                //Debug.Print(logLump);
+                                                //if (logLump.Contains("Duke Jones"))
+                                                //    Debug.Print("Stop");
+                                                if (m.Success)
+                                                {
+#if extScanLog
+                                                    logger.Log("Candidate added : " + logLump.Replace("\n", "").Replace("\r", ""));
+#endif
+                                                    Debug.Print("Candidate : " + logLump);
+                                                    PossibleStations.Add(logLump);
+                                                }
+
                                             }
                                         }
 
-                                        Debug.Print("Station:" + stationName);
+                                        // if we have the systemname we're looking for the stationname
+                                        if (!string.IsNullOrEmpty(systemName) && string.IsNullOrEmpty(stationName))
+                                        {
+                                            m = RegExTest.Match(logLump);
+                                            //Debug.Print(logLump);
+                                            //if (logLump.Contains("Duke Jones"))
+                                            //    Debug.Print("Stop");
+                                            if (m.Success)
+                                            {
+#if extScanLog
+                                                logger.Log("Stationstring (direct) : " + logLump.Replace("\n", "").Replace("\r", ""));
+#endif
+                                                Debug.Print("Stationstring (direct) : " + logLump);
+                                                getStation(ref stationName, m);
+                                            }
+                                        }
                                     }
+
+                                    if (StartPos >= 3)
+                                    {
+                                        Datei.Seek(StartPos-1, SeekOrigin.Begin);
+                                    }
+                                    else
+                                        Datei.Seek(0, SeekOrigin.Begin);
                                 }
-                                SBuilder.Clear();
-                            }
 
-                            lastByte = ByteBuffer[0];
-                            if ((ByteBuffer[0] != 0x0D) && (ByteBuffer[0] != 0x0A))
-                                SBuilder.Insert(0, Encoding.ASCII.GetString(ByteBuffer));
+                                Datei.Close();
+                                Datei.Dispose();
+                                Debug.Print("Datei geschlossen");
+#if extScanLog
+                                logger.Log("File closed");
+#endif
 
-                            if (!String.IsNullOrEmpty(stationName))
-                            {
-                                break;
-                            }
-                        }
-
-
-                        if (systemName != "")
-                        {
-                            Debug.Print("<" + systemName + "> - <" + tbCurrentSystemFromLogs.Text + ">");
-
-                            if (_LoggedSystem != systemName)
-                            {
-                                // "ClientArrivedtoNewSystem()" was often faster - so nothing was logged
-                                if (cbAutoAdd_JumpedTo.Checked)
+                                if (systemName != "")
                                 {
-                                    String EventID = CommandersLog.CreateEvent("Jumped To", "", systemName, "", "", 0, "", DateTime.Now);
-                                    setActiveItem(EventID);
+                                    Debug.Print("<" + systemName + "> - <" + tbCurrentSystemFromLogs.Text + ">");
+
+                                    if (_LoggedSystem != systemName)
+                                    {
+#if extScanLog
+                                        logger.Log("1 <" + systemName + "> - <" + tbCurrentSystemFromLogs.Text + ">");
+                                        logger.Log("1 <" + stationName + "> - <" + tbCurrentStationinfoFromLogs.Text + ">");
+#endif
+
+                                        // "ClientArrivedtoNewSystem()" was often faster - so nothing was logged
+                                        if (cbAutoAdd_JumpedTo.Checked)
+                                        {
+                                            CommandersLog_CreateJumpedToEvent(systemName);
+                                        }
+
+                                        _LoggedSystem = systemName;
+
+                                        if (!String.IsNullOrEmpty(stationName))
+                                            m_lastestStationInfo = stationName;
+                                        else
+                                            m_lastestStationInfo = "scanning...";
+                                    }
+                                    else if (!String.IsNullOrEmpty(stationName))
+                                    { 
+#if extScanLog
+                                        logger.Log("2 <" + stationName + "> - <" + tbCurrentStationinfoFromLogs.Text + ">");
+#endif
+                                        m_lastestStationInfo = stationName;
+                                    }
+
+                                    if (tbLogEventID.Text != "" && tbLogEventID.Text != systemName)
+                                    {
+                                        setSystemInfo(systemName);
+                                    }
+
+#if extScanLog
+                                    logger.Log("Found <" + systemName + "> - <" + m_lastestStationInfo + ">");
+                                    logger.Log("GUI   <" + tbCurrentSystemFromLogs.Text + "> - <" + tbCurrentStationinfoFromLogs.Text + ">");
+#endif
                                 }
 
-                                _LoggedSystem = systemName;
+                                
 
-                                if (!String.IsNullOrEmpty(stationName))
-                                    m_lastestStationInfo = stationName;
-                                else
-                                    m_lastestStationInfo = "scanning...";
-                            }
-                            else if (!String.IsNullOrEmpty(m_lastestStationInfo))
-                                m_lastestStationInfo = stationName;
+                                setStationInfo();
 
-                            if (tbLogEventID.Text != "" && tbLogEventID.Text != systemName)
-                            {
-                                if (updateCommandersLogUi)
-                                    cbLogSystemName.Text = systemName;
                             }
+
                         }
-
-                        setStationInfo();
-
                     }
+                }
+                catch (Exception ex)
+                {
+                    Debug.Print("AnalyseError");
+                    logger.Log(ex.Message + "\n" + ex.StackTrace + "\n\n");
+                }
 
-                    Debug.Print("\n\n\n");
-                    if (stateTimer == null)
-                    {
-                        var autoEvent = new AutoResetEvent(false);
-                        TimerCallback timerCallback = TimerCallback;
-                        stateTimer = new System.Threading.Timer(timerCallback, autoEvent, 10000, 10000);
-                    }
+#if extScanLog
+                logger.Log("sleeping...");
+                logger.Log("\n\n\n");
+#endif
+                Debug.Print("\n\n\n");
+                m_LogfileScanner_ARE.WaitOne();
+#if extScanLog
+                logger.Log("awake...");
+#endif
+
+            }while (!this.Disposing && !m_Closing);
+
+            Debug.Print("out");
+        }
+
+        private void CommandersLog_CreateJumpedToEvent(string Systemname)
+        {
+            if (InvokeRequired)
+            {
+                Invoke(new ScreenshotsQueuedDelegate(CommandersLog_CreateJumpedToEvent), Systemname);
+            }
+            else
+            {
+                String EventID = CommandersLog.CreateEvent("Jumped To", "", Systemname, "", "", 0, "", DateTime.Now);
+                setActiveItem(EventID);
+            }
+        }
+
+        private void getStation(ref string stationName, Match m)
+        {
+            string[] parts = m.Groups[0].ToString().Split(':');
+            if (parts.GetUpperBound(0) >= 3)
+            {
+                stationName = _textInfo.ToTitleCase(parts[parts.GetUpperBound(0)-1].ToLower());
+
+                if (parts[0].Equals("FindBestIsland", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    if (String.IsNullOrEmpty(RegulatedNoiseSettings.PilotsName))
+                        RegulatedNoiseSettings.PilotsName = parts[1];
+                }
+                else
+                {
+                    if (String.IsNullOrEmpty(RegulatedNoiseSettings.PilotsName))
+                        RegulatedNoiseSettings.PilotsName = parts[0];
                 }
             }
         }
 
         private void TimerCallback(object state)
         {
-            GenericSingleParameterMessage(null, AppDelegateType.UpdateSystemNameLiveFromLog);
+            UpdateSystemNameFromLogFile();
         }
 
         private void saveLogEntry(object sender, EventArgs e)
@@ -4254,6 +4533,11 @@ namespace RegulatedNoise
             }
         }
 
+        void lvCommandersLog_ColumnWidthChanged(object sender, System.Windows.Forms.ColumnWidthChangedEventArgs e)
+        {
+            saveColumns((ListView)sender);            
+        }
+
         private void cbLogSystemName_DropDown(object sender, EventArgs e)
         {
             cbLogSystemName.Items.Clear();
@@ -4326,14 +4610,14 @@ namespace RegulatedNoise
                 _timer.Start();
             }
 
-            tabControl1.SelectedTab = tabPriceAnalysis;
+            tabCtrlMain.SelectedTab = tabPriceAnalysis;
             tabControl2.SelectedTab = tabPage3;
             tabControl2.SelectedTab = tabPage1;
             tabControl2.SelectedTab = tabPage2;
             tabControl2.SelectedTab = tabStationToStation;
             tabControl2.SelectedTab = tabPage3;
-            tabControl1.SelectedTab = tabHelpAndChangeLog;
-
+            tabCtrlMain.SelectedTab = tabHelpAndChangeLog;
+            
             Retheme();
 
             Clock = new System.Windows.Forms.Timer();
@@ -4623,11 +4907,28 @@ namespace RegulatedNoise
             lbAllRoundTrips.Items.Clear();
             int bestRoundTrip = -1;
             string stationA = "", stationB = "";
+            ProgressView progress   = new ProgressView();
             List<Tuple<string, double>> allRoundTrips = new List<Tuple<string, double>>();
+            
+            var selectedStations = StationDirectory.Where(x => getStationSelection(x));
 
-            foreach (var a in StationDirectory.Where(x => !cbLimitLightYears.Checked || Distance(CombinedNameToSystemName(x.Key))))
-                foreach (var b in StationDirectory.Where(x => !cbLimitLightYears.Checked || Distance(CombinedNameToSystemName(x.Key))))
+            Int32 Total             = getCalculations(selectedStations.Count());
+            Int32 Current           = 0;
+
+            progress.progressStart(string.Format(string.Format("calculating best routes: {0} abilities from {1} stations", Total, selectedStations.Count())));
+
+            for (int i = 0; i < selectedStations.Count()-1; i++)
+            {
+                for (int j = i+1; j < selectedStations.Count(); j++)
                 {
+                    var a = selectedStations.ElementAt(i);        
+                    var b = selectedStations.ElementAt(j);
+
+                    Current+=1;
+                    progress.progressUpdate(Current, Total);
+
+                    Debug.Print(Current +"/"+ Total);
+
                     int bestThisTrip;
                     GetBestRoundTripForTwoStations(a.Key, b.Key, out bestThisTrip);
                     if (bestThisTrip > 0)
@@ -4641,18 +4942,19 @@ namespace RegulatedNoise
                         else
                         {
                             key1 = b.Key;
-                            key2 = a.Key;
+                            key2 = a.Key;                            
                         }
 
                         string credits;
                         double creditsDouble;
                         double distance = 1d;
 
+                        distance = DistanceInLightYears(CombinedNameToSystemName(a.Key).ToUpper(), CombinedNameToSystemName(b.Key).ToUpper());
+
                         if (cbPerLightYearRoundTrip.Checked)
                         {
-                            distance = 2 * DistanceInLightYears(CombinedNameToSystemName(a.Key).ToUpper(), CombinedNameToSystemName(b.Key).ToUpper());
-                            creditsDouble = bestThisTrip / distance;
-                            credits = String.Format("{0:0.000}", creditsDouble / distance) + " Cr/Ly";
+                            creditsDouble = bestThisTrip / (2.0 * distance);
+                            credits = String.Format("{0:0.000}", creditsDouble / (2.0 * distance)) + " Cr/Ly";
                         }
                         else
                         {
@@ -4660,55 +4962,66 @@ namespace RegulatedNoise
                             credits = (bestThisTrip + " Cr");
                         }
 
-                        allRoundTrips.Add(
-                            new Tuple<string, double>(
-                                credits.PadRight(13) + " :" +
-                                key1
-                                + "..." +
-                                key2
-                                , creditsDouble));
-
-                        if (bestThisTrip > bestRoundTrip)
+                        if ((!cbMaxRouteDistance.Checked) || (double.Parse(cmbMaxRouteDistance.Text) >= distance))
                         {
-                            bestRoundTrip = bestThisTrip;
-                            stationA = a.Key;
-                            stationB = b.Key;
+                            allRoundTrips.Add(
+                                new Tuple<string, double>(
+                                    credits.PadRight(13) + " :" + 
+                                    key1
+                                    + "..." + 
+                                    key2
+                                    , creditsDouble));
+
+                            if (bestThisTrip > bestRoundTrip)
+                            {
+                                bestRoundTrip = bestThisTrip;
+                                stationA = a.Key;
+                                stationB = b.Key;
+                            }
                         }
+
                     }
+
+                    if (progress.Cancelled)
+                        break;
                 }
+
+                if (progress.Cancelled)
+                    break;
+            }
+
+            progress.progressStop();
 
             var ordered = allRoundTrips.OrderByDescending(x => x.Item2).Select(x => x.Item1).Distinct().ToList().Cast<object>().ToArray();
 
             lbAllRoundTrips.Items.AddRange(ordered);
-            if (lbAllRoundTrips.Items.Count > 0)
+            if(lbAllRoundTrips.Items.Count > 0)
                 lbAllRoundTrips.SelectedIndex = 0;
 
-            //if (bestRoundTrip > 0)
-            //{
-            //    for (int i = 0; i < cbStationToStationFrom.Items.Count; i++)
-            //    {
-            //        if ((string)(cbStationToStationFrom.Items[i]) == stationA)
-            //        {
-            //            cbStationToStationFrom.SelectedIndex = i;
-            //            break;
-            //        }
-            //    }
-            //
-            //    for (int i = 0; i < cbStationToStationTo.Items.Count; i++)
-            //    {
-            //        if ((string)(cbStationToStationTo.Items[i]) == stationB)
-            //        {
-            //            cbStationToStationTo.SelectedIndex = i;
-            //            break;
-            //        }
-            //    }
-            //}
             this.Cursor = Cursors.Default;
+        }
+
+        private int getCalculations(int Total)
+        {
+            Int32 retValue = 0;
+
+            for (int i = 0; i <Total; i++)
+            {
+                retValue += i;
+            }
+            return retValue;
+
         }
 
         private void checkboxLightYears_CheckedChanged(object sender, EventArgs e)
         {
             RegulatedNoiseSettings.limitLightYears = cbLimitLightYears.Checked;
+            SetupGui();
+        }
+
+        private void cbStationToStar_CheckedChanged(object sender, EventArgs e)
+        {
+            RegulatedNoiseSettings.StationToStar = cbStationToStar.Checked;
             SetupGui();
         }
 
@@ -4995,8 +5308,8 @@ namespace RegulatedNoise
                 checkboxImportEDDN.Visible = true;
                 checkboxSpoolEddnToFile.Visible = true;
 
-                if (!tabControl1.TabPages.ContainsKey("tabEDDN"))
-                    tabControl1.TabPages.Insert(_EDDNTabPageIndex, _EDDNTabPage);
+                if (!tabCtrlMain.TabPages.ContainsKey("tabEDDN"))
+                    tabCtrlMain.TabPages.Insert(_EDDNTabPageIndex, _EDDNTabPage);
             }
             else
             {
@@ -5011,8 +5324,8 @@ namespace RegulatedNoise
                 checkboxSpoolEddnToFile.Checked = false;
                 checkboxSpoolEddnToFile.Visible = false;
 
-                if (tabControl1.TabPages.ContainsKey("tabEDDN"))
-                    tabControl1.TabPages.RemoveByKey("tabEDDN");
+                if (tabCtrlMain.TabPages.ContainsKey("tabEDDN"))
+                    tabCtrlMain.TabPages.RemoveByKey("tabEDDN");
             }
         }
 
@@ -5021,9 +5334,9 @@ namespace RegulatedNoise
             TabPage OCRTabPage;
             OcrCalibratorTab TabControl;
 
-            if (GameSettings != null && tabControl3.TabPages["OCR_Calibration"] != null)
+            if (GameSettings != null && tabCtrlOCR.TabPages["OCR_Calibration"] != null)
             {
-                OCRTabPage = tabControl3.TabPages["OCR_Calibration"];
+                OCRTabPage = tabCtrlOCR.TabPages["OCR_Calibration"];
                 OCRTabPage.Enabled = (GameSettings.Display != null);
                 TabControl = (OcrCalibratorTab)(OCRTabPage.Controls[0]);
                 TabControl.lblWarning.Visible = (GameSettings.Display == null);
@@ -5154,12 +5467,12 @@ namespace RegulatedNoise
                 SetupGui();
         }
 
-        private void cbLightYearsInput_LostFocus(object sender, EventArgs e)
+        private void cmbLightYearsInput_LostFocus(object sender, EventArgs e)
         {
             checkcbLightYearsInput();
         }
 
-        private void cbLightYearsInput_KeyPress(object sender, System.Windows.Forms.KeyPressEventArgs e)
+        private void cmbLightYearsInput_KeyPress(object sender, System.Windows.Forms.KeyPressEventArgs e)
         {
             if (e.KeyChar == (char)Keys.Return)
             {
@@ -5167,9 +5480,44 @@ namespace RegulatedNoise
             }
         }
 
-        private void cbLightYears_SelectedIndexChanged(object sender, EventArgs e)
+        private void cmbLightYears_SelectedIndexChanged(object sender, EventArgs e)
         {
             checkcbLightYearsInput();
+        }
+
+        private void cmbStationToStarInput_LostFocus(object sender, System.EventArgs e)
+        {
+            checkcmbStationToStarInput();
+        }
+
+        private void cmbStationToStar_SelectedIndexChanged(object sender, System.EventArgs e)
+        {
+            checkcmbStationToStarInput();
+        }
+        private void cmbStationToStarInput_KeyPress(object sender, System.Windows.Forms.KeyPressEventArgs e)
+        {
+            if (e.KeyChar == (char)Keys.Return)
+            { 
+                checkcmbStationToStarInput();   
+            }
+        }
+
+        private void cmbMaxRouteDistance_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            cmbMaxRouteDistanceInput();   
+        }
+
+        private void cmbMaxRouteDistance_KeyPress(object sender, System.Windows.Forms.KeyPressEventArgs e)
+        {
+            if (e.KeyChar == (char)Keys.Return)
+            { 
+                cmbMaxRouteDistanceInput();   
+            }
+        }
+
+        private void cmbMaxRouteDistance_LostFocus(object sender, System.EventArgs e)
+        {
+            cmbMaxRouteDistanceInput();   
         }
 
         private void checkcbLightYearsInput()
@@ -5179,7 +5527,7 @@ namespace RegulatedNoise
 
             Debug.Print("1");
 
-            if (int.TryParse(cbLightYears.Text, out value))
+            if (int.TryParse(cmbLightYears.Text, out value))
             {
                 if (value >= 0)
                 {
@@ -5187,15 +5535,63 @@ namespace RegulatedNoise
                     valueOK = true;
                 }
                 else
-                    cbLightYears.Text = RegulatedNoiseSettings.lastLightYears.ToString();
+                    cmbLightYears.Text = RegulatedNoiseSettings.lastLightYears.ToString();
             }
             else
             {
-                cbLightYears.Text = RegulatedNoiseSettings.lastLightYears.ToString();
+                cmbLightYears.Text = RegulatedNoiseSettings.lastLightYears.ToString();
             }
 
             if (valueOK && cbLimitLightYears.Checked)
                 SetupGui();
+        }
+
+        private void checkcmbStationToStarInput()
+        {
+            int value;
+            bool valueOK = false;
+
+            Debug.Print("1");
+
+            if (int.TryParse(cmbStationToStar.Text, out value))
+            {
+                if (value >= 0)
+                {
+                    RegulatedNoiseSettings.lastStationToStar = value;
+                    valueOK = true;
+                }
+                else
+                    cmbStationToStar.Text = RegulatedNoiseSettings.lastStationToStar.ToString();
+            }
+            else
+            {
+                cmbStationToStar.Text = RegulatedNoiseSettings.lastStationToStar.ToString();
+            }
+
+            if (valueOK && cbStationToStar.Checked)
+                SetupGui();
+        }
+
+        private void cmbMaxRouteDistanceInput()
+        {
+            int value;
+            bool valueOK = false;
+
+            if (int.TryParse(cmbMaxRouteDistance.Text, out value))
+            {
+                if (value >= 0)
+                {
+                    RegulatedNoiseSettings.lastMaxRouteDistance = value;
+                    valueOK = true;
+                }
+                else
+                    cmbMaxRouteDistance.Text = RegulatedNoiseSettings.lastMaxRouteDistance.ToString();
+            }
+            else
+            {
+                cmbMaxRouteDistance.Text = RegulatedNoiseSettings.lastMaxRouteDistance.ToString();
+            }
+
         }
 
         private void cbPerLightYearRoundTrip_CheckedChanged(object sender, EventArgs e)
@@ -5301,6 +5697,14 @@ namespace RegulatedNoise
                 tbCurrentStationinfoFromLogs.Text = m_lastestStationInfo;
         }
 
+        public void setSystemInfo(string SystemInfo)
+        {
+            if (InvokeRequired)
+                Invoke(new ScreenshotsQueuedDelegate(setSystemInfo), SystemInfo);
+            else
+                tbCurrentSystemFromLogs.Text = SystemInfo;
+        }
+
         /// <summary>
         /// copies the systemname of the CmdrLog entry to the clipboard
         /// </summary>
@@ -5315,6 +5719,501 @@ namespace RegulatedNoise
         }
 
         /// <summary>
+        /// Initializes the external data manager and loads available data sources from the config file
+        /// </summary>
+        private void InitializeExternalData()
+        {
+            ExternalDataManager = new ExternalDataManager();
+
+            UpdateConnectionStatus(string.Empty);
+            btn_DownloadData.Enabled = false;
+            btn_UploadData.Enabled = false;
+
+            // Initialize ExternalDataManager
+            Response res = ExternalDataManager.Initialize();
+            if (!res.IsSuccessStatus)
+            {
+                AppendExternalDataLog(string.Format("Could not load data sources from config file '{0}': {1}", ExternalDataManager.CONFIG_FILE, res.Content));
+                cb_DataSource.Enabled = false;
+                return;
+            }
+
+            // Set data binding for availabe external data sources
+            dataSourceBindingSource.DataSource = ExternalDataManager.DataSources;
+            ExternalDataManager.SelectedDataSource = cb_DataSource.SelectedItem as DataSource;
+        }
+
+        /// <summary>
+        /// Test the connection to the selected data source
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void btn_TestDataSourceConnection_Click(object sender, EventArgs e)
+        {
+            if (ExternalDataManager.SelectedDataSource == null)
+            {
+                AppendExternalDataLog("No valid data source selected!");
+                UpdateConnectionStatus("Invalid");
+                return;
+            }
+
+            UpdateConnectionStatus("Connecting");
+            AppendExternalDataLog(string.Format("Testing connection to '{0}' at {1} (authentication type: {2}): ",
+                ExternalDataManager.SelectedDataSource.Name,
+                ExternalDataManager.SelectedDataSource.Url,
+                ExternalDataManager.SelectedDataSource.Authentication.Type),false);
+
+            try
+            {
+                Response res = await ExternalDataManager.GetDataAsync("");
+                AppendExternalDataLog(res.Status);
+                UpdateConnectionStatus(res.Status);
+
+                if (res.IsSuccessStatus)
+                {
+                    btn_DownloadData.Enabled = true;
+                    btn_UploadData.Enabled = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                AppendExternalDataLog(ex.Message);
+                UpdateConnectionStatus("Failed");
+            }
+        }
+
+        /// <summary>
+        /// Selected data source was changed
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void cb_DataSource_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            ExternalDataManager.SelectedDataSource = cb_DataSource.SelectedItem as DataSource;
+
+            btn_DownloadData.Enabled = false;
+            btn_UploadData.Enabled = false;
+            UpdateConnectionStatus(string.Empty);
+            if (ExternalDataManager.SelectedDataSource != null)
+            {
+                AppendExternalDataLog(string.Format("Selected data source '{0}'. Please test connection.", ExternalDataManager.SelectedDataSource.Name));
+            }
+        }
+
+        /// <summary>
+        /// gets the reduced selection of station due to lightyear limit and distance to star limit
+        /// </summary>
+        /// <param name="x"></param>
+        /// <returns></returns>
+        private bool getStationSelection(KeyValuePair<string, List<Form1.CsvRow>> x)
+        {
+            return (!cbLimitLightYears.Checked || Distance(CombinedNameToSystemName(x.Key))) &&
+                   (!cbStationToStar.Checked   || StationDistance(CombinedNameToSystemName(x.Key), CombinedNameToStationName(x.Key)));
+
+        }
+
+        private bool getStationSelection(CsvRow x)
+        {
+            return (!cbLimitLightYears.Checked || Distance(x.SystemName)) &&
+                   (!cbStationToStar.Checked   || StationDistance(x.SystemName, x.StationName));
+        }
+
+        private void label63_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void cmdLoadCurrentSystem_Click(object sender, EventArgs e)
+        {
+            loadSystemData(_LoggedSystem);
+        }
+
+        private void loadSystemData(string Systemname)
+        {
+            
+            m_SystemLoadingValues = true;
+
+            if(Systemname.Equals(ID_NEWITEM))
+            {
+                m_loadedSystemdata = new EDSystem();
+                m_SystemIsNew = true;
+            }
+            else
+            { 
+                m_loadedSystemdata = _Milkyway.getSystem(Systemname);
+                m_SystemIsNew = false;
+            }
+
+            if(m_loadedSystemdata != null)
+            { 
+                m_currentSystemdata.getValues(m_loadedSystemdata, true);
+
+                txtSystemId.Text                    = m_loadedSystemdata.Id.ToString(CultureInfo.CurrentCulture);
+                txtSystemName.Text                  = m_loadedSystemdata.Name.ToString();
+                txtSystemX.Text                     = m_loadedSystemdata.X.ToString(CultureInfo.CurrentCulture);
+                txtSystemY.Text                     = m_loadedSystemdata.Y.ToString(CultureInfo.CurrentCulture);
+                txtSystemZ.Text                     = m_loadedSystemdata.Z.ToString(CultureInfo.CurrentCulture);
+                txtSystemFaction.Text               = m_loadedSystemdata.Faction.ToString();
+                txtSystemPopulation.Text            = ((long)m_loadedSystemdata.Population).ToString("#,##0.", CultureInfo.CurrentCulture);
+                txtSystemUpdatedAt.Text             = m_loadedSystemdata.UpdatedAt.ToString();
+                txtSystemNeedsPermit.SelectedValue  = m_loadedSystemdata.NeedsPermit;
+                txtSystemPrimaryEconomy.Text        = m_loadedSystemdata.PrimaryEconomy.ToString();
+                txtSystemSecurity.Text              = m_loadedSystemdata.Security.ToString();
+                txtSystemState.Text                 = m_loadedSystemdata.State.ToString();
+                txtSystemAllegiance.Text            = m_loadedSystemdata.Allegiance.ToString();
+                txtSystemGovernment.Text            = m_loadedSystemdata.Government.ToString();
+            
+                m_SystemLoadingValues = false;
+                setSaveButton(true, false);
+
+                if(_Milkyway.getSystems(EDMilkyway.enDataType.Data_EDDB).Exists(x => x.Name.Equals(m_loadedSystemdata.Name, StringComparison.InvariantCultureIgnoreCase)))
+                {
+                    txtSystemName.ReadOnly = true;
+                    lblRenameHint.Visible = true;
+                }
+                else
+                {
+                    txtSystemName.ReadOnly = false;
+                    lblRenameHint.Visible = false;
+                }
+            }
+            else
+            {
+                m_currentSystemdata.clear();
+
+                txtSystemId.Text                    = "";
+                txtSystemName.Text                  = "system not in database";
+                txtSystemX.Text                     = "0.0";
+                txtSystemY.Text                     = "0.0";
+                txtSystemZ.Text                     = "0.0";
+                txtSystemFaction.Text               = "";
+                txtSystemPopulation.Text            = "0";
+                txtSystemUpdatedAt.Text             = "";
+                txtSystemNeedsPermit.SelectedValue  = "0";
+                txtSystemPrimaryEconomy.Text        = "";
+                txtSystemSecurity.Text              = "";
+                txtSystemState.Text                 = "";
+                txtSystemAllegiance.Text            = "";
+                txtSystemGovernment.Text            = "";
+            
+                m_SystemLoadingValues = false;
+                setSaveButton(true, false);
+
+                txtSystemName.ReadOnly = false;
+                lblRenameHint.Visible = false;
+            }
+
+
+        }
+
+        private void prePrepareSystemFields()
+        {
+
+            txtSystemGovernment.Items.Add("");
+            txtSystemGovernment.Items.Add("Anarchy");
+            txtSystemGovernment.Items.Add("Communism");
+            txtSystemGovernment.Items.Add("Confederacy");
+            txtSystemGovernment.Items.Add("Corporate");
+            txtSystemGovernment.Items.Add("Coperative");
+            txtSystemGovernment.Items.Add("Democracy");
+            txtSystemGovernment.Items.Add("Dictatorship");
+            txtSystemGovernment.Items.Add("Feudal");
+            txtSystemGovernment.Items.Add("Imperial");
+            txtSystemGovernment.Items.Add("Patronage");
+            txtSystemGovernment.Items.Add("Colony");
+            txtSystemGovernment.Items.Add("Prison Colony");
+            txtSystemGovernment.Items.Add("Theocracy");
+
+            txtSystemState.Items.Add("");
+            txtSystemState.Items.Add("Bust");
+            txtSystemState.Items.Add("Civil Unrest");
+            txtSystemState.Items.Add("Civil War");
+            txtSystemState.Items.Add("Expansion");
+            txtSystemState.Items.Add("Lockdown");
+            txtSystemState.Items.Add("Outbreak");
+            txtSystemState.Items.Add("War");
+
+            txtSystemAllegiance.Items.Add("");
+            txtSystemAllegiance.Items.Add("Alliance");
+            txtSystemAllegiance.Items.Add("Empire");
+            txtSystemAllegiance.Items.Add("Federation");
+            txtSystemAllegiance.Items.Add("Independent");
+
+            txtSystemSecurity.Items.Add("");
+            txtSystemSecurity.Items.Add("Low");
+            txtSystemSecurity.Items.Add("Medium");
+            txtSystemSecurity.Items.Add("High");
+
+            txtSystemPrimaryEconomy.Items.Add("");
+            txtSystemPrimaryEconomy.Items.Add("Agriculture");
+            txtSystemPrimaryEconomy.Items.Add("Extraction");
+            txtSystemPrimaryEconomy.Items.Add("High Tech");
+            txtSystemPrimaryEconomy.Items.Add("Industrial");
+            txtSystemPrimaryEconomy.Items.Add("Military");
+            txtSystemPrimaryEconomy.Items.Add("Refinery");
+            txtSystemPrimaryEconomy.Items.Add("Service");
+            txtSystemPrimaryEconomy.Items.Add("Terraforming");
+            txtSystemPrimaryEconomy.Items.Add("Tourism");
+
+            List<KeyValuePair<int, string>> DDObjects = new List<KeyValuePair<int, string>>() {
+                                       new KeyValuePair<int, string>(0, "No"), 
+                                       new KeyValuePair<int, string>(1, "Yes")};
+
+            txtSystemNeedsPermit.DataSource = DDObjects;
+            txtSystemNeedsPermit.DisplayMember = "Value";
+            txtSystemNeedsPermit.ValueMember = "Key";
+
+            txtSystemPopulation.Culture = CultureInfo.CurrentCulture;
+
+            this.txtSystemName.TextChanged              += new System.EventHandler(this.txtSystem_TextChanged);
+            this.txtSystemName.TextChanged              += new System.EventHandler(this.txtSystem_TextChanged);              
+            this.txtSystemX.TextChanged                 += new System.EventHandler(this.txtSystem_TextChanged);                 
+            this.txtSystemY.TextChanged                 += new System.EventHandler(this.txtSystem_TextChanged);                 
+            this.txtSystemZ.TextChanged                 += new System.EventHandler(this.txtSystem_TextChanged);                 
+            this.txtSystemFaction.TextChanged           += new System.EventHandler(this.txtSystem_TextChanged);           
+            this.txtSystemPopulation.TextChanged        += new System.EventHandler(this.txtSystem_TextChanged);        
+            this.txtSystemUpdatedAt.TextChanged         += new System.EventHandler(this.txtSystem_TextChanged);           
+            this.txtSystemNeedsPermit.TextChanged       += new System.EventHandler(this.txtSystem_TextChanged);       
+            this.txtSystemPrimaryEconomy.TextChanged    += new System.EventHandler(this.txtSystem_TextChanged);    
+            this.txtSystemSecurity.TextChanged          += new System.EventHandler(this.txtSystem_TextChanged);          
+            this.txtSystemState.TextChanged             += new System.EventHandler(this.txtSystem_TextChanged);             
+            this.txtSystemAllegiance.TextChanged        += new System.EventHandler(this.txtSystem_TextChanged);        
+            this.txtSystemGovernment.TextChanged        += new System.EventHandler(this.txtSystem_TextChanged);
+
+            this.txtSystemName.LostFocus                += txtSystem_LostFocus;
+            this.txtSystemName.LostFocus                += txtSystem_LostFocus;              
+            this.txtSystemX.LostFocus                   += txtSystem_LostFocus;                 
+            this.txtSystemY.LostFocus                   += txtSystem_LostFocus;                 
+            this.txtSystemZ.LostFocus                   += txtSystem_LostFocus;                 
+            this.txtSystemFaction.LostFocus             += txtSystem_LostFocus;           
+            this.txtSystemPopulation.LostFocus          += txtSystem_LostFocus;        
+            this.txtSystemUpdatedAt.LostFocus           += txtSystem_LostFocus;           
+            this.txtSystemNeedsPermit.LostFocus         += txtSystem_LostFocus;       
+            this.txtSystemPrimaryEconomy.LostFocus      += txtSystem_LostFocus;    
+            this.txtSystemSecurity.LostFocus            += txtSystem_LostFocus;          
+            this.txtSystemState.LostFocus               += txtSystem_LostFocus;             
+            this.txtSystemAllegiance.LostFocus          += txtSystem_LostFocus;        
+            this.txtSystemGovernment.LostFocus          += txtSystem_LostFocus;
+
+            this.txtSystemName.GotFocus                += txtSystem_GotFocus;
+            this.txtSystemName.GotFocus                += txtSystem_GotFocus;              
+            this.txtSystemX.GotFocus                   += txtSystem_GotFocus;                 
+            this.txtSystemY.GotFocus                   += txtSystem_GotFocus;                 
+            this.txtSystemZ.GotFocus                   += txtSystem_GotFocus;                 
+            this.txtSystemFaction.GotFocus             += txtSystem_GotFocus;           
+            this.txtSystemPopulation.GotFocus          += txtSystem_GotFocus;        
+            this.txtSystemUpdatedAt.GotFocus           += txtSystem_GotFocus;           
+            this.txtSystemNeedsPermit.GotFocus         += txtSystem_GotFocus;       
+            this.txtSystemPrimaryEconomy.GotFocus      += txtSystem_GotFocus;    
+            this.txtSystemSecurity.GotFocus            += txtSystem_GotFocus;          
+            this.txtSystemState.GotFocus               += txtSystem_GotFocus;             
+            this.txtSystemAllegiance.GotFocus          += txtSystem_GotFocus;        
+            this.txtSystemGovernment.GotFocus          += txtSystem_GotFocus;
+
+
+        }
+
+        void txtSystem_GotFocus(object sender, EventArgs e)
+        {
+            try
+            {
+                PropertyInfo _propertyInfo = null;
+                Type _type = Type.GetType("RegulatedNoise.EDDB_Data.EDSystem");
+
+
+                switch (sender.GetType().Name)
+                {
+                    case "TextBox":
+                        _propertyInfo = _type.GetProperty(((TextBox)sender).Name.Substring(9));
+                        break;
+                    case "MaskedTextBox":
+                        _propertyInfo = _type.GetProperty(((MaskedTextBox)sender).Name.Substring(9));
+                        break;
+                    case "ComboBox":
+                        _propertyInfo = _type.GetProperty(((ComboBox)sender).Name.Substring(9));
+                        break;
+                }
+                m_lastSystemValue = (_propertyInfo.GetValue(m_currentSystemdata, null)).ToString();
+
+                setSaveButton();
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        void txtSystem_LostFocus(object sender, EventArgs e)
+        {
+            Int32 intValue;
+            long longValue;
+            Double doubleValue;
+
+            switch (((Control)sender).Name)
+            {
+            	case "txtSystemName":     
+                    if(m_SystemIsNew)
+                    {
+                        EDSystem existing = _Milkyway.getSystems(EDMilkyway.enDataType.Data_Merged).Find(x => x.Name.Equals(txtSystemName.Text, StringComparison.InvariantCultureIgnoreCase));
+                        if(existing != null)
+                        {
+                            if(DateTime.Now.Subtract(m_SystemWarningTime).TotalSeconds > 5)
+                            { 
+                                m_SystemWarningTime = DateTime.Now;
+                                MessageBox.Show("A system with this name already exists", "Adding a new system", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                            }
+                        }
+                    }
+                    m_currentSystemdata.Name = txtSystemName.Text;  
+                    break;
+                case "txtSystemX":
+                    if(double.TryParse(txtSystemX.Text, out doubleValue))
+                        m_currentSystemdata.X = doubleValue;
+                    else
+                    { 
+                        m_currentSystemdata.X = double.Parse(m_lastSystemValue);
+                        txtSystemX.Text = m_lastSystemValue;
+                    }
+                    break;
+                case "txtSystemY":         
+                    if(double.TryParse(txtSystemY.Text, out doubleValue))
+                        m_currentSystemdata.Y = doubleValue;
+                    else
+                    { 
+                        m_currentSystemdata.Y = double.Parse(m_lastSystemValue);
+                        txtSystemY.Text = m_lastSystemValue;
+                    }
+                    break;
+                case "txtSystemZ":         
+                    if(double.TryParse(txtSystemZ.Text, out doubleValue))
+                        m_currentSystemdata.Z = doubleValue;
+                    else
+                    {
+                        m_currentSystemdata.Z = double.Parse(m_lastSystemValue);
+                        txtSystemZ.Text = m_lastSystemValue;
+                    }
+                    break;
+                case "txtSystemFaction":   
+                    m_currentSystemdata.Faction = txtSystemFaction.Text;
+                    break;
+                case "txtSystemPopulation":
+                    if(long.TryParse(txtSystemPopulation.Text.Replace(",","").Replace(".",""), out longValue))
+                        m_currentSystemdata.Population = longValue;
+                    else
+                    { 
+                        m_currentSystemdata.Population = long.Parse(m_lastSystemValue);
+                    }
+                    txtSystemPopulation.Text = ((long)m_currentSystemdata.Population).ToString("#,##0.", CultureInfo.CurrentCulture);
+                    break;
+                case "txtSystemUpdatedAt": 
+                    if(Int32.TryParse(txtSystemUpdatedAt.Text, out intValue))
+                        m_currentSystemdata.UpdatedAt = intValue;
+                    else
+                    { 
+                        m_currentSystemdata.UpdatedAt = Int32.Parse(m_lastSystemValue);
+                        txtSystemUpdatedAt.Text = m_lastSystemValue;
+                    }
+                    break;
+                case "txtSystemNeedsPermit":
+                    m_currentSystemdata.NeedsPermit = (int)(txtSystemNeedsPermit.SelectedValue);
+
+                    //if(Int32.TryParse((int)(txtSystemNeedsPermit.SelectedValue), out intValue))
+                    //    m_currentSystemdata.NeedsPermit = intValue;
+                    //else
+                    //{ 
+                    //    m_currentSystemdata.NeedsPermit = Int32.Parse(m_lastSystemValue);
+                    //    txtSystemNeedsPermit.Text = m_lastSystemValue;
+                    //}
+                    break;
+                case "txtSystemPrimaryEconomy":
+                    m_currentSystemdata.PrimaryEconomy = txtSystemPrimaryEconomy.Text;
+                    break;
+                case "txtSystemSecurity":  
+                    m_currentSystemdata.Security = txtSystemSecurity.Text;
+                    break;
+                case "txtSystemState":     
+                    m_currentSystemdata.State = txtSystemState.Text;
+                    break;
+                case "txtSystemAllegiance":
+                    m_currentSystemdata.Allegiance = txtSystemAllegiance.Text;
+                    break;
+                case "txtSystemGovernment":
+                    m_currentSystemdata.Government = txtSystemGovernment.Text;
+            		break;
+            } 
+            
+
+            setSaveButton();
+        }
+
+        private void txtSystem_TextChanged(object sender, EventArgs e)
+        {
+            if (!m_SystemLoadingValues)
+            {
+                setSaveButton(true, true);
+            }
+
+        }
+
+        private void cmdSystemChange_Click(object sender, EventArgs e)
+        {
+            if(m_SystemIsNew)
+            {
+                EDSystem existing = _Milkyway.getSystems(EDMilkyway.enDataType.Data_Merged).Find(x => x.Name.Equals(m_currentSystemdata.Name, StringComparison.InvariantCultureIgnoreCase));
+                if(existing != null)
+                {
+                    MessageBox.Show("A system with this name already exists", "Adding a new system", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                    return;
+                }
+            }
+
+            if(MessageBox.Show("Save changes on current system ?", "Stationdata changed", MessageBoxButtons.OKCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1) == System.Windows.Forms.DialogResult.OK)
+            { 
+                _Milkyway.changeSystem(m_currentSystemdata);
+                setSaveButton(true, false);
+            }
+        }
+
+        private void cmdSystemNew_Click(object sender, EventArgs e)
+        {
+            loadSystemData(ID_NEWITEM);
+        }
+
+        private void setSaveButton(bool force = false, bool forceValue = true)
+        {
+            if(m_SystemIsNew)
+            { 
+                if (!String.IsNullOrEmpty(m_currentSystemdata.Name))
+                    cmdSystemChange.Enabled = true;
+                else
+                    cmdSystemChange.Enabled = false;
+            }
+            else
+            {
+                if(force)
+                    cmdSystemChange.Enabled = forceValue;
+                else
+                    cmdSystemChange.Enabled = !m_currentSystemdata.EqualsED(m_loadedSystemdata);
+            }
+        }
+
+        private void cbIncludeUnknownDTS_CheckedChanged(object sender, EventArgs e)
+        {
+            RegulatedNoiseSettings.IncludeUnknownDTS = cbIncludeUnknownDTS.Checked;
+            SaveSettings();
+            SetupGui();
+        }
+
+        private void cbMaxRouteDistance_CheckedChanged(object sender, EventArgs e)
+        {
+            RegulatedNoiseSettings.MaxRouteDistance = cbMaxRouteDistance.Checked;
+            SaveSettings();
+
+            
+        }
+        
+		 /// <summary>
         /// Initializes the external data manager and loads available data sources from the config file
         /// </summary>
         private void InitializeExternalData()
@@ -5652,5 +6551,6 @@ namespace RegulatedNoise
                 ValidateDownloadDayLimit();
             }
         }
+
     }
 }
