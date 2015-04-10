@@ -80,26 +80,26 @@ namespace RegulatedNoise
         // Added external data sources for EIC edition
         public ExternalDataManager ExternalDataManager;
 
-        private BindingSource _bs_Stations                              = new BindingSource();
-        private BindingSource _bs_StationsFrom                          = new BindingSource();
-        private BindingSource _bs_StationsTo                            = new BindingSource();
-        private Dictionary<string, int> _StationIndices                 = new Dictionary<string,int>();
-        private bool _InitDone                                          = false;
-        private StationHistory _StationHistory                          = new StationHistory();
+        private BindingSource _bs_Stations = new BindingSource();
+        private BindingSource _bs_StationsFrom = new BindingSource();
+        private BindingSource _bs_StationsTo = new BindingSource();
+        private Dictionary<string, int> _StationIndices = new Dictionary<string, int>();
+        private bool _InitDone = false;
+        private StationHistory _StationHistory = new StationHistory();
         //bool _cbIncludeWithinRegionOfStation_IndexChanged             = false;
 
         private String m_lastestStationInfo = String.Empty;
         private System.Windows.Forms.Timer Clock;
         private CommandersLogEvent m_RightMouseSelectedLogEvent = null;
         private bool m_Closing = false;
-        private AutoResetEvent m_LogfileScanner_ARE                     = new AutoResetEvent(false);
+        private AutoResetEvent m_LogfileScanner_ARE = new AutoResetEvent(false);
         private Thread m_LogfileScanner_Thread;
-        private EDSystem m_loadedSystemdata                             = null;
-        private EDSystem m_currentSystemdata                            = new EDSystem();
-        private string m_lastSystemValue                                = String.Empty;
-        private Boolean m_SystemLoadingValues                           = false;
-        private Boolean m_SystemIsNew                                   = false;
-        private DateTime m_SystemWarningTime                            = DateTime.Now;
+        private EDSystem m_loadedSystemdata = null;
+        private EDSystem m_currentSystemdata = new EDSystem();
+        private string m_lastSystemValue = String.Empty;
+        private Boolean m_SystemLoadingValues = false;
+        private Boolean m_SystemIsNew = false;
+        private DateTime m_SystemWarningTime = DateTime.Now;
 
         [SecurityPermission(SecurityAction.Demand, ControlAppDomain = true)]
         public Form1()
@@ -344,7 +344,7 @@ namespace RegulatedNoise
             }
             catch (Exception ex)
             {
-                throw new Exception("Error while reading system and station data", ex);   
+                throw new Exception("Error while reading system and station data", ex);
             }
         }
 
@@ -355,17 +355,17 @@ namespace RegulatedNoise
             switch (currentListView.Name)
             {
                 case "lvCommandersLog":
-                    currentListView.Columns[0].Width 	=  113;
-                    currentListView.Columns[1].Width 	=  119;
-                    currentListView.Columns[2].Width 	=  122;
-                    currentListView.Columns[3].Width 	=  141;
-                    currentListView.Columns[4].Width 	=   96;
-                    currentListView.Columns[5].Width 	=   72;
-                    currentListView.Columns[6].Width 	=   77;
-                    currentListView.Columns[7].Width 	=  127;
-                    currentListView.Columns[8].Width 	=   60;
-                    currentListView.Columns[9].Width 	=   63;
-                    currentListView.Columns[10].Width 	=   60;
+                    currentListView.Columns[0].Width = 113;
+                    currentListView.Columns[1].Width = 119;
+                    currentListView.Columns[2].Width = 122;
+                    currentListView.Columns[3].Width = 141;
+                    currentListView.Columns[4].Width = 96;
+                    currentListView.Columns[5].Width = 72;
+                    currentListView.Columns[6].Width = 77;
+                    currentListView.Columns[7].Width = 127;
+                    currentListView.Columns[8].Width = 60;
+                    currentListView.Columns[9].Width = 63;
+                    currentListView.Columns[10].Width = 60;
                     break;
             }
 
@@ -479,7 +479,7 @@ namespace RegulatedNoise
 
             string returnValue = null;
             foreach (var directory in autoSearchdir)
-            { 
+            {
                 if (directory == null) continue;
                 foreach (var dir in Directory.GetDirectories(directory))
                 {
@@ -491,7 +491,7 @@ namespace RegulatedNoise
             }
             if (returnValue != null) return returnValue;
 
-            if(Directory.Exists(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\Frontier_Developments\Products\"))
+            if (Directory.Exists(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\Frontier_Developments\Products\"))
                 return Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\Frontier_Developments\Products\";
 
             // nothing found ? then lets have a try with the MUICache
@@ -727,19 +727,19 @@ namespace RegulatedNoise
             // perform the sort with the last sort options.
             this.lvCommandersLog.Sort();
 
-            txtlastStationCount.Text                = RegulatedNoiseSettings.lastStationCount.ToString();
-            cmbLightYears.Text                      = RegulatedNoiseSettings.lastLightYears.ToString();
-            cblastVisitedFirst.Checked              = RegulatedNoiseSettings.lastStationCountActive;
-            cbLimitLightYears.Checked               = RegulatedNoiseSettings.limitLightYears;
-            cbPerLightYearRoundTrip.Checked         = RegulatedNoiseSettings.PerLightYearRoundTrip;
-            cbAutoActivateOCRTab.Checked            = RegulatedNoiseSettings.AutoActivateOCRTab;
-            cbIncludeUnknownDTS.Checked             = RegulatedNoiseSettings.IncludeUnknownDTS;
+            txtlastStationCount.Text = RegulatedNoiseSettings.lastStationCount.ToString();
+            cmbLightYears.Text = RegulatedNoiseSettings.lastLightYears.ToString();
+            cblastVisitedFirst.Checked = RegulatedNoiseSettings.lastStationCountActive;
+            cbLimitLightYears.Checked = RegulatedNoiseSettings.limitLightYears;
+            cbPerLightYearRoundTrip.Checked = RegulatedNoiseSettings.PerLightYearRoundTrip;
+            cbAutoActivateOCRTab.Checked = RegulatedNoiseSettings.AutoActivateOCRTab;
+            cbIncludeUnknownDTS.Checked = RegulatedNoiseSettings.IncludeUnknownDTS;
 
-            cmbStationToStar.Text                   = RegulatedNoiseSettings.lastStationToStar.ToString();
-            cbStationToStar.Checked                 = RegulatedNoiseSettings.StationToStar;
+            cmbStationToStar.Text = RegulatedNoiseSettings.lastStationToStar.ToString();
+            cbStationToStar.Checked = RegulatedNoiseSettings.StationToStar;
 
-            cmbMaxRouteDistance.Text                = RegulatedNoiseSettings.lastMaxRouteDistance.ToString();
-            cbMaxRouteDistance.Checked              = RegulatedNoiseSettings.MaxRouteDistance;
+            cmbMaxRouteDistance.Text = RegulatedNoiseSettings.lastMaxRouteDistance.ToString();
+            cbMaxRouteDistance.Checked = RegulatedNoiseSettings.MaxRouteDistance;
 
             switch (RegulatedNoiseSettings.CBSortingSelection)
             {
@@ -926,7 +926,7 @@ namespace RegulatedNoise
                 try
                 {
                     tabCtrlMain.SelectedTab = tabCtrlMain.TabPages["tabOCRGroup"];
-                    tabCtrlOCR.SelectedTab  = tabCtrlOCR.TabPages["tabOCR"];
+                    tabCtrlOCR.SelectedTab = tabCtrlOCR.TabPages["tabOCR"];
                 }
                 catch (Exception)
                 {
@@ -1312,7 +1312,7 @@ namespace RegulatedNoise
 
                 dist = _Milkyway.getStationDistance(SystemName, StationName);
 
-                if((!RegulatedNoiseSettings.IncludeUnknownDTS) && (dist == -1))
+                if ((!RegulatedNoiseSettings.IncludeUnknownDTS) && (dist == -1))
                     return false;
 
                 var limit = int.Parse(cmbStationToStar.Text);
@@ -2082,7 +2082,7 @@ namespace RegulatedNoise
             lbCommodities.Items.Clear();
 
             if (selectedCmbItem != null)
-            { 
+            {
                 foreach (var row in CommodityDirectory[(selectedCmbItem.ToString())].Where(x => getStationSelection(x)))
                 {
                     lbCommodities.Items.Add(new ListViewItem(new[] 
@@ -4084,20 +4084,20 @@ namespace RegulatedNoise
 
                         if (versions.Count() == 0)
                         {
-                            #if extScanLog
+#if extScanLog
                                 logger.Log("no dirs with <FORC-FDEV> found");
                                 var versions2 = Directory.GetDirectories(appConfigPath).ToList().OrderByDescending(x => x).ToList();
                                 foreach (string SubPath in versions2)
                                 {
                                     logger.Log("but found <" +  SubPath + ">");   
                                 }
-                            #endif
+#endif
                         }
                         else
                         {
-                            #if extScanLog
+#if extScanLog
                                 logger.Log("lookin' for files in <" + versions[0] + ">");
-                            #endif
+#endif
 
                             // We'll just go right ahead and use the latest log...
                             var netLogs =
@@ -4150,7 +4150,7 @@ namespace RegulatedNoise
 
                                     } while (StartPos == -1 && Datei.Position >= 3);
 
-                                    if((StartPos == -1) && ((EndPos - StartPos) > SEARCH_MINLENGTH))
+                                    if ((StartPos == -1) && ((EndPos - StartPos) > SEARCH_MINLENGTH))
                                         StartPos = 0;
 
                                     if ((StartPos >= 0) && ((EndPos - StartPos) <= SEARCH_MAXLENGTH))
@@ -4159,7 +4159,7 @@ namespace RegulatedNoise
                                         // read
                                         Datei.Read(LineBuffer, 0, (int)(EndPos - StartPos));
                                         // and convert to string
-                                        logLump = Encoding.ASCII.GetString(LineBuffer, 0, (int)(EndPos - StartPos) );
+                                        logLump = Encoding.ASCII.GetString(LineBuffer, 0, (int)(EndPos - StartPos));
 
                                         // first looking for the systemname
                                         if (logLump != null && String.IsNullOrEmpty(systemName))
@@ -4255,7 +4255,7 @@ namespace RegulatedNoise
 
                                     if (StartPos >= 3)
                                     {
-                                        Datei.Seek(StartPos-1, SeekOrigin.Begin);
+                                        Datei.Seek(StartPos - 1, SeekOrigin.Begin);
                                     }
                                     else
                                         Datei.Seek(0, SeekOrigin.Begin);
@@ -4293,7 +4293,7 @@ namespace RegulatedNoise
                                             m_lastestStationInfo = "scanning...";
                                     }
                                     else if (!String.IsNullOrEmpty(stationName))
-                                    { 
+                                    {
 #if extScanLog
                                         logger.Log("2 <" + stationName + "> - <" + tbCurrentStationinfoFromLogs.Text + ">");
 #endif
@@ -4311,7 +4311,7 @@ namespace RegulatedNoise
 #endif
                                 }
 
-                                
+
 
                                 setStationInfo();
 
@@ -4336,7 +4336,7 @@ namespace RegulatedNoise
                 logger.Log("awake...");
 #endif
 
-            }while (!this.Disposing && !m_Closing);
+            } while (!this.Disposing && !m_Closing);
 
             Debug.Print("out");
         }
@@ -4359,7 +4359,7 @@ namespace RegulatedNoise
             string[] parts = m.Groups[0].ToString().Split(':');
             if (parts.GetUpperBound(0) >= 3)
             {
-                stationName = _textInfo.ToTitleCase(parts[parts.GetUpperBound(0)-1].ToLower());
+                stationName = _textInfo.ToTitleCase(parts[parts.GetUpperBound(0) - 1].ToLower());
 
                 if (parts[0].Equals("FindBestIsland", StringComparison.InvariantCultureIgnoreCase))
                 {
@@ -4535,7 +4535,7 @@ namespace RegulatedNoise
 
         void lvCommandersLog_ColumnWidthChanged(object sender, System.Windows.Forms.ColumnWidthChangedEventArgs e)
         {
-            saveColumns((ListView)sender);            
+            saveColumns((ListView)sender);
         }
 
         private void cbLogSystemName_DropDown(object sender, EventArgs e)
@@ -4617,7 +4617,7 @@ namespace RegulatedNoise
             tabControl2.SelectedTab = tabStationToStation;
             tabControl2.SelectedTab = tabPage3;
             tabCtrlMain.SelectedTab = tabHelpAndChangeLog;
-            
+
             Retheme();
 
             Clock = new System.Windows.Forms.Timer();
@@ -4907,27 +4907,27 @@ namespace RegulatedNoise
             lbAllRoundTrips.Items.Clear();
             int bestRoundTrip = -1;
             string stationA = "", stationB = "";
-            ProgressView progress   = new ProgressView();
+            ProgressView progress = new ProgressView();
             List<Tuple<string, double>> allRoundTrips = new List<Tuple<string, double>>();
-            
+
             var selectedStations = StationDirectory.Where(x => getStationSelection(x));
 
-            Int32 Total             = getCalculations(selectedStations.Count());
-            Int32 Current           = 0;
+            Int32 Total = getCalculations(selectedStations.Count());
+            Int32 Current = 0;
 
             progress.progressStart(string.Format(string.Format("calculating best routes: {0} abilities from {1} stations", Total, selectedStations.Count())));
 
-            for (int i = 0; i < selectedStations.Count()-1; i++)
+            for (int i = 0; i < selectedStations.Count() - 1; i++)
             {
-                for (int j = i+1; j < selectedStations.Count(); j++)
+                for (int j = i + 1; j < selectedStations.Count(); j++)
                 {
-                    var a = selectedStations.ElementAt(i);        
+                    var a = selectedStations.ElementAt(i);
                     var b = selectedStations.ElementAt(j);
 
-                    Current+=1;
+                    Current += 1;
                     progress.progressUpdate(Current, Total);
 
-                    Debug.Print(Current +"/"+ Total);
+                    Debug.Print(Current + "/" + Total);
 
                     int bestThisTrip;
                     GetBestRoundTripForTwoStations(a.Key, b.Key, out bestThisTrip);
@@ -4942,7 +4942,7 @@ namespace RegulatedNoise
                         else
                         {
                             key1 = b.Key;
-                            key2 = a.Key;                            
+                            key2 = a.Key;
                         }
 
                         string credits;
@@ -4966,9 +4966,9 @@ namespace RegulatedNoise
                         {
                             allRoundTrips.Add(
                                 new Tuple<string, double>(
-                                    credits.PadRight(13) + " :" + 
+                                    credits.PadRight(13) + " :" +
                                     key1
-                                    + "..." + 
+                                    + "..." +
                                     key2
                                     , creditsDouble));
 
@@ -4995,7 +4995,7 @@ namespace RegulatedNoise
             var ordered = allRoundTrips.OrderByDescending(x => x.Item2).Select(x => x.Item1).Distinct().ToList().Cast<object>().ToArray();
 
             lbAllRoundTrips.Items.AddRange(ordered);
-            if(lbAllRoundTrips.Items.Count > 0)
+            if (lbAllRoundTrips.Items.Count > 0)
                 lbAllRoundTrips.SelectedIndex = 0;
 
             this.Cursor = Cursors.Default;
@@ -5005,7 +5005,7 @@ namespace RegulatedNoise
         {
             Int32 retValue = 0;
 
-            for (int i = 0; i <Total; i++)
+            for (int i = 0; i < Total; i++)
             {
                 retValue += i;
             }
@@ -5497,27 +5497,27 @@ namespace RegulatedNoise
         private void cmbStationToStarInput_KeyPress(object sender, System.Windows.Forms.KeyPressEventArgs e)
         {
             if (e.KeyChar == (char)Keys.Return)
-            { 
-                checkcmbStationToStarInput();   
+            {
+                checkcmbStationToStarInput();
             }
         }
 
         private void cmbMaxRouteDistance_SelectedIndexChanged(object sender, EventArgs e)
         {
-            cmbMaxRouteDistanceInput();   
+            cmbMaxRouteDistanceInput();
         }
 
         private void cmbMaxRouteDistance_KeyPress(object sender, System.Windows.Forms.KeyPressEventArgs e)
         {
             if (e.KeyChar == (char)Keys.Return)
-            { 
-                cmbMaxRouteDistanceInput();   
+            {
+                cmbMaxRouteDistanceInput();
             }
         }
 
         private void cmbMaxRouteDistance_LostFocus(object sender, System.EventArgs e)
         {
-            cmbMaxRouteDistanceInput();   
+            cmbMaxRouteDistanceInput();
         }
 
         private void checkcbLightYearsInput()
@@ -5726,14 +5726,14 @@ namespace RegulatedNoise
         private bool getStationSelection(KeyValuePair<string, List<Form1.CsvRow>> x)
         {
             return (!cbLimitLightYears.Checked || Distance(CombinedNameToSystemName(x.Key))) &&
-                   (!cbStationToStar.Checked   || StationDistance(CombinedNameToSystemName(x.Key), CombinedNameToStationName(x.Key)));
+                   (!cbStationToStar.Checked || StationDistance(CombinedNameToSystemName(x.Key), CombinedNameToStationName(x.Key)));
 
         }
 
         private bool getStationSelection(CsvRow x)
         {
             return (!cbLimitLightYears.Checked || Distance(x.SystemName)) &&
-                   (!cbStationToStar.Checked   || StationDistance(x.SystemName, x.StationName));
+                   (!cbStationToStar.Checked || StationDistance(x.SystemName, x.StationName));
         }
 
         private void label63_Click(object sender, EventArgs e)
@@ -5748,43 +5748,43 @@ namespace RegulatedNoise
 
         private void loadSystemData(string Systemname)
         {
-            
+
             m_SystemLoadingValues = true;
 
-            if(Systemname.Equals(ID_NEWITEM))
+            if (Systemname.Equals(ID_NEWITEM))
             {
                 m_loadedSystemdata = new EDSystem();
                 m_SystemIsNew = true;
             }
             else
-            { 
+            {
                 m_loadedSystemdata = _Milkyway.getSystem(Systemname);
                 m_SystemIsNew = false;
             }
 
-            if(m_loadedSystemdata != null)
-            { 
+            if (m_loadedSystemdata != null)
+            {
                 m_currentSystemdata.getValues(m_loadedSystemdata, true);
 
-                txtSystemId.Text                    = m_loadedSystemdata.Id.ToString(CultureInfo.CurrentCulture);
-                txtSystemName.Text                  = m_loadedSystemdata.Name.ToString();
-                txtSystemX.Text                     = m_loadedSystemdata.X.ToString(CultureInfo.CurrentCulture);
-                txtSystemY.Text                     = m_loadedSystemdata.Y.ToString(CultureInfo.CurrentCulture);
-                txtSystemZ.Text                     = m_loadedSystemdata.Z.ToString(CultureInfo.CurrentCulture);
-                txtSystemFaction.Text               = m_loadedSystemdata.Faction.ToString();
-                txtSystemPopulation.Text            = ((long)m_loadedSystemdata.Population).ToString("#,##0.", CultureInfo.CurrentCulture);
-                txtSystemUpdatedAt.Text             = m_loadedSystemdata.UpdatedAt.ToString();
-                txtSystemNeedsPermit.SelectedValue  = m_loadedSystemdata.NeedsPermit;
-                txtSystemPrimaryEconomy.Text        = m_loadedSystemdata.PrimaryEconomy.ToString();
-                txtSystemSecurity.Text              = m_loadedSystemdata.Security.ToString();
-                txtSystemState.Text                 = m_loadedSystemdata.State.ToString();
-                txtSystemAllegiance.Text            = m_loadedSystemdata.Allegiance.ToString();
-                txtSystemGovernment.Text            = m_loadedSystemdata.Government.ToString();
-            
+                txtSystemId.Text = m_loadedSystemdata.Id.ToString(CultureInfo.CurrentCulture);
+                txtSystemName.Text = m_loadedSystemdata.Name.ToString();
+                txtSystemX.Text = m_loadedSystemdata.X.ToString(CultureInfo.CurrentCulture);
+                txtSystemY.Text = m_loadedSystemdata.Y.ToString(CultureInfo.CurrentCulture);
+                txtSystemZ.Text = m_loadedSystemdata.Z.ToString(CultureInfo.CurrentCulture);
+                txtSystemFaction.Text = m_loadedSystemdata.Faction.ToString();
+                txtSystemPopulation.Text = ((long)m_loadedSystemdata.Population).ToString("#,##0.", CultureInfo.CurrentCulture);
+                txtSystemUpdatedAt.Text = m_loadedSystemdata.UpdatedAt.ToString();
+                txtSystemNeedsPermit.SelectedValue = m_loadedSystemdata.NeedsPermit;
+                txtSystemPrimaryEconomy.Text = m_loadedSystemdata.PrimaryEconomy.ToString();
+                txtSystemSecurity.Text = m_loadedSystemdata.Security.ToString();
+                txtSystemState.Text = m_loadedSystemdata.State.ToString();
+                txtSystemAllegiance.Text = m_loadedSystemdata.Allegiance.ToString();
+                txtSystemGovernment.Text = m_loadedSystemdata.Government.ToString();
+
                 m_SystemLoadingValues = false;
                 setSaveButton(true, false);
 
-                if(_Milkyway.getSystems(EDMilkyway.enDataType.Data_EDDB).Exists(x => x.Name.Equals(m_loadedSystemdata.Name, StringComparison.InvariantCultureIgnoreCase)))
+                if (_Milkyway.getSystems(EDMilkyway.enDataType.Data_EDDB).Exists(x => x.Name.Equals(m_loadedSystemdata.Name, StringComparison.InvariantCultureIgnoreCase)))
                 {
                     txtSystemName.ReadOnly = true;
                     lblRenameHint.Visible = true;
@@ -5799,21 +5799,21 @@ namespace RegulatedNoise
             {
                 m_currentSystemdata.clear();
 
-                txtSystemId.Text                    = "";
-                txtSystemName.Text                  = "system not in database";
-                txtSystemX.Text                     = "0.0";
-                txtSystemY.Text                     = "0.0";
-                txtSystemZ.Text                     = "0.0";
-                txtSystemFaction.Text               = "";
-                txtSystemPopulation.Text            = "0";
-                txtSystemUpdatedAt.Text             = "";
-                txtSystemNeedsPermit.SelectedValue  = "0";
-                txtSystemPrimaryEconomy.Text        = "";
-                txtSystemSecurity.Text              = "";
-                txtSystemState.Text                 = "";
-                txtSystemAllegiance.Text            = "";
-                txtSystemGovernment.Text            = "";
-            
+                txtSystemId.Text = "";
+                txtSystemName.Text = "system not in database";
+                txtSystemX.Text = "0.0";
+                txtSystemY.Text = "0.0";
+                txtSystemZ.Text = "0.0";
+                txtSystemFaction.Text = "";
+                txtSystemPopulation.Text = "0";
+                txtSystemUpdatedAt.Text = "";
+                txtSystemNeedsPermit.SelectedValue = "0";
+                txtSystemPrimaryEconomy.Text = "";
+                txtSystemSecurity.Text = "";
+                txtSystemState.Text = "";
+                txtSystemAllegiance.Text = "";
+                txtSystemGovernment.Text = "";
+
                 m_SystemLoadingValues = false;
                 setSaveButton(true, false);
 
@@ -5883,50 +5883,50 @@ namespace RegulatedNoise
 
             txtSystemPopulation.Culture = CultureInfo.CurrentCulture;
 
-            this.txtSystemName.TextChanged              += new System.EventHandler(this.txtSystem_TextChanged);
-            this.txtSystemName.TextChanged              += new System.EventHandler(this.txtSystem_TextChanged);              
-            this.txtSystemX.TextChanged                 += new System.EventHandler(this.txtSystem_TextChanged);                 
-            this.txtSystemY.TextChanged                 += new System.EventHandler(this.txtSystem_TextChanged);                 
-            this.txtSystemZ.TextChanged                 += new System.EventHandler(this.txtSystem_TextChanged);                 
-            this.txtSystemFaction.TextChanged           += new System.EventHandler(this.txtSystem_TextChanged);           
-            this.txtSystemPopulation.TextChanged        += new System.EventHandler(this.txtSystem_TextChanged);        
-            this.txtSystemUpdatedAt.TextChanged         += new System.EventHandler(this.txtSystem_TextChanged);           
-            this.txtSystemNeedsPermit.TextChanged       += new System.EventHandler(this.txtSystem_TextChanged);       
-            this.txtSystemPrimaryEconomy.TextChanged    += new System.EventHandler(this.txtSystem_TextChanged);    
-            this.txtSystemSecurity.TextChanged          += new System.EventHandler(this.txtSystem_TextChanged);          
-            this.txtSystemState.TextChanged             += new System.EventHandler(this.txtSystem_TextChanged);             
-            this.txtSystemAllegiance.TextChanged        += new System.EventHandler(this.txtSystem_TextChanged);        
-            this.txtSystemGovernment.TextChanged        += new System.EventHandler(this.txtSystem_TextChanged);
+            this.txtSystemName.TextChanged += new System.EventHandler(this.txtSystem_TextChanged);
+            this.txtSystemName.TextChanged += new System.EventHandler(this.txtSystem_TextChanged);
+            this.txtSystemX.TextChanged += new System.EventHandler(this.txtSystem_TextChanged);
+            this.txtSystemY.TextChanged += new System.EventHandler(this.txtSystem_TextChanged);
+            this.txtSystemZ.TextChanged += new System.EventHandler(this.txtSystem_TextChanged);
+            this.txtSystemFaction.TextChanged += new System.EventHandler(this.txtSystem_TextChanged);
+            this.txtSystemPopulation.TextChanged += new System.EventHandler(this.txtSystem_TextChanged);
+            this.txtSystemUpdatedAt.TextChanged += new System.EventHandler(this.txtSystem_TextChanged);
+            this.txtSystemNeedsPermit.TextChanged += new System.EventHandler(this.txtSystem_TextChanged);
+            this.txtSystemPrimaryEconomy.TextChanged += new System.EventHandler(this.txtSystem_TextChanged);
+            this.txtSystemSecurity.TextChanged += new System.EventHandler(this.txtSystem_TextChanged);
+            this.txtSystemState.TextChanged += new System.EventHandler(this.txtSystem_TextChanged);
+            this.txtSystemAllegiance.TextChanged += new System.EventHandler(this.txtSystem_TextChanged);
+            this.txtSystemGovernment.TextChanged += new System.EventHandler(this.txtSystem_TextChanged);
 
-            this.txtSystemName.LostFocus                += txtSystem_LostFocus;
-            this.txtSystemName.LostFocus                += txtSystem_LostFocus;              
-            this.txtSystemX.LostFocus                   += txtSystem_LostFocus;                 
-            this.txtSystemY.LostFocus                   += txtSystem_LostFocus;                 
-            this.txtSystemZ.LostFocus                   += txtSystem_LostFocus;                 
-            this.txtSystemFaction.LostFocus             += txtSystem_LostFocus;           
-            this.txtSystemPopulation.LostFocus          += txtSystem_LostFocus;        
-            this.txtSystemUpdatedAt.LostFocus           += txtSystem_LostFocus;           
-            this.txtSystemNeedsPermit.LostFocus         += txtSystem_LostFocus;       
-            this.txtSystemPrimaryEconomy.LostFocus      += txtSystem_LostFocus;    
-            this.txtSystemSecurity.LostFocus            += txtSystem_LostFocus;          
-            this.txtSystemState.LostFocus               += txtSystem_LostFocus;             
-            this.txtSystemAllegiance.LostFocus          += txtSystem_LostFocus;        
-            this.txtSystemGovernment.LostFocus          += txtSystem_LostFocus;
+            this.txtSystemName.LostFocus += txtSystem_LostFocus;
+            this.txtSystemName.LostFocus += txtSystem_LostFocus;
+            this.txtSystemX.LostFocus += txtSystem_LostFocus;
+            this.txtSystemY.LostFocus += txtSystem_LostFocus;
+            this.txtSystemZ.LostFocus += txtSystem_LostFocus;
+            this.txtSystemFaction.LostFocus += txtSystem_LostFocus;
+            this.txtSystemPopulation.LostFocus += txtSystem_LostFocus;
+            this.txtSystemUpdatedAt.LostFocus += txtSystem_LostFocus;
+            this.txtSystemNeedsPermit.LostFocus += txtSystem_LostFocus;
+            this.txtSystemPrimaryEconomy.LostFocus += txtSystem_LostFocus;
+            this.txtSystemSecurity.LostFocus += txtSystem_LostFocus;
+            this.txtSystemState.LostFocus += txtSystem_LostFocus;
+            this.txtSystemAllegiance.LostFocus += txtSystem_LostFocus;
+            this.txtSystemGovernment.LostFocus += txtSystem_LostFocus;
 
-            this.txtSystemName.GotFocus                += txtSystem_GotFocus;
-            this.txtSystemName.GotFocus                += txtSystem_GotFocus;              
-            this.txtSystemX.GotFocus                   += txtSystem_GotFocus;                 
-            this.txtSystemY.GotFocus                   += txtSystem_GotFocus;                 
-            this.txtSystemZ.GotFocus                   += txtSystem_GotFocus;                 
-            this.txtSystemFaction.GotFocus             += txtSystem_GotFocus;           
-            this.txtSystemPopulation.GotFocus          += txtSystem_GotFocus;        
-            this.txtSystemUpdatedAt.GotFocus           += txtSystem_GotFocus;           
-            this.txtSystemNeedsPermit.GotFocus         += txtSystem_GotFocus;       
-            this.txtSystemPrimaryEconomy.GotFocus      += txtSystem_GotFocus;    
-            this.txtSystemSecurity.GotFocus            += txtSystem_GotFocus;          
-            this.txtSystemState.GotFocus               += txtSystem_GotFocus;             
-            this.txtSystemAllegiance.GotFocus          += txtSystem_GotFocus;        
-            this.txtSystemGovernment.GotFocus          += txtSystem_GotFocus;
+            this.txtSystemName.GotFocus += txtSystem_GotFocus;
+            this.txtSystemName.GotFocus += txtSystem_GotFocus;
+            this.txtSystemX.GotFocus += txtSystem_GotFocus;
+            this.txtSystemY.GotFocus += txtSystem_GotFocus;
+            this.txtSystemZ.GotFocus += txtSystem_GotFocus;
+            this.txtSystemFaction.GotFocus += txtSystem_GotFocus;
+            this.txtSystemPopulation.GotFocus += txtSystem_GotFocus;
+            this.txtSystemUpdatedAt.GotFocus += txtSystem_GotFocus;
+            this.txtSystemNeedsPermit.GotFocus += txtSystem_GotFocus;
+            this.txtSystemPrimaryEconomy.GotFocus += txtSystem_GotFocus;
+            this.txtSystemSecurity.GotFocus += txtSystem_GotFocus;
+            this.txtSystemState.GotFocus += txtSystem_GotFocus;
+            this.txtSystemAllegiance.GotFocus += txtSystem_GotFocus;
+            this.txtSystemGovernment.GotFocus += txtSystem_GotFocus;
 
 
         }
@@ -5970,41 +5970,41 @@ namespace RegulatedNoise
 
             switch (((Control)sender).Name)
             {
-            	case "txtSystemName":     
-                    if(m_SystemIsNew)
+                case "txtSystemName":
+                    if (m_SystemIsNew)
                     {
                         EDSystem existing = _Milkyway.getSystems(EDMilkyway.enDataType.Data_Merged).Find(x => x.Name.Equals(txtSystemName.Text, StringComparison.InvariantCultureIgnoreCase));
-                        if(existing != null)
+                        if (existing != null)
                         {
-                            if(DateTime.Now.Subtract(m_SystemWarningTime).TotalSeconds > 5)
-                            { 
+                            if (DateTime.Now.Subtract(m_SystemWarningTime).TotalSeconds > 5)
+                            {
                                 m_SystemWarningTime = DateTime.Now;
                                 MessageBox.Show("A system with this name already exists", "Adding a new system", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                             }
                         }
                     }
-                    m_currentSystemdata.Name = txtSystemName.Text;  
+                    m_currentSystemdata.Name = txtSystemName.Text;
                     break;
                 case "txtSystemX":
-                    if(double.TryParse(txtSystemX.Text, out doubleValue))
+                    if (double.TryParse(txtSystemX.Text, out doubleValue))
                         m_currentSystemdata.X = doubleValue;
                     else
-                    { 
+                    {
                         m_currentSystemdata.X = double.Parse(m_lastSystemValue);
                         txtSystemX.Text = m_lastSystemValue;
                     }
                     break;
-                case "txtSystemY":         
-                    if(double.TryParse(txtSystemY.Text, out doubleValue))
+                case "txtSystemY":
+                    if (double.TryParse(txtSystemY.Text, out doubleValue))
                         m_currentSystemdata.Y = doubleValue;
                     else
-                    { 
+                    {
                         m_currentSystemdata.Y = double.Parse(m_lastSystemValue);
                         txtSystemY.Text = m_lastSystemValue;
                     }
                     break;
-                case "txtSystemZ":         
-                    if(double.TryParse(txtSystemZ.Text, out doubleValue))
+                case "txtSystemZ":
+                    if (double.TryParse(txtSystemZ.Text, out doubleValue))
                         m_currentSystemdata.Z = doubleValue;
                     else
                     {
@@ -6012,23 +6012,23 @@ namespace RegulatedNoise
                         txtSystemZ.Text = m_lastSystemValue;
                     }
                     break;
-                case "txtSystemFaction":   
+                case "txtSystemFaction":
                     m_currentSystemdata.Faction = txtSystemFaction.Text;
                     break;
                 case "txtSystemPopulation":
-                    if(long.TryParse(txtSystemPopulation.Text.Replace(",","").Replace(".",""), out longValue))
+                    if (long.TryParse(txtSystemPopulation.Text.Replace(",", "").Replace(".", ""), out longValue))
                         m_currentSystemdata.Population = longValue;
                     else
-                    { 
+                    {
                         m_currentSystemdata.Population = long.Parse(m_lastSystemValue);
                     }
                     txtSystemPopulation.Text = ((long)m_currentSystemdata.Population).ToString("#,##0.", CultureInfo.CurrentCulture);
                     break;
-                case "txtSystemUpdatedAt": 
-                    if(Int32.TryParse(txtSystemUpdatedAt.Text, out intValue))
+                case "txtSystemUpdatedAt":
+                    if (Int32.TryParse(txtSystemUpdatedAt.Text, out intValue))
                         m_currentSystemdata.UpdatedAt = intValue;
                     else
-                    { 
+                    {
                         m_currentSystemdata.UpdatedAt = Int32.Parse(m_lastSystemValue);
                         txtSystemUpdatedAt.Text = m_lastSystemValue;
                     }
@@ -6047,10 +6047,10 @@ namespace RegulatedNoise
                 case "txtSystemPrimaryEconomy":
                     m_currentSystemdata.PrimaryEconomy = txtSystemPrimaryEconomy.Text;
                     break;
-                case "txtSystemSecurity":  
+                case "txtSystemSecurity":
                     m_currentSystemdata.Security = txtSystemSecurity.Text;
                     break;
-                case "txtSystemState":     
+                case "txtSystemState":
                     m_currentSystemdata.State = txtSystemState.Text;
                     break;
                 case "txtSystemAllegiance":
@@ -6058,9 +6058,9 @@ namespace RegulatedNoise
                     break;
                 case "txtSystemGovernment":
                     m_currentSystemdata.Government = txtSystemGovernment.Text;
-            		break;
-            } 
-            
+                    break;
+            }
+
 
             setSaveButton();
         }
@@ -6076,18 +6076,18 @@ namespace RegulatedNoise
 
         private void cmdSystemChange_Click(object sender, EventArgs e)
         {
-            if(m_SystemIsNew)
+            if (m_SystemIsNew)
             {
                 EDSystem existing = _Milkyway.getSystems(EDMilkyway.enDataType.Data_Merged).Find(x => x.Name.Equals(m_currentSystemdata.Name, StringComparison.InvariantCultureIgnoreCase));
-                if(existing != null)
+                if (existing != null)
                 {
                     MessageBox.Show("A system with this name already exists", "Adding a new system", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                     return;
                 }
             }
 
-            if(MessageBox.Show("Save changes on current system ?", "Stationdata changed", MessageBoxButtons.OKCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1) == System.Windows.Forms.DialogResult.OK)
-            { 
+            if (MessageBox.Show("Save changes on current system ?", "Stationdata changed", MessageBoxButtons.OKCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1) == System.Windows.Forms.DialogResult.OK)
+            {
                 _Milkyway.changeSystem(m_currentSystemdata);
                 setSaveButton(true, false);
             }
@@ -6100,8 +6100,8 @@ namespace RegulatedNoise
 
         private void setSaveButton(bool force = false, bool forceValue = true)
         {
-            if(m_SystemIsNew)
-            { 
+            if (m_SystemIsNew)
+            {
                 if (!String.IsNullOrEmpty(m_currentSystemdata.Name))
                     cmdSystemChange.Enabled = true;
                 else
@@ -6109,7 +6109,7 @@ namespace RegulatedNoise
             }
             else
             {
-                if(force)
+                if (force)
                     cmdSystemChange.Enabled = forceValue;
                 else
                     cmdSystemChange.Enabled = !m_currentSystemdata.EqualsED(m_loadedSystemdata);
@@ -6128,7 +6128,7 @@ namespace RegulatedNoise
             RegulatedNoiseSettings.MaxRouteDistance = cbMaxRouteDistance.Checked;
             SaveSettings();
 
-            
+
         }
 
         #region ExternalData
@@ -6289,8 +6289,11 @@ namespace RegulatedNoise
                     AppendExternalDataLog(string.Format("Done importing. Imported {0} entries.", entryCount));
                 }
                 UpdateConnectionStatus("Done");
-                // Update listings (hack)
+                // Force update of commodity listings (hack)
+                SetupGui(true);
                 cbStation_SelectedIndexChanged(cmbStation, null);
+                // Force save commodity data
+                SaveCommodityData(true);
             }
             catch (Exception ex)
             {
