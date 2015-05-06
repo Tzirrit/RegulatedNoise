@@ -18,12 +18,43 @@ todo:
    * copy system name with context menu in the "by station" and "by commodity" view
    * if implausibe prices show warnlevel direct under the price data
    * show hint with age of market prices if location is a station
-   * webserver : allow other ports than 8080
+   * show hint how many stations and systems are in database
+   * add rejected marketdata from eddn with rightclick contextmenue
    ***********************************************************************************
 
 -------------------------------------------------------------------------------------      
 
-1.84_0.14_2
+1.84_0.17_3
+   * many steps for adding and changing station data done
+-------------------------------------------------------------------------------------      
+1.84_0.17_2
+   * data system can be added and changed - station data still open
+-------------------------------------------------------------------------------------      
+1.84_0.17_1
+   * set "unset"-value for EDDB station and system properties to null
+   * option to cancel while asked for needed directorys on first start
+   * systems in general now editable, not only the current system
+   * cleaned up system tab
+   * added new helper classes "controls_ext", "Extensions", "ObjectCompare"
+-------------------------------------------------------------------------------------      
+1.84_0.16
+   * translating of EDDN messages, EDDN now possible with other languages than english
+   * fixed a bug in the internal translating logic
+   * added a plausibility filter to the incoming EDDN logic
+   * added last EDDB data files
+-------------------------------------------------------------------------------------      
+1.84_0.15_2
+   * sorting of comboboxes is saved now
+   * search for 'products' path can be cancelled
+-------------------------------------------------------------------------------------      
+1.84_0.15_1
+   * auto show systemdata
+   * port of webserver is adjustable
+   * show number of stations in system
+   * completed splash screen
+   * optimized program start behaviour
+-------------------------------------------------------------------------------------      
+1.84_0.14
    * added a progress view for calculating best routes with cancel option
    * filter added : max. distance for trade routes
 -------------------------------------------------------------------------------------      

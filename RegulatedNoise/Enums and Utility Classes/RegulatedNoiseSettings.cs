@@ -59,7 +59,7 @@ namespace RegulatedNoise
 
 #if DukeJones
 
-        public readonly decimal VersionDJ = 0.14m;
+        public readonly decimal VersionDJ = 0.16m;
 #endif
         private int _isFirstRun = -1;
 
@@ -67,6 +67,7 @@ namespace RegulatedNoise
         public string GamePath = ""; //Should Replace ProductsPath by always contain the newest FORC-FDEV dir.
         public string ProductAppData = ""; //2nd location for game configuration files
         public string WebserverIpAddress = "";
+        public string WebserverPort = "8080";
         public bool StartWebserverOnLoad = false;
         public string WebserverBackgroundColor = "#FFFFFF";
         public string WebserverForegroundColor = "#000000";
@@ -104,8 +105,10 @@ namespace RegulatedNoise
         public decimal lastVersionDJ                                    = 0.00m;
         public int GUIColorCutoffLevel                                  = 150;
         public bool AutoActivateOCRTab                                  = true;
+        public bool AutoActivateSystemTab                               = true;
         public string PilotsName                                        = String.Empty;
         public bool IncludeUnknownDTS                                   = false;
+        public bool LoadStationsJSON                                  = false;
 
         public SerializableDictionary<string, WindowData> WindowBaseData = new SerializableDictionary<string, WindowData>() { 
                                                                                                                   {"Form1",                 new WindowData()},
@@ -328,7 +331,30 @@ namespace RegulatedNoise
                                   int.Parse(UiColour.Substring(3, 2), System.Globalization.NumberStyles.HexNumber),
                                   int.Parse(UiColour.Substring(5, 2), System.Globalization.NumberStyles.HexNumber));
         }
-    }
+
+        /// <summary>
+        /// returns the UI color as color object
+        /// </summary>
+        /// <returns></returns>
+        public Color getForegroundColor()
+        {
+            return Color.FromArgb(int.Parse(ForegroundColour.Substring(1, 2), System.Globalization.NumberStyles.HexNumber), 
+                                  int.Parse(ForegroundColour.Substring(3, 2), System.Globalization.NumberStyles.HexNumber),
+                                  int.Parse(ForegroundColour.Substring(5, 2), System.Globalization.NumberStyles.HexNumber));
+        }
+
+            /// <summary>
+        /// returns the UI color as color object
+        /// </summary>
+        /// <returns></returns>
+        public Color getBackgroundColor()
+        {
+            return Color.FromArgb(int.Parse(BackgroundColour.Substring(1, 2), System.Globalization.NumberStyles.HexNumber), 
+                                  int.Parse(BackgroundColour.Substring(3, 2), System.Globalization.NumberStyles.HexNumber),
+                                  int.Parse(BackgroundColour.Substring(5, 2), System.Globalization.NumberStyles.HexNumber));
+        }
+
+}
 
     public partial class Form1
     {
