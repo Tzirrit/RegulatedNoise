@@ -5380,8 +5380,5 @@
         private System.Windows.Forms.TextBox tb_DownloadDayLimit;
         private System.Windows.Forms.CheckBox cb_LimitDownload;
     }
-
-        
-    }
 }
 

@@ -56,11 +56,7 @@ namespace RegulatedNoise
     public class RegulatedNoiseSettings
     {
         public readonly decimal Version   = 1.84m;
-
-#if DukeJones
-
-        public readonly decimal VersionDJ = 0.18m;
-#endif
+        public readonly decimal VersionDJ = 0.19m;
         private int _isFirstRun = -1;
 
         public string ProductsPath = "";

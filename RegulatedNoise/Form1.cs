@@ -50,7 +50,6 @@ namespace RegulatedNoise
         private delegate void delCheckboxInvoker(CheckBox myCheckbox, bool setChecked);
 
         public static Form1 InstanceObject;
-
         
         public EDDN Eddn;
         public Random random = new Random();
@@ -82,6 +81,9 @@ namespace RegulatedNoise
 
         //Implementation of the new classlibrary
         public EdSystem CurrentSystem;
+
+        // External Data Sources
+        public ExternalDataManager ExternalDataManager;
 
         private BindingSource _bs_Stations                              = new BindingSource();
         private BindingSource _bs_StationsFrom                          = new BindingSource();
@@ -245,8 +247,10 @@ namespace RegulatedNoise
                 if (!Directory.Exists(".//OCR Correction Images"))
                     Directory.CreateDirectory(".//OCR Correction Images");
 
+                _Splash.InfoAdd("initialize external data sources...");
                 InitializeExternalData();
                 _logger.Log("  - external data sources initialized");
+                _Splash.InfoAdd("initialize external data sources...<OK>");
 
                 _logger.Log("Initialisation complete");
 
@@ -5010,26 +5014,6 @@ namespace RegulatedNoise
                 }
             }
         }
-
-        private void Retheme()
-        {
-            bool noBackColor = false;
-
-            if (RegulatedNoiseSettings.ForegroundColour == null || RegulatedNoiseSettings.BackgroundColour == null) return;
-
-            var x = GetAll(this);
-
-            int redF = int.Parse(RegulatedNoiseSettings.ForegroundColour.Substring(1, 2), System.Globalization.NumberStyles.HexNumber);
-            int greenF = int.Parse(RegulatedNoiseSettings.ForegroundColour.Substring(3, 2), System.Globalization.NumberStyles.HexNumber);
-            int blueF = int.Parse(RegulatedNoiseSettings.ForegroundColour.Substring(5, 2), System.Globalization.NumberStyles.HexNumber);
-            var f = Color.FromArgb(redF, greenF, blueF);
-            int redB = int.Parse(RegulatedNoiseSettings.BackgroundColour.Substring(1, 2), System.Globalization.NumberStyles.HexNumber);
-            int greenB = int.Parse(RegulatedNoiseSettings.BackgroundColour.Substring(3, 2), System.Globalization.NumberStyles.HexNumber);
-            int blueB = int.Parse(RegulatedNoiseSettings.BackgroundColour.Substring(5, 2), System.Globalization.NumberStyles.HexNumber);
-            var b = Color.FromArgb(redB, greenB, blueB);
-            foreach (Control c in x)
-            {
-                var props = c.GetType().GetProperties().Select(y => y.Name);
 
         private void Retheme()
         {
