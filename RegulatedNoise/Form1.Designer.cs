@@ -39,6 +39,9 @@
             this.rbSortByDistance = new System.Windows.Forms.RadioButton();
             this.rbSortByStation = new System.Windows.Forms.RadioButton();
             this.rbSortBySystem = new System.Windows.Forms.RadioButton();
+            this.label89 = new System.Windows.Forms.Label();
+            this.nudPurgeOldDataDays = new System.Windows.Forms.NumericUpDown();
+            this.cmdPurgeOldData = new System.Windows.Forms.Button();
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.dsCommodities = new RegulatedNoise.Enums_and_Utility_Classes.dsCommodities();
             this.namesBindingSource = new System.Windows.Forms.BindingSource(this.components);
@@ -55,6 +58,15 @@
             this.button5 = new System.Windows.Forms.Button();
             this.tabCtrlMain = new System.Windows.Forms.TabControl();
             this.tabHelpAndChangeLog = new System.Windows.Forms.TabPage();
+            this.label93 = new System.Windows.Forms.Label();
+            this.label92 = new System.Windows.Forms.Label();
+            this.label91 = new System.Windows.Forms.Label();
+            this.linkLabel11 = new System.Windows.Forms.LinkLabel();
+            this.linkLabel10 = new System.Windows.Forms.LinkLabel();
+            this.llVisitUpdate = new System.Windows.Forms.LinkLabel();
+            this.cmdUpdate = new System.Windows.Forms.Button();
+            this.lblUpdateInfo = new System.Windows.Forms.Label();
+            this.lblUpdateDetail = new System.Windows.Forms.TextBox();
             this.cmdDonate = new System.Windows.Forms.Button();
             this.label42 = new System.Windows.Forms.Label();
             this.panel2 = new System.Windows.Forms.Panel();
@@ -81,7 +93,10 @@
             this.lblSubtitle = new System.Windows.Forms.Label();
             this.lblRegulatedNoise = new System.Windows.Forms.Label();
             this.tabSystemData = new System.Windows.Forms.TabPage();
+            this.groupBox14 = new System.Windows.Forms.GroupBox();
+            this.cmbStationStations = new System.Windows.Forms.ComboBox_ro();
             this.paEconomies = new System.Windows.Forms.Panel();
+            this.cbStationEcoNone = new System.Windows.Forms.CheckBox_ro();
             this.button8 = new System.Windows.Forms.Button();
             this.cbStationEcoTourism = new System.Windows.Forms.CheckBox_ro();
             this.cbStationEcoTerraforming = new System.Windows.Forms.CheckBox_ro();
@@ -92,7 +107,6 @@
             this.cbStationEcoHighTech = new System.Windows.Forms.CheckBox_ro();
             this.cbStationEcoExtraction = new System.Windows.Forms.CheckBox_ro();
             this.cbStationEcoAgriculture = new System.Windows.Forms.CheckBox_ro();
-            this.groupBox14 = new System.Windows.Forms.GroupBox();
             this.cmdStationCancel = new System.Windows.Forms.Button();
             this.lblStationCountTotal = new System.Windows.Forms.Label();
             this.label90 = new System.Windows.Forms.Label();
@@ -110,7 +124,6 @@
             this.cbStationHasRefuel = new System.Windows.Forms.CheckBox_ro();
             this.cbStationHasCommodities = new System.Windows.Forms.CheckBox_ro();
             this.cbStationHasBlackmarket = new System.Windows.Forms.CheckBox_ro();
-            this.cmbStationStations = new System.Windows.Forms.ComboBox_ro();
             this.label87 = new System.Windows.Forms.Label();
             this.cmdStationNew = new System.Windows.Forms.Button();
             this.cmdStationSave = new System.Windows.Forms.Button();
@@ -333,7 +346,8 @@
             this.lbEddnImplausible = new System.Windows.Forms.ListBox();
             this.tbEddnStats = new System.Windows.Forms.TextBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.checkboxSpoolEddnToFile = new System.Windows.Forms.CheckBox();
+            this.cbSpoolImplausibleToFile = new System.Windows.Forms.CheckBox();
+            this.cbSpoolEddnToFile = new System.Windows.Forms.CheckBox();
             this.bPurgeAllEddnData = new System.Windows.Forms.Button();
             this.button17 = new System.Windows.Forms.Button();
             this.label28 = new System.Windows.Forms.Label();
@@ -353,6 +367,9 @@
             this.cbAutoActivateOCRTab = new System.Windows.Forms.CheckBox();
             this.button6 = new System.Windows.Forms.Button();
             this.groupBox10 = new System.Windows.Forms.GroupBox();
+            this.cbAutoAdd_ReplaceVisited = new System.Windows.Forms.CheckBox();
+            this.cbAutoAdd_Marketdata = new System.Windows.Forms.CheckBox();
+            this.cbAutoAdd_Visited = new System.Windows.Forms.CheckBox();
             this.label49 = new System.Windows.Forms.Label();
             this.cbAutoAdd_JumpedTo = new System.Windows.Forms.CheckBox();
             this.groupBox8 = new System.Windows.Forms.GroupBox();
@@ -399,6 +416,7 @@
             this.cb_DataSource = new System.Windows.Forms.ComboBox();
             this.dataSourceBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.btn_TestDataSourceConnection = new System.Windows.Forms.Button();
+            ((System.ComponentModel.ISupportInitialize)(this.nudPurgeOldDataDays)).BeginInit();
             this.contextMenuStrip1.SuspendLayout();
             this.tabCtrlMain.SuspendLayout();
             this.tabHelpAndChangeLog.SuspendLayout();
@@ -407,8 +425,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.pbForegroundColour)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.tabSystemData.SuspendLayout();
-            this.paEconomies.SuspendLayout();
             this.groupBox14.SuspendLayout();
+            this.paEconomies.SuspendLayout();
             this.gbSystemSystemData.SuspendLayout();
             this.tabPriceAnalysis.SuspendLayout();
             this.gbSorting.SuspendLayout();
@@ -517,6 +535,50 @@
             this.toolTip1.SetToolTip(this.rbSortBySystem, "sorting by system");
             this.rbSortBySystem.UseVisualStyleBackColor = true;
             this.rbSortBySystem.CheckedChanged += new System.EventHandler(this.rbSortBy_CheckedChanged);
+            // 
+            // label89
+            // 
+            this.label89.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.label89.AutoSize = true;
+            this.label89.Location = new System.Drawing.Point(203, 338);
+            this.label89.Name = "label89";
+            this.label89.Size = new System.Drawing.Size(29, 13);
+            this.label89.TabIndex = 19;
+            this.label89.Text = "days";
+            this.toolTip1.SetToolTip(this.label89, "0 purges all but todays price data, -1 purges ALL price data");
+            // 
+            // nudPurgeOldDataDays
+            // 
+            this.nudPurgeOldDataDays.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.nudPurgeOldDataDays.Location = new System.Drawing.Point(154, 335);
+            this.nudPurgeOldDataDays.Maximum = new decimal(new int[] {
+            365,
+            0,
+            0,
+            0});
+            this.nudPurgeOldDataDays.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            -2147483648});
+            this.nudPurgeOldDataDays.Name = "nudPurgeOldDataDays";
+            this.nudPurgeOldDataDays.Size = new System.Drawing.Size(44, 20);
+            this.nudPurgeOldDataDays.TabIndex = 62;
+            this.nudPurgeOldDataDays.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.toolTip1.SetToolTip(this.nudPurgeOldDataDays, "0 purges all but todays data, -1 purges ALL data");
+            this.nudPurgeOldDataDays.ValueChanged += new System.EventHandler(this.nudPurgeOldDataDays_ValueChanged);
+            // 
+            // cmdPurgeOldData
+            // 
+            this.cmdPurgeOldData.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.cmdPurgeOldData.Location = new System.Drawing.Point(32, 333);
+            this.cmdPurgeOldData.Name = "cmdPurgeOldData";
+            this.cmdPurgeOldData.Size = new System.Drawing.Size(116, 23);
+            this.cmdPurgeOldData.TabIndex = 8;
+            this.cmdPurgeOldData.Text = "purge data older than";
+            this.toolTip1.SetToolTip(this.cmdPurgeOldData, "0 purges all but todays price data, -1 purges ALL price data");
+            this.cmdPurgeOldData.UseVisualStyleBackColor = true;
+            this.cmdPurgeOldData.Click += new System.EventHandler(this.cmdPurgeOldData_Click);
             // 
             // contextMenuStrip1
             // 
@@ -651,10 +713,21 @@
             this.tabCtrlMain.SelectedIndex = 0;
             this.tabCtrlMain.Size = new System.Drawing.Size(1059, 615);
             this.tabCtrlMain.TabIndex = 4;
+            this.tabCtrlMain.SelectedIndexChanged += new System.EventHandler(this.tabCtrlMain_SelectedIndexChanged);
+            this.tabCtrlMain.Selecting += new System.Windows.Forms.TabControlCancelEventHandler(this.tabCtrlMain_Selecting);
             this.tabCtrlMain.Selected += new System.Windows.Forms.TabControlEventHandler(this.tabControl1_Selected);
             // 
             // tabHelpAndChangeLog
             // 
+            this.tabHelpAndChangeLog.Controls.Add(this.label93);
+            this.tabHelpAndChangeLog.Controls.Add(this.label92);
+            this.tabHelpAndChangeLog.Controls.Add(this.label91);
+            this.tabHelpAndChangeLog.Controls.Add(this.linkLabel11);
+            this.tabHelpAndChangeLog.Controls.Add(this.linkLabel10);
+            this.tabHelpAndChangeLog.Controls.Add(this.llVisitUpdate);
+            this.tabHelpAndChangeLog.Controls.Add(this.cmdUpdate);
+            this.tabHelpAndChangeLog.Controls.Add(this.lblUpdateInfo);
+            this.tabHelpAndChangeLog.Controls.Add(this.lblUpdateDetail);
             this.tabHelpAndChangeLog.Controls.Add(this.cmdDonate);
             this.tabHelpAndChangeLog.Controls.Add(this.label42);
             this.tabHelpAndChangeLog.Controls.Add(this.panel2);
@@ -676,6 +749,99 @@
             this.tabHelpAndChangeLog.TabIndex = 9;
             this.tabHelpAndChangeLog.Text = "Help and Changelog";
             this.tabHelpAndChangeLog.UseVisualStyleBackColor = true;
+            // 
+            // label93
+            // 
+            this.label93.AutoSize = true;
+            this.label93.Location = new System.Drawing.Point(297, 221);
+            this.label93.Name = "label93";
+            this.label93.Size = new System.Drawing.Size(121, 13);
+            this.label93.TabIndex = 47;
+            this.label93.Text = "RN im deutschen Forum";
+            // 
+            // label92
+            // 
+            this.label92.AutoSize = true;
+            this.label92.Location = new System.Drawing.Point(297, 186);
+            this.label92.Name = "label92";
+            this.label92.Size = new System.Drawing.Size(92, 13);
+            this.label92.TabIndex = 46;
+            this.label92.Text = "english RN thread";
+            // 
+            // label91
+            // 
+            this.label91.AutoSize = true;
+            this.label91.Location = new System.Drawing.Point(27, 186);
+            this.label91.Name = "label91";
+            this.label91.Size = new System.Drawing.Size(63, 13);
+            this.label91.TabIndex = 45;
+            this.label91.Text = "Project-Link";
+            // 
+            // linkLabel11
+            // 
+            this.linkLabel11.AutoSize = true;
+            this.linkLabel11.Location = new System.Drawing.Point(297, 234);
+            this.linkLabel11.Name = "linkLabel11";
+            this.linkLabel11.Size = new System.Drawing.Size(343, 13);
+            this.linkLabel11.TabIndex = 44;
+            this.linkLabel11.TabStop = true;
+            this.linkLabel11.Text = "http://www.elitedangerous.de/forum/viewtopic.php?f=66&t=6404&start=0";
+            this.linkLabel11.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.llVisitUpdate_LinkClicked);
+            // 
+            // linkLabel10
+            // 
+            this.linkLabel10.AutoSize = true;
+            this.linkLabel10.Location = new System.Drawing.Point(297, 200);
+            this.linkLabel10.Name = "linkLabel10";
+            this.linkLabel10.Size = new System.Drawing.Size(271, 13);
+            this.linkLabel10.TabIndex = 43;
+            this.linkLabel10.TabStop = true;
+            this.linkLabel10.Text = "https://forums.frontier.co.uk/showthread.php?t=137732";
+            this.linkLabel10.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.llVisitUpdate_LinkClicked);
+            // 
+            // llVisitUpdate
+            // 
+            this.llVisitUpdate.AutoSize = true;
+            this.llVisitUpdate.Location = new System.Drawing.Point(27, 200);
+            this.llVisitUpdate.Name = "llVisitUpdate";
+            this.llVisitUpdate.Size = new System.Drawing.Size(238, 13);
+            this.llVisitUpdate.TabIndex = 42;
+            this.llVisitUpdate.TabStop = true;
+            this.llVisitUpdate.Text = "https://github.com/Duke-Jones/RegulatedNoise";
+            this.llVisitUpdate.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.llVisitUpdate_LinkClicked);
+            // 
+            // cmdUpdate
+            // 
+            this.cmdUpdate.Location = new System.Drawing.Point(541, 257);
+            this.cmdUpdate.Name = "cmdUpdate";
+            this.cmdUpdate.Size = new System.Drawing.Size(167, 32);
+            this.cmdUpdate.TabIndex = 41;
+            this.cmdUpdate.Text = "visit update page";
+            this.cmdUpdate.UseVisualStyleBackColor = true;
+            this.cmdUpdate.Click += new System.EventHandler(this.cmdUpdate_Click);
+            // 
+            // lblUpdateInfo
+            // 
+            this.lblUpdateInfo.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.lblUpdateInfo.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblUpdateInfo.Location = new System.Drawing.Point(30, 260);
+            this.lblUpdateInfo.Name = "lblUpdateInfo";
+            this.lblUpdateInfo.Size = new System.Drawing.Size(491, 25);
+            this.lblUpdateInfo.TabIndex = 40;
+            this.lblUpdateInfo.Text = "label92";
+            // 
+            // lblUpdateDetail
+            // 
+            this.lblUpdateDetail.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.lblUpdateDetail.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblUpdateDetail.Location = new System.Drawing.Point(30, 295);
+            this.lblUpdateDetail.Multiline = true;
+            this.lblUpdateDetail.Name = "lblUpdateDetail";
+            this.lblUpdateDetail.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.lblUpdateDetail.Size = new System.Drawing.Size(664, 214);
+            this.lblUpdateDetail.TabIndex = 39;
             // 
             // cmdDonate
             // 
@@ -714,7 +880,7 @@
             this.panel2.Controls.Add(this.linkLabel5);
             this.panel2.Controls.Add(this.linkLabel6);
             this.panel2.Controls.Add(this.linkLabel7);
-            this.panel2.Location = new System.Drawing.Point(-7, 514);
+            this.panel2.Location = new System.Drawing.Point(1, 514);
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(1051, 68);
             this.panel2.TabIndex = 33;
@@ -969,140 +1135,12 @@
             this.tabSystemData.Text = "System Data";
             this.tabSystemData.UseVisualStyleBackColor = true;
             // 
-            // paEconomies
-            // 
-            this.paEconomies.Controls.Add(this.button8);
-            this.paEconomies.Controls.Add(this.cbStationEcoTourism);
-            this.paEconomies.Controls.Add(this.cbStationEcoTerraforming);
-            this.paEconomies.Controls.Add(this.cbStationEcoService);
-            this.paEconomies.Controls.Add(this.cbStationEcoRefinery);
-            this.paEconomies.Controls.Add(this.cbStationEcoMilitary);
-            this.paEconomies.Controls.Add(this.cbStationEcoIndustrial);
-            this.paEconomies.Controls.Add(this.cbStationEcoHighTech);
-            this.paEconomies.Controls.Add(this.cbStationEcoExtraction);
-            this.paEconomies.Controls.Add(this.cbStationEcoAgriculture);
-            this.paEconomies.Location = new System.Drawing.Point(7, 364);
-            this.paEconomies.Name = "paEconomies";
-            this.paEconomies.Size = new System.Drawing.Size(173, 94);
-            this.paEconomies.TabIndex = 129;
-            this.paEconomies.Visible = false;
-            // 
-            // button8
-            // 
-            this.button8.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.button8.Font = new System.Drawing.Font("Microsoft Sans Serif", 6F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button8.Location = new System.Drawing.Point(107, 73);
-            this.button8.Name = "button8";
-            this.button8.Size = new System.Drawing.Size(62, 17);
-            this.button8.TabIndex = 23;
-            this.button8.Text = "OK";
-            this.button8.UseVisualStyleBackColor = true;
-            this.button8.Click += new System.EventHandler(this.button8_Click);
-            // 
-            // cbStationEcoTourism
-            // 
-            this.cbStationEcoTourism.AutoSize = true;
-            this.cbStationEcoTourism.Location = new System.Drawing.Point(84, 57);
-            this.cbStationEcoTourism.Name = "cbStationEcoTourism";
-            this.cbStationEcoTourism.ReadOnly = false;
-            this.cbStationEcoTourism.Size = new System.Drawing.Size(63, 17);
-            this.cbStationEcoTourism.TabIndex = 22;
-            this.cbStationEcoTourism.Text = "Tourism";
-            this.cbStationEcoTourism.UseVisualStyleBackColor = false;
-            // 
-            // cbStationEcoTerraforming
-            // 
-            this.cbStationEcoTerraforming.AutoSize = true;
-            this.cbStationEcoTerraforming.Location = new System.Drawing.Point(84, 39);
-            this.cbStationEcoTerraforming.Name = "cbStationEcoTerraforming";
-            this.cbStationEcoTerraforming.ReadOnly = false;
-            this.cbStationEcoTerraforming.Size = new System.Drawing.Size(85, 17);
-            this.cbStationEcoTerraforming.TabIndex = 21;
-            this.cbStationEcoTerraforming.Text = "Terraforming";
-            this.cbStationEcoTerraforming.UseVisualStyleBackColor = false;
-            // 
-            // cbStationEcoService
-            // 
-            this.cbStationEcoService.AutoSize = true;
-            this.cbStationEcoService.Location = new System.Drawing.Point(84, 21);
-            this.cbStationEcoService.Name = "cbStationEcoService";
-            this.cbStationEcoService.ReadOnly = false;
-            this.cbStationEcoService.Size = new System.Drawing.Size(62, 17);
-            this.cbStationEcoService.TabIndex = 20;
-            this.cbStationEcoService.Text = "Service";
-            this.cbStationEcoService.UseVisualStyleBackColor = false;
-            // 
-            // cbStationEcoRefinery
-            // 
-            this.cbStationEcoRefinery.AutoSize = true;
-            this.cbStationEcoRefinery.Location = new System.Drawing.Point(84, 3);
-            this.cbStationEcoRefinery.Name = "cbStationEcoRefinery";
-            this.cbStationEcoRefinery.ReadOnly = false;
-            this.cbStationEcoRefinery.Size = new System.Drawing.Size(65, 17);
-            this.cbStationEcoRefinery.TabIndex = 19;
-            this.cbStationEcoRefinery.Text = "Refinery";
-            this.cbStationEcoRefinery.UseVisualStyleBackColor = false;
-            // 
-            // cbStationEcoMilitary
-            // 
-            this.cbStationEcoMilitary.AutoSize = true;
-            this.cbStationEcoMilitary.Location = new System.Drawing.Point(3, 75);
-            this.cbStationEcoMilitary.Name = "cbStationEcoMilitary";
-            this.cbStationEcoMilitary.ReadOnly = false;
-            this.cbStationEcoMilitary.Size = new System.Drawing.Size(58, 17);
-            this.cbStationEcoMilitary.TabIndex = 18;
-            this.cbStationEcoMilitary.Text = "Military";
-            this.cbStationEcoMilitary.UseVisualStyleBackColor = false;
-            // 
-            // cbStationEcoIndustrial
-            // 
-            this.cbStationEcoIndustrial.AutoSize = true;
-            this.cbStationEcoIndustrial.Location = new System.Drawing.Point(3, 57);
-            this.cbStationEcoIndustrial.Name = "cbStationEcoIndustrial";
-            this.cbStationEcoIndustrial.ReadOnly = false;
-            this.cbStationEcoIndustrial.Size = new System.Drawing.Size(68, 17);
-            this.cbStationEcoIndustrial.TabIndex = 17;
-            this.cbStationEcoIndustrial.Text = "Industrial";
-            this.cbStationEcoIndustrial.UseVisualStyleBackColor = false;
-            // 
-            // cbStationEcoHighTech
-            // 
-            this.cbStationEcoHighTech.AutoSize = true;
-            this.cbStationEcoHighTech.Location = new System.Drawing.Point(3, 39);
-            this.cbStationEcoHighTech.Name = "cbStationEcoHighTech";
-            this.cbStationEcoHighTech.ReadOnly = false;
-            this.cbStationEcoHighTech.Size = new System.Drawing.Size(76, 17);
-            this.cbStationEcoHighTech.TabIndex = 16;
-            this.cbStationEcoHighTech.Text = "High Tech";
-            this.cbStationEcoHighTech.UseVisualStyleBackColor = false;
-            // 
-            // cbStationEcoExtraction
-            // 
-            this.cbStationEcoExtraction.AutoSize = true;
-            this.cbStationEcoExtraction.Location = new System.Drawing.Point(3, 21);
-            this.cbStationEcoExtraction.Name = "cbStationEcoExtraction";
-            this.cbStationEcoExtraction.ReadOnly = false;
-            this.cbStationEcoExtraction.Size = new System.Drawing.Size(73, 17);
-            this.cbStationEcoExtraction.TabIndex = 15;
-            this.cbStationEcoExtraction.Text = "Extraction";
-            this.cbStationEcoExtraction.UseVisualStyleBackColor = false;
-            // 
-            // cbStationEcoAgriculture
-            // 
-            this.cbStationEcoAgriculture.AutoSize = true;
-            this.cbStationEcoAgriculture.Location = new System.Drawing.Point(3, 3);
-            this.cbStationEcoAgriculture.Name = "cbStationEcoAgriculture";
-            this.cbStationEcoAgriculture.ReadOnly = false;
-            this.cbStationEcoAgriculture.Size = new System.Drawing.Size(76, 17);
-            this.cbStationEcoAgriculture.TabIndex = 14;
-            this.cbStationEcoAgriculture.Text = "Agriculture";
-            this.cbStationEcoAgriculture.UseVisualStyleBackColor = false;
-            // 
             // groupBox14
             // 
             this.groupBox14.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox14.Controls.Add(this.cmbStationStations);
             this.groupBox14.Controls.Add(this.paEconomies);
             this.groupBox14.Controls.Add(this.cmdStationCancel);
             this.groupBox14.Controls.Add(this.lblStationCountTotal);
@@ -1121,7 +1159,6 @@
             this.groupBox14.Controls.Add(this.cbStationHasRefuel);
             this.groupBox14.Controls.Add(this.cbStationHasCommodities);
             this.groupBox14.Controls.Add(this.cbStationHasBlackmarket);
-            this.groupBox14.Controls.Add(this.cmbStationStations);
             this.groupBox14.Controls.Add(this.label87);
             this.groupBox14.Controls.Add(this.cmdStationNew);
             this.groupBox14.Controls.Add(this.cmdStationSave);
@@ -1151,12 +1188,168 @@
             this.groupBox14.TabStop = false;
             this.groupBox14.Text = "Station Data";
             // 
+            // cmbStationStations
+            // 
+            this.cmbStationStations.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this.cmbStationStations.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+            this.cmbStationStations.BackColor_ro = System.Drawing.SystemColors.Control;
+            this.cmbStationStations.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbStationStations.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.cmbStationStations.ForeColor_ro = System.Drawing.SystemColors.WindowText;
+            this.cmbStationStations.Location = new System.Drawing.Point(114, 31);
+            this.cmbStationStations.Name = "cmbStationStations";
+            this.cmbStationStations.ReadOnly = false;
+            this.cmbStationStations.Size = new System.Drawing.Size(236, 23);
+            this.cmbStationStations.TabIndex = 130;
+            this.cmbStationStations.Visible_ro = true;
+            // 
+            // paEconomies
+            // 
+            this.paEconomies.Controls.Add(this.cbStationEcoNone);
+            this.paEconomies.Controls.Add(this.button8);
+            this.paEconomies.Controls.Add(this.cbStationEcoTourism);
+            this.paEconomies.Controls.Add(this.cbStationEcoTerraforming);
+            this.paEconomies.Controls.Add(this.cbStationEcoService);
+            this.paEconomies.Controls.Add(this.cbStationEcoRefinery);
+            this.paEconomies.Controls.Add(this.cbStationEcoMilitary);
+            this.paEconomies.Controls.Add(this.cbStationEcoIndustrial);
+            this.paEconomies.Controls.Add(this.cbStationEcoHighTech);
+            this.paEconomies.Controls.Add(this.cbStationEcoExtraction);
+            this.paEconomies.Controls.Add(this.cbStationEcoAgriculture);
+            this.paEconomies.Location = new System.Drawing.Point(7, 364);
+            this.paEconomies.Name = "paEconomies";
+            this.paEconomies.Size = new System.Drawing.Size(173, 113);
+            this.paEconomies.TabIndex = 129;
+            this.paEconomies.Visible = false;
+            // 
+            // cbStationEcoNone
+            // 
+            this.cbStationEcoNone.AutoSize = true;
+            this.cbStationEcoNone.Location = new System.Drawing.Point(84, 75);
+            this.cbStationEcoNone.Name = "cbStationEcoNone";
+            this.cbStationEcoNone.ReadOnly = false;
+            this.cbStationEcoNone.Size = new System.Drawing.Size(52, 17);
+            this.cbStationEcoNone.TabIndex = 10;
+            this.cbStationEcoNone.Text = "None";
+            this.cbStationEcoNone.UseVisualStyleBackColor = false;
+            // 
+            // button8
+            // 
+            this.button8.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.button8.Font = new System.Drawing.Font("Microsoft Sans Serif", 6F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.button8.Location = new System.Drawing.Point(107, 92);
+            this.button8.Name = "button8";
+            this.button8.Size = new System.Drawing.Size(62, 17);
+            this.button8.TabIndex = 9;
+            this.button8.Text = "OK";
+            this.button8.UseVisualStyleBackColor = true;
+            this.button8.Click += new System.EventHandler(this.cmdStationEco_OK_Click);
+            // 
+            // cbStationEcoTourism
+            // 
+            this.cbStationEcoTourism.AutoSize = true;
+            this.cbStationEcoTourism.Location = new System.Drawing.Point(84, 57);
+            this.cbStationEcoTourism.Name = "cbStationEcoTourism";
+            this.cbStationEcoTourism.ReadOnly = false;
+            this.cbStationEcoTourism.Size = new System.Drawing.Size(63, 17);
+            this.cbStationEcoTourism.TabIndex = 8;
+            this.cbStationEcoTourism.Text = "Tourism";
+            this.cbStationEcoTourism.UseVisualStyleBackColor = false;
+            // 
+            // cbStationEcoTerraforming
+            // 
+            this.cbStationEcoTerraforming.AutoSize = true;
+            this.cbStationEcoTerraforming.Location = new System.Drawing.Point(84, 39);
+            this.cbStationEcoTerraforming.Name = "cbStationEcoTerraforming";
+            this.cbStationEcoTerraforming.ReadOnly = false;
+            this.cbStationEcoTerraforming.Size = new System.Drawing.Size(85, 17);
+            this.cbStationEcoTerraforming.TabIndex = 7;
+            this.cbStationEcoTerraforming.Text = "Terraforming";
+            this.cbStationEcoTerraforming.UseVisualStyleBackColor = false;
+            // 
+            // cbStationEcoService
+            // 
+            this.cbStationEcoService.AutoSize = true;
+            this.cbStationEcoService.Location = new System.Drawing.Point(84, 21);
+            this.cbStationEcoService.Name = "cbStationEcoService";
+            this.cbStationEcoService.ReadOnly = false;
+            this.cbStationEcoService.Size = new System.Drawing.Size(62, 17);
+            this.cbStationEcoService.TabIndex = 6;
+            this.cbStationEcoService.Text = "Service";
+            this.cbStationEcoService.UseVisualStyleBackColor = false;
+            // 
+            // cbStationEcoRefinery
+            // 
+            this.cbStationEcoRefinery.AutoSize = true;
+            this.cbStationEcoRefinery.Location = new System.Drawing.Point(84, 3);
+            this.cbStationEcoRefinery.Name = "cbStationEcoRefinery";
+            this.cbStationEcoRefinery.ReadOnly = false;
+            this.cbStationEcoRefinery.Size = new System.Drawing.Size(65, 17);
+            this.cbStationEcoRefinery.TabIndex = 5;
+            this.cbStationEcoRefinery.Text = "Refinery";
+            this.cbStationEcoRefinery.UseVisualStyleBackColor = false;
+            // 
+            // cbStationEcoMilitary
+            // 
+            this.cbStationEcoMilitary.AutoSize = true;
+            this.cbStationEcoMilitary.Location = new System.Drawing.Point(3, 75);
+            this.cbStationEcoMilitary.Name = "cbStationEcoMilitary";
+            this.cbStationEcoMilitary.ReadOnly = false;
+            this.cbStationEcoMilitary.Size = new System.Drawing.Size(58, 17);
+            this.cbStationEcoMilitary.TabIndex = 4;
+            this.cbStationEcoMilitary.Text = "Military";
+            this.cbStationEcoMilitary.UseVisualStyleBackColor = false;
+            // 
+            // cbStationEcoIndustrial
+            // 
+            this.cbStationEcoIndustrial.AutoSize = true;
+            this.cbStationEcoIndustrial.Location = new System.Drawing.Point(3, 57);
+            this.cbStationEcoIndustrial.Name = "cbStationEcoIndustrial";
+            this.cbStationEcoIndustrial.ReadOnly = false;
+            this.cbStationEcoIndustrial.Size = new System.Drawing.Size(68, 17);
+            this.cbStationEcoIndustrial.TabIndex = 3;
+            this.cbStationEcoIndustrial.Text = "Industrial";
+            this.cbStationEcoIndustrial.UseVisualStyleBackColor = false;
+            // 
+            // cbStationEcoHighTech
+            // 
+            this.cbStationEcoHighTech.AutoSize = true;
+            this.cbStationEcoHighTech.Location = new System.Drawing.Point(3, 39);
+            this.cbStationEcoHighTech.Name = "cbStationEcoHighTech";
+            this.cbStationEcoHighTech.ReadOnly = false;
+            this.cbStationEcoHighTech.Size = new System.Drawing.Size(76, 17);
+            this.cbStationEcoHighTech.TabIndex = 2;
+            this.cbStationEcoHighTech.Text = "High Tech";
+            this.cbStationEcoHighTech.UseVisualStyleBackColor = false;
+            // 
+            // cbStationEcoExtraction
+            // 
+            this.cbStationEcoExtraction.AutoSize = true;
+            this.cbStationEcoExtraction.Location = new System.Drawing.Point(3, 21);
+            this.cbStationEcoExtraction.Name = "cbStationEcoExtraction";
+            this.cbStationEcoExtraction.ReadOnly = false;
+            this.cbStationEcoExtraction.Size = new System.Drawing.Size(73, 17);
+            this.cbStationEcoExtraction.TabIndex = 1;
+            this.cbStationEcoExtraction.Text = "Extraction";
+            this.cbStationEcoExtraction.UseVisualStyleBackColor = false;
+            // 
+            // cbStationEcoAgriculture
+            // 
+            this.cbStationEcoAgriculture.AutoSize = true;
+            this.cbStationEcoAgriculture.Location = new System.Drawing.Point(3, 3);
+            this.cbStationEcoAgriculture.Name = "cbStationEcoAgriculture";
+            this.cbStationEcoAgriculture.ReadOnly = false;
+            this.cbStationEcoAgriculture.Size = new System.Drawing.Size(76, 17);
+            this.cbStationEcoAgriculture.TabIndex = 0;
+            this.cbStationEcoAgriculture.Text = "Agriculture";
+            this.cbStationEcoAgriculture.UseVisualStyleBackColor = false;
+            // 
             // cmdStationCancel
             // 
             this.cmdStationCancel.Location = new System.Drawing.Point(169, 473);
             this.cmdStationCancel.Name = "cmdStationCancel";
             this.cmdStationCancel.Size = new System.Drawing.Size(110, 23);
-            this.cmdStationCancel.TabIndex = 23;
+            this.cmdStationCancel.TabIndex = 21;
             this.cmdStationCancel.Text = "Cancel";
             this.cmdStationCancel.UseVisualStyleBackColor = true;
             this.cmdStationCancel.Click += new System.EventHandler(this.cmdStationCancel_Click);
@@ -1187,7 +1380,7 @@
             this.cmdStationEdit.Location = new System.Drawing.Point(168, 435);
             this.cmdStationEdit.Name = "cmdStationEdit";
             this.cmdStationEdit.Size = new System.Drawing.Size(110, 23);
-            this.cmdStationEdit.TabIndex = 21;
+            this.cmdStationEdit.TabIndex = 19;
             this.cmdStationEdit.Text = "Edit Station";
             this.cmdStationEdit.UseVisualStyleBackColor = true;
             this.cmdStationEdit.Click += new System.EventHandler(this.cmdStationEdit_Click);
@@ -1221,9 +1414,9 @@
             this.lbStationEconomies.Location = new System.Drawing.Point(127, 334);
             this.lbStationEconomies.Name = "lbStationEconomies";
             this.lbStationEconomies.Size = new System.Drawing.Size(151, 79);
-            this.lbStationEconomies.TabIndex = 12;
+            this.lbStationEconomies.TabIndex = 10;
             this.lbStationEconomies.Tag = "ReadOnly";
-            this.lbStationEconomies.MouseClick += lbStationEconomies_MouseClick;
+            this.lbStationEconomies.MouseClick += new System.Windows.Forms.MouseEventHandler(this.lbStationEconomies_MouseClick);
             // 
             // label64
             // 
@@ -1242,7 +1435,7 @@
             this.txtStationUpdatedAt.Name = "txtStationUpdatedAt";
             this.txtStationUpdatedAt.ReadOnly = true;
             this.txtStationUpdatedAt.Size = new System.Drawing.Size(151, 21);
-            this.txtStationUpdatedAt.TabIndex = 20;
+            this.txtStationUpdatedAt.TabIndex = 18;
             this.txtStationUpdatedAt.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             // 
             // label73
@@ -1262,7 +1455,7 @@
             this.cbStationHasOutfitting.Name = "cbStationHasOutfitting";
             this.cbStationHasOutfitting.ReadOnly = false;
             this.cbStationHasOutfitting.Size = new System.Drawing.Size(68, 17);
-            this.cbStationHasOutfitting.TabIndex = 15;
+            this.cbStationHasOutfitting.TabIndex = 13;
             this.cbStationHasOutfitting.Text = "Outfitting";
             this.cbStationHasOutfitting.UseVisualStyleBackColor = true;
             // 
@@ -1273,40 +1466,40 @@
             this.cbStationHasShipyard.Name = "cbStationHasShipyard";
             this.cbStationHasShipyard.ReadOnly = false;
             this.cbStationHasShipyard.Size = new System.Drawing.Size(67, 17);
-            this.cbStationHasShipyard.TabIndex = 16;
+            this.cbStationHasShipyard.TabIndex = 14;
             this.cbStationHasShipyard.Text = "Shipyard";
             this.cbStationHasShipyard.UseVisualStyleBackColor = true;
             // 
             // cbStationHasRepair
             // 
             this.cbStationHasRepair.AutoSize = true;
-            this.cbStationHasRepair.Location = new System.Drawing.Point(328, 306);
+            this.cbStationHasRepair.Location = new System.Drawing.Point(424, 197);
             this.cbStationHasRepair.Name = "cbStationHasRepair";
             this.cbStationHasRepair.ReadOnly = false;
             this.cbStationHasRepair.Size = new System.Drawing.Size(57, 17);
-            this.cbStationHasRepair.TabIndex = 19;
+            this.cbStationHasRepair.TabIndex = 17;
             this.cbStationHasRepair.Text = "Repair";
             this.cbStationHasRepair.UseVisualStyleBackColor = true;
             // 
             // cbStationHasRearm
             // 
             this.cbStationHasRearm.AutoSize = true;
-            this.cbStationHasRearm.Location = new System.Drawing.Point(328, 260);
+            this.cbStationHasRearm.Location = new System.Drawing.Point(424, 151);
             this.cbStationHasRearm.Name = "cbStationHasRearm";
             this.cbStationHasRearm.ReadOnly = false;
             this.cbStationHasRearm.Size = new System.Drawing.Size(61, 17);
-            this.cbStationHasRearm.TabIndex = 17;
+            this.cbStationHasRearm.TabIndex = 15;
             this.cbStationHasRearm.Text = "Re-Arm";
             this.cbStationHasRearm.UseVisualStyleBackColor = true;
             // 
             // cbStationHasRefuel
             // 
             this.cbStationHasRefuel.AutoSize = true;
-            this.cbStationHasRefuel.Location = new System.Drawing.Point(328, 283);
+            this.cbStationHasRefuel.Location = new System.Drawing.Point(424, 174);
             this.cbStationHasRefuel.Name = "cbStationHasRefuel";
             this.cbStationHasRefuel.ReadOnly = false;
             this.cbStationHasRefuel.Size = new System.Drawing.Size(57, 17);
-            this.cbStationHasRefuel.TabIndex = 18;
+            this.cbStationHasRefuel.TabIndex = 16;
             this.cbStationHasRefuel.Text = "Refuel";
             this.cbStationHasRefuel.UseVisualStyleBackColor = true;
             // 
@@ -1317,7 +1510,7 @@
             this.cbStationHasCommodities.Name = "cbStationHasCommodities";
             this.cbStationHasCommodities.ReadOnly = false;
             this.cbStationHasCommodities.Size = new System.Drawing.Size(85, 17);
-            this.cbStationHasCommodities.TabIndex = 13;
+            this.cbStationHasCommodities.TabIndex = 11;
             this.cbStationHasCommodities.Text = "Commodities";
             this.cbStationHasCommodities.UseVisualStyleBackColor = false;
             // 
@@ -1328,20 +1521,9 @@
             this.cbStationHasBlackmarket.Name = "cbStationHasBlackmarket";
             this.cbStationHasBlackmarket.ReadOnly = false;
             this.cbStationHasBlackmarket.Size = new System.Drawing.Size(85, 17);
-            this.cbStationHasBlackmarket.TabIndex = 14;
+            this.cbStationHasBlackmarket.TabIndex = 12;
             this.cbStationHasBlackmarket.Text = "Blackmarket";
             this.cbStationHasBlackmarket.UseVisualStyleBackColor = true;
-            // 
-            // cmbStationStations
-            // 
-            this.cmbStationStations.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.cmbStationStations.Location = new System.Drawing.Point(114, 33);
-            this.cmbStationStations.Name = "cmbStationStations";
-            this.cmbStationStations.ReadOnly = false;
-            this.cmbStationStations.Size = new System.Drawing.Size(236, 23);
-            this.cmbStationStations.TabIndex = 0;
-            this.cmbStationStations.Visible_ro = true;
-            this.cmbStationStations.SelectedIndexChanged += new System.EventHandler(this.cmbStationStations_SelectedIndexChanged);
             // 
             // label87
             // 
@@ -1358,7 +1540,7 @@
             this.cmdStationNew.Location = new System.Drawing.Point(285, 435);
             this.cmdStationNew.Name = "cmdStationNew";
             this.cmdStationNew.Size = new System.Drawing.Size(110, 23);
-            this.cmdStationNew.TabIndex = 22;
+            this.cmdStationNew.TabIndex = 20;
             this.cmdStationNew.Text = "Add Station";
             this.cmdStationNew.UseVisualStyleBackColor = true;
             this.cmdStationNew.Click += new System.EventHandler(this.cmdStationNew_Click);
@@ -1368,27 +1550,29 @@
             this.cmdStationSave.Location = new System.Drawing.Point(285, 473);
             this.cmdStationSave.Name = "cmdStationSave";
             this.cmdStationSave.Size = new System.Drawing.Size(110, 23);
-            this.cmdStationSave.TabIndex = 24;
+            this.cmdStationSave.TabIndex = 22;
             this.cmdStationSave.Text = "Save Changes";
             this.cmdStationSave.UseVisualStyleBackColor = true;
-            this.cmdStationSave.Click += new System.EventHandler(this.cmdStationChange_Click);
+            this.cmdStationSave.Click += new System.EventHandler(this.cmdStationSave_Click);
             // 
             // cmbStationType
             // 
-            this.cmbStationType.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Append;
+            this.cmbStationType.BackColor_ro = System.Drawing.SystemColors.Control;
+            this.cmbStationType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbStationType.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.cmbStationType.Location = new System.Drawing.Point(127, 307);
+            this.cmbStationType.ForeColor_ro = System.Drawing.SystemColors.WindowText;
+            this.cmbStationType.Location = new System.Drawing.Point(127, 202);
             this.cmbStationType.Name = "cmbStationType";
             this.cmbStationType.ReadOnly = false;
             this.cmbStationType.Size = new System.Drawing.Size(151, 23);
-            this.cmbStationType.TabIndex = 10;
+            this.cmbStationType.TabIndex = 9;
             this.cmbStationType.Visible_ro = true;
             // 
             // label75
             // 
             this.label75.AutoSize = true;
             this.label75.ForeColor = System.Drawing.SystemColors.WindowText;
-            this.label75.Location = new System.Drawing.Point(22, 310);
+            this.label75.Location = new System.Drawing.Point(22, 205);
             this.label75.Name = "label75";
             this.label75.Size = new System.Drawing.Size(31, 13);
             this.label75.TabIndex = 86;
@@ -1396,13 +1580,15 @@
             // 
             // cmbStationState
             // 
-            this.cmbStationState.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Append;
+            this.cmbStationState.BackColor_ro = System.Drawing.SystemColors.Control;
+            this.cmbStationState.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbStationState.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.cmbStationState.ForeColor_ro = System.Drawing.SystemColors.WindowText;
             this.cmbStationState.Location = new System.Drawing.Point(127, 281);
             this.cmbStationState.Name = "cmbStationState";
             this.cmbStationState.ReadOnly = false;
             this.cmbStationState.Size = new System.Drawing.Size(151, 23);
-            this.cmbStationState.TabIndex = 9;
+            this.cmbStationState.TabIndex = 8;
             this.cmbStationState.Visible_ro = true;
             // 
             // label76
@@ -1417,13 +1603,15 @@
             // 
             // cmbStationAllegiance
             // 
-            this.cmbStationAllegiance.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Append;
+            this.cmbStationAllegiance.BackColor_ro = System.Drawing.SystemColors.Control;
+            this.cmbStationAllegiance.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbStationAllegiance.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.cmbStationAllegiance.ForeColor_ro = System.Drawing.SystemColors.WindowText;
             this.cmbStationAllegiance.Location = new System.Drawing.Point(127, 255);
             this.cmbStationAllegiance.Name = "cmbStationAllegiance";
             this.cmbStationAllegiance.ReadOnly = false;
             this.cmbStationAllegiance.Size = new System.Drawing.Size(151, 23);
-            this.cmbStationAllegiance.TabIndex = 8;
+            this.cmbStationAllegiance.TabIndex = 7;
             this.cmbStationAllegiance.Visible_ro = true;
             // 
             // label77
@@ -1438,13 +1626,15 @@
             // 
             // cmbStationGovernment
             // 
-            this.cmbStationGovernment.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Append;
+            this.cmbStationGovernment.BackColor_ro = System.Drawing.SystemColors.Control;
+            this.cmbStationGovernment.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbStationGovernment.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.cmbStationGovernment.ForeColor_ro = System.Drawing.SystemColors.WindowText;
             this.cmbStationGovernment.Location = new System.Drawing.Point(127, 229);
             this.cmbStationGovernment.Name = "cmbStationGovernment";
             this.cmbStationGovernment.ReadOnly = false;
             this.cmbStationGovernment.Size = new System.Drawing.Size(151, 23);
-            this.cmbStationGovernment.TabIndex = 7;
+            this.cmbStationGovernment.TabIndex = 6;
             this.cmbStationGovernment.Visible_ro = true;
             // 
             // label78
@@ -1460,16 +1650,16 @@
             // txtStationFaction
             // 
             this.txtStationFaction.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtStationFaction.Location = new System.Drawing.Point(127, 203);
+            this.txtStationFaction.Location = new System.Drawing.Point(127, 308);
             this.txtStationFaction.Name = "txtStationFaction";
-            this.txtStationFaction.Size = new System.Drawing.Size(151, 21);
-            this.txtStationFaction.TabIndex = 6;
+            this.txtStationFaction.Size = new System.Drawing.Size(352, 21);
+            this.txtStationFaction.TabIndex = 5;
             // 
             // label79
             // 
             this.label79.AutoSize = true;
             this.label79.ForeColor = System.Drawing.SystemColors.WindowText;
-            this.label79.Location = new System.Drawing.Point(22, 208);
+            this.label79.Location = new System.Drawing.Point(22, 313);
             this.label79.Name = "label79";
             this.label79.Size = new System.Drawing.Size(42, 13);
             this.label79.TabIndex = 78;
@@ -1481,7 +1671,7 @@
             this.txtStationDistanceToStar.Location = new System.Drawing.Point(127, 147);
             this.txtStationDistanceToStar.Name = "txtStationDistanceToStar";
             this.txtStationDistanceToStar.Size = new System.Drawing.Size(68, 21);
-            this.txtStationDistanceToStar.TabIndex = 4;
+            this.txtStationDistanceToStar.TabIndex = 3;
             this.txtStationDistanceToStar.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             // 
             // label80
@@ -1496,13 +1686,15 @@
             // 
             // cmbStationMaxLandingPadSize
             // 
-            this.cmbStationMaxLandingPadSize.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Append;
+            this.cmbStationMaxLandingPadSize.BackColor_ro = System.Drawing.SystemColors.Control;
+            this.cmbStationMaxLandingPadSize.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbStationMaxLandingPadSize.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.cmbStationMaxLandingPadSize.ForeColor_ro = System.Drawing.SystemColors.WindowText;
             this.cmbStationMaxLandingPadSize.Location = new System.Drawing.Point(127, 174);
             this.cmbStationMaxLandingPadSize.Name = "cmbStationMaxLandingPadSize";
             this.cmbStationMaxLandingPadSize.ReadOnly = false;
             this.cmbStationMaxLandingPadSize.Size = new System.Drawing.Size(68, 23);
-            this.cmbStationMaxLandingPadSize.TabIndex = 5;
+            this.cmbStationMaxLandingPadSize.TabIndex = 4;
             this.cmbStationMaxLandingPadSize.Visible_ro = true;
             // 
             // label81
@@ -1522,7 +1714,7 @@
             this.txtStationName.Name = "txtStationName";
             this.txtStationName.ReadOnly = true;
             this.txtStationName.Size = new System.Drawing.Size(236, 21);
-            this.txtStationName.TabIndex = 3;
+            this.txtStationName.TabIndex = 2;
             // 
             // label85
             // 
@@ -1671,7 +1863,10 @@
             // 
             this.cmbSystemsAllSystems.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
             this.cmbSystemsAllSystems.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+            this.cmbSystemsAllSystems.BackColor_ro = System.Drawing.SystemColors.Control;
+            this.cmbSystemsAllSystems.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbSystemsAllSystems.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.cmbSystemsAllSystems.ForeColor_ro = System.Drawing.SystemColors.WindowText;
             this.cmbSystemsAllSystems.Location = new System.Drawing.Point(89, 33);
             this.cmbSystemsAllSystems.Name = "cmbSystemsAllSystems";
             this.cmbSystemsAllSystems.ReadOnly = false;
@@ -1750,13 +1945,14 @@
             this.label63.Size = new System.Drawing.Size(48, 13);
             this.label63.TabIndex = 58;
             this.label63.Text = "Updated";
-            this.label63.Click += new System.EventHandler(this.label63_Click);
             // 
             // cmbSystemPrimaryEconomy
             // 
-            this.cmbSystemPrimaryEconomy.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Append;
+            this.cmbSystemPrimaryEconomy.BackColor_ro = System.Drawing.SystemColors.Control;
+            this.cmbSystemPrimaryEconomy.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbSystemPrimaryEconomy.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.cmbSystemPrimaryEconomy.Location = new System.Drawing.Point(295, 309);
+            this.cmbSystemPrimaryEconomy.ForeColor_ro = System.Drawing.SystemColors.WindowText;
+            this.cmbSystemPrimaryEconomy.Location = new System.Drawing.Point(295, 201);
             this.cmbSystemPrimaryEconomy.Name = "cmbSystemPrimaryEconomy";
             this.cmbSystemPrimaryEconomy.ReadOnly = false;
             this.cmbSystemPrimaryEconomy.Size = new System.Drawing.Size(151, 23);
@@ -1767,7 +1963,7 @@
             // 
             this.label65.AutoSize = true;
             this.label65.ForeColor = System.Drawing.SystemColors.WindowText;
-            this.label65.Location = new System.Drawing.Point(203, 312);
+            this.label65.Location = new System.Drawing.Point(203, 204);
             this.label65.Name = "label65";
             this.label65.Size = new System.Drawing.Size(88, 13);
             this.label65.TabIndex = 54;
@@ -1775,8 +1971,10 @@
             // 
             // cmbSystemSecurity
             // 
-            this.cmbSystemSecurity.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Append;
+            this.cmbSystemSecurity.BackColor_ro = System.Drawing.SystemColors.Control;
+            this.cmbSystemSecurity.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbSystemSecurity.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.cmbSystemSecurity.ForeColor_ro = System.Drawing.SystemColors.WindowText;
             this.cmbSystemSecurity.Location = new System.Drawing.Point(295, 174);
             this.cmbSystemSecurity.Name = "cmbSystemSecurity";
             this.cmbSystemSecurity.ReadOnly = false;
@@ -1796,8 +1994,10 @@
             // 
             // cmbSystemState
             // 
-            this.cmbSystemState.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Append;
+            this.cmbSystemState.BackColor_ro = System.Drawing.SystemColors.Control;
+            this.cmbSystemState.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbSystemState.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.cmbSystemState.ForeColor_ro = System.Drawing.SystemColors.WindowText;
             this.cmbSystemState.Location = new System.Drawing.Point(295, 283);
             this.cmbSystemState.Name = "cmbSystemState";
             this.cmbSystemState.ReadOnly = false;
@@ -1817,9 +2017,11 @@
             // 
             // cmbSystemAllegiance
             // 
-            this.cmbSystemAllegiance.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Append;
+            this.cmbSystemAllegiance.BackColor_ro = System.Drawing.SystemColors.Control;
+            this.cmbSystemAllegiance.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbSystemAllegiance.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.cmbSystemAllegiance.Location = new System.Drawing.Point(295, 257);
+            this.cmbSystemAllegiance.ForeColor_ro = System.Drawing.SystemColors.WindowText;
+            this.cmbSystemAllegiance.Location = new System.Drawing.Point(295, 256);
             this.cmbSystemAllegiance.Name = "cmbSystemAllegiance";
             this.cmbSystemAllegiance.ReadOnly = false;
             this.cmbSystemAllegiance.Size = new System.Drawing.Size(151, 23);
@@ -1838,8 +2040,10 @@
             // 
             // cmbSystemGovernment
             // 
-            this.cmbSystemGovernment.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Append;
+            this.cmbSystemGovernment.BackColor_ro = System.Drawing.SystemColors.Control;
+            this.cmbSystemGovernment.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbSystemGovernment.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.cmbSystemGovernment.ForeColor_ro = System.Drawing.SystemColors.WindowText;
             this.cmbSystemGovernment.Location = new System.Drawing.Point(295, 228);
             this.cmbSystemGovernment.Name = "cmbSystemGovernment";
             this.cmbSystemGovernment.ReadOnly = false;
@@ -1883,17 +2087,16 @@
             // txtSystemFaction
             // 
             this.txtSystemFaction.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtSystemFaction.Location = new System.Drawing.Point(295, 203);
+            this.txtSystemFaction.Location = new System.Drawing.Point(89, 310);
             this.txtSystemFaction.Name = "txtSystemFaction";
-            this.txtSystemFaction.ReadOnly = true;
-            this.txtSystemFaction.Size = new System.Drawing.Size(151, 21);
+            this.txtSystemFaction.Size = new System.Drawing.Size(357, 21);
             this.txtSystemFaction.TabIndex = 9;
             // 
             // label61
             // 
             this.label61.AutoSize = true;
             this.label61.ForeColor = System.Drawing.SystemColors.WindowText;
-            this.label61.Location = new System.Drawing.Point(203, 208);
+            this.label61.Location = new System.Drawing.Point(41, 313);
             this.label61.Name = "label61";
             this.label61.Size = new System.Drawing.Size(42, 13);
             this.label61.TabIndex = 42;
@@ -2051,7 +2254,6 @@
             this.cmbStationToStar.TabIndex = 16;
             this.cmbStationToStar.SelectedIndexChanged += new System.EventHandler(this.cmbStationToStar_SelectedIndexChanged);
             this.cmbStationToStar.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.cmbStationToStarInput_KeyPress);
-            this.cmbStationToStar.LostFocus += new System.EventHandler(this.cmbStationToStarInput_LostFocus);
             // 
             // gbSorting
             // 
@@ -2151,7 +2353,6 @@
             this.cmbLightYears.TabIndex = 11;
             this.cmbLightYears.SelectedIndexChanged += new System.EventHandler(this.cmbLightYears_SelectedIndexChanged);
             this.cmbLightYears.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.cmbLightYearsInput_KeyPress);
-            this.cmbLightYears.LostFocus += new System.EventHandler(this.cmbLightYearsInput_LostFocus);
             // 
             // tabControl2
             // 
@@ -2162,10 +2363,10 @@
             this.tabControl2.Controls.Add(this.tabPage1);
             this.tabControl2.Controls.Add(this.tabPage2);
             this.tabControl2.Controls.Add(this.tabStationToStation);
-            this.tabControl2.Location = new System.Drawing.Point(0, 56);
+            this.tabControl2.Location = new System.Drawing.Point(0, 54);
             this.tabControl2.Name = "tabControl2";
             this.tabControl2.SelectedIndex = 0;
-            this.tabControl2.Size = new System.Drawing.Size(1048, 530);
+            this.tabControl2.Size = new System.Drawing.Size(1048, 532);
             this.tabControl2.TabIndex = 10;
             // 
             // tabPage3
@@ -2173,7 +2374,7 @@
             this.tabPage3.Controls.Add(this.splitContainer2);
             this.tabPage3.Location = new System.Drawing.Point(4, 22);
             this.tabPage3.Name = "tabPage3";
-            this.tabPage3.Size = new System.Drawing.Size(1040, 504);
+            this.tabPage3.Size = new System.Drawing.Size(1040, 506);
             this.tabPage3.TabIndex = 2;
             this.tabPage3.Text = "All Commodities";
             this.tabPage3.UseVisualStyleBackColor = true;
@@ -2196,7 +2397,7 @@
             // splitContainer2.Panel2
             // 
             this.splitContainer2.Panel2.Controls.Add(this.splitContainer1);
-            this.splitContainer2.Size = new System.Drawing.Size(1040, 501);
+            this.splitContainer2.Size = new System.Drawing.Size(1040, 503);
             this.splitContainer2.SplitterDistance = 822;
             this.splitContainer2.SplitterWidth = 6;
             this.splitContainer2.TabIndex = 8;
@@ -2209,7 +2410,7 @@
             this.lvAllComms.FullRowSelect = true;
             this.lvAllComms.Location = new System.Drawing.Point(0, 0);
             this.lvAllComms.Name = "lvAllComms";
-            this.lvAllComms.Size = new System.Drawing.Size(821, 503);
+            this.lvAllComms.Size = new System.Drawing.Size(821, 505);
             this.lvAllComms.Sorting = System.Windows.Forms.SortOrder.Ascending;
             this.lvAllComms.TabIndex = 4;
             this.lvAllComms.UseCompatibleStateImageBehavior = false;
@@ -2234,7 +2435,7 @@
             // 
             this.splitContainer1.Panel2.Controls.Add(this.label9);
             this.splitContainer1.Panel2.Controls.Add(this.chart2);
-            this.splitContainer1.Size = new System.Drawing.Size(212, 501);
+            this.splitContainer1.Size = new System.Drawing.Size(212, 503);
             this.splitContainer1.SplitterDistance = 226;
             this.splitContainer1.SplitterWidth = 6;
             this.splitContainer1.TabIndex = 7;
@@ -2284,7 +2485,7 @@
             series2.ChartArea = "ChartArea1";
             series2.Name = "Series1";
             this.chart2.Series.Add(series2);
-            this.chart2.Size = new System.Drawing.Size(210, 267);
+            this.chart2.Size = new System.Drawing.Size(210, 269);
             this.chart2.TabIndex = 6;
             this.chart2.Text = "chart2";
             this.chart2.MouseMove += new System.Windows.Forms.MouseEventHandler(this.chart1_MouseMove);
@@ -2302,7 +2503,7 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(1040, 504);
+            this.tabPage1.Size = new System.Drawing.Size(1040, 506);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "By Station";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -2387,7 +2588,7 @@
             this.lbPrices.ImeMode = System.Windows.Forms.ImeMode.Off;
             this.lbPrices.Location = new System.Drawing.Point(0, 71);
             this.lbPrices.Name = "lbPrices";
-            this.lbPrices.Size = new System.Drawing.Size(1040, 427);
+            this.lbPrices.Size = new System.Drawing.Size(1040, 429);
             this.lbPrices.Sorting = System.Windows.Forms.SortOrder.Ascending;
             this.lbPrices.TabIndex = 3;
             this.lbPrices.UseCompatibleStateImageBehavior = false;
@@ -2451,7 +2652,7 @@
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(1040, 504);
+            this.tabPage2.Size = new System.Drawing.Size(1040, 506);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "By Commodity";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -2660,7 +2861,7 @@
             this.lbCommodities.FullRowSelect = true;
             this.lbCommodities.Location = new System.Drawing.Point(0, 47);
             this.lbCommodities.Name = "lbCommodities";
-            this.lbCommodities.Size = new System.Drawing.Size(1040, 451);
+            this.lbCommodities.Size = new System.Drawing.Size(1040, 453);
             this.lbCommodities.Sorting = System.Windows.Forms.SortOrder.Ascending;
             this.lbCommodities.TabIndex = 4;
             this.lbCommodities.UseCompatibleStateImageBehavior = false;
@@ -2683,7 +2884,7 @@
             this.tabStationToStation.Controls.Add(this.bShowStationToStationRouteAtStarchartDotClub);
             this.tabStationToStation.Location = new System.Drawing.Point(4, 22);
             this.tabStationToStation.Name = "tabStationToStation";
-            this.tabStationToStation.Size = new System.Drawing.Size(1040, 504);
+            this.tabStationToStation.Size = new System.Drawing.Size(1040, 506);
             this.tabStationToStation.TabIndex = 8;
             this.tabStationToStation.Text = "Station-To-Station";
             this.tabStationToStation.UseVisualStyleBackColor = true;
@@ -2703,7 +2904,7 @@
             // splitContainer4.Panel2
             // 
             this.splitContainer4.Panel2.Controls.Add(this.lvStationToStationReturn);
-            this.splitContainer4.Size = new System.Drawing.Size(609, 458);
+            this.splitContainer4.Size = new System.Drawing.Size(609, 460);
             this.splitContainer4.SplitterDistance = 228;
             this.splitContainer4.TabIndex = 19;
             // 
@@ -2730,7 +2931,7 @@
             this.lvStationToStationReturn.ImeMode = System.Windows.Forms.ImeMode.Off;
             this.lvStationToStationReturn.Location = new System.Drawing.Point(0, 3);
             this.lvStationToStationReturn.Name = "lvStationToStationReturn";
-            this.lvStationToStationReturn.Size = new System.Drawing.Size(606, 220);
+            this.lvStationToStationReturn.Size = new System.Drawing.Size(606, 222);
             this.lvStationToStationReturn.Sorting = System.Windows.Forms.SortOrder.Ascending;
             this.lvStationToStationReturn.TabIndex = 18;
             this.lvStationToStationReturn.UseCompatibleStateImageBehavior = false;
@@ -2750,7 +2951,7 @@
             this.groupBox7.Controls.Add(this.btnBestRoundTrip);
             this.groupBox7.Location = new System.Drawing.Point(624, 34);
             this.groupBox7.Name = "groupBox7";
-            this.groupBox7.Size = new System.Drawing.Size(409, 458);
+            this.groupBox7.Size = new System.Drawing.Size(409, 460);
             this.groupBox7.TabIndex = 17;
             this.groupBox7.TabStop = false;
             this.groupBox7.Text = "Find Round-Trips";
@@ -2817,7 +3018,7 @@
             this.lbAllRoundTrips.FormattingEnabled = true;
             this.lbAllRoundTrips.Location = new System.Drawing.Point(6, 52);
             this.lbAllRoundTrips.Name = "lbAllRoundTrips";
-            this.lbAllRoundTrips.Size = new System.Drawing.Size(397, 355);
+            this.lbAllRoundTrips.Size = new System.Drawing.Size(397, 394);
             this.lbAllRoundTrips.TabIndex = 13;
             this.lbAllRoundTrips.SelectedIndexChanged += new System.EventHandler(this.lbAllRoundTrips_SelectedIndexChanged);
             // 
@@ -3007,11 +3208,13 @@
             // cbLogSystemName
             // 
             this.cbLogSystemName.FormattingEnabled = true;
-            this.cbLogSystemName.Location = new System.Drawing.Point(111, 138);
+            this.cbLogSystemName.Location = new System.Drawing.Point(111, 111);
             this.cbLogSystemName.Name = "cbLogSystemName";
-            this.cbLogSystemName.Size = new System.Drawing.Size(327, 21);
+            this.cbLogSystemName.Size = new System.Drawing.Size(334, 21);
             this.cbLogSystemName.TabIndex = 9;
             this.cbLogSystemName.DropDown += new System.EventHandler(this.cbLogSystemName_DropDown);
+            this.cbLogSystemName.SelectedIndexChanged += new System.EventHandler(this.cbLogSystemName_SelectedIndexChanged);
+            this.cbLogSystemName.TextChanged += new System.EventHandler(this.cbLogSystemName_TextChanged);
             // 
             // label41
             // 
@@ -3027,6 +3230,7 @@
             this.cbLogEventType.FormattingEnabled = true;
             this.cbLogEventType.Items.AddRange(new object[] {
             "Jumped To",
+            "Visited",
             "Market Data Collected",
             "Cargo",
             "Fight",
@@ -3073,9 +3277,9 @@
             // cbLogStationName
             // 
             this.cbLogStationName.FormattingEnabled = true;
-            this.cbLogStationName.Location = new System.Drawing.Point(111, 111);
+            this.cbLogStationName.Location = new System.Drawing.Point(111, 138);
             this.cbLogStationName.Name = "cbLogStationName";
-            this.cbLogStationName.Size = new System.Drawing.Size(327, 21);
+            this.cbLogStationName.Size = new System.Drawing.Size(334, 21);
             this.cbLogStationName.TabIndex = 8;
             this.cbLogStationName.DropDown += new System.EventHandler(this.cbLogStationName_DropDown);
             // 
@@ -3091,7 +3295,7 @@
             // label19
             // 
             this.label19.AutoSize = true;
-            this.label19.Location = new System.Drawing.Point(65, 114);
+            this.label19.Location = new System.Drawing.Point(65, 141);
             this.label19.Name = "label19";
             this.label19.Size = new System.Drawing.Size(40, 13);
             this.label19.TabIndex = 10;
@@ -3109,7 +3313,7 @@
             // label20
             // 
             this.label20.AutoSize = true;
-            this.label20.Location = new System.Drawing.Point(64, 141);
+            this.label20.Location = new System.Drawing.Point(62, 114);
             this.label20.Name = "label20";
             this.label20.Size = new System.Drawing.Size(41, 13);
             this.label20.TabIndex = 11;
@@ -3163,7 +3367,7 @@
             this.cbPrepareNewEntry.Name = "cbPrepareNewEntry";
             this.cbPrepareNewEntry.Size = new System.Drawing.Size(164, 23);
             this.cbPrepareNewEntry.TabIndex = 26;
-            this.cbPrepareNewEntry.Text = "Prepare Fields For A New Entry";
+            this.cbPrepareNewEntry.Text = "prepare for new entry";
             this.cbPrepareNewEntry.UseVisualStyleBackColor = true;
             this.cbPrepareNewEntry.Click += new System.EventHandler(this.button11_Click);
             // 
@@ -3246,8 +3450,6 @@
             // 
             // dtpLogEventDate
             // 
-            this.dtpLogEventDate.CustomFormat = "yyyy-MM-dd HH:mm:ss";
-            this.dtpLogEventDate.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
             this.dtpLogEventDate.Location = new System.Drawing.Point(238, 85);
             this.dtpLogEventDate.Name = "dtpLogEventDate";
             this.dtpLogEventDate.Size = new System.Drawing.Size(200, 20);
@@ -3369,8 +3571,6 @@
             // cbUseEddnTestSchema
             // 
             this.cbUseEddnTestSchema.AutoSize = true;
-            this.cbUseEddnTestSchema.Checked = true;
-            this.cbUseEddnTestSchema.CheckState = System.Windows.Forms.CheckState.Checked;
             this.cbUseEddnTestSchema.Location = new System.Drawing.Point(169, 471);
             this.cbUseEddnTestSchema.Name = "cbUseEddnTestSchema";
             this.cbUseEddnTestSchema.Size = new System.Drawing.Size(89, 17);
@@ -3524,7 +3724,7 @@
             this.bContinueOcr.Name = "bContinueOcr";
             this.bContinueOcr.Size = new System.Drawing.Size(154, 23);
             this.bContinueOcr.TabIndex = 14;
-            this.bContinueOcr.Text = "Continue";
+            this.bContinueOcr.Text = "C&ontinue";
             this.bContinueOcr.UseVisualStyleBackColor = true;
             this.bContinueOcr.Click += new System.EventHandler(this.bContinueOcr_Click);
             // 
@@ -3889,7 +4089,8 @@
             // 
             // groupBox2
             // 
-            this.groupBox2.Controls.Add(this.checkboxSpoolEddnToFile);
+            this.groupBox2.Controls.Add(this.cbSpoolImplausibleToFile);
+            this.groupBox2.Controls.Add(this.cbSpoolEddnToFile);
             this.groupBox2.Controls.Add(this.bPurgeAllEddnData);
             this.groupBox2.Controls.Add(this.button17);
             this.groupBox2.Controls.Add(this.label28);
@@ -3907,15 +4108,25 @@
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Listen for EDDN Events";
             // 
-            // checkboxSpoolEddnToFile
+            // cbSpoolImplausibleToFile
             // 
-            this.checkboxSpoolEddnToFile.AutoSize = true;
-            this.checkboxSpoolEddnToFile.Location = new System.Drawing.Point(10, 45);
-            this.checkboxSpoolEddnToFile.Name = "checkboxSpoolEddnToFile";
-            this.checkboxSpoolEddnToFile.Size = new System.Drawing.Size(139, 17);
-            this.checkboxSpoolEddnToFile.TabIndex = 13;
-            this.checkboxSpoolEddnToFile.Text = "Spool to EddnOutput.txt";
-            this.checkboxSpoolEddnToFile.UseVisualStyleBackColor = true;
+            this.cbSpoolImplausibleToFile.AutoSize = true;
+            this.cbSpoolImplausibleToFile.Location = new System.Drawing.Point(10, 50);
+            this.cbSpoolImplausibleToFile.Name = "cbSpoolImplausibleToFile";
+            this.cbSpoolImplausibleToFile.Size = new System.Drawing.Size(210, 17);
+            this.cbSpoolImplausibleToFile.TabIndex = 14;
+            this.cbSpoolImplausibleToFile.Text = "Spool implausible to EddnImpOutput.txt";
+            this.cbSpoolImplausibleToFile.UseVisualStyleBackColor = true;
+            // 
+            // cbSpoolEddnToFile
+            // 
+            this.cbSpoolEddnToFile.AutoSize = true;
+            this.cbSpoolEddnToFile.Location = new System.Drawing.Point(10, 34);
+            this.cbSpoolEddnToFile.Name = "cbSpoolEddnToFile";
+            this.cbSpoolEddnToFile.Size = new System.Drawing.Size(139, 17);
+            this.cbSpoolEddnToFile.TabIndex = 13;
+            this.cbSpoolEddnToFile.Text = "Spool to EddnOutput.txt";
+            this.cbSpoolEddnToFile.UseVisualStyleBackColor = true;
             // 
             // bPurgeAllEddnData
             // 
@@ -3926,13 +4137,13 @@
             this.bPurgeAllEddnData.TabIndex = 12;
             this.bPurgeAllEddnData.Text = "Purge all EDDN data";
             this.bPurgeAllEddnData.UseVisualStyleBackColor = true;
-            this.bPurgeAllEddnData.Click += new System.EventHandler(this.button24_Click);
+            this.bPurgeAllEddnData.Click += new System.EventHandler(this.cmdPurgeEDDNData);
             // 
             // button17
             // 
-            this.button17.Location = new System.Drawing.Point(244, 122);
+            this.button17.Location = new System.Drawing.Point(283, 127);
             this.button17.Name = "button17";
-            this.button17.Size = new System.Drawing.Size(200, 23);
+            this.button17.Size = new System.Drawing.Size(161, 23);
             this.button17.TabIndex = 11;
             this.button17.Text = "Flush all EDDN data to UI";
             this.button17.UseVisualStyleBackColor = true;
@@ -3941,7 +4152,7 @@
             // label28
             // 
             this.label28.AutoSize = true;
-            this.label28.Location = new System.Drawing.Point(11, 100);
+            this.label28.Location = new System.Drawing.Point(7, 112);
             this.label28.Name = "label28";
             this.label28.Size = new System.Drawing.Size(280, 13);
             this.label28.TabIndex = 10;
@@ -3950,7 +4161,7 @@
             // label27
             // 
             this.label27.AutoSize = true;
-            this.label27.Location = new System.Drawing.Point(11, 82);
+            this.label27.Location = new System.Drawing.Point(7, 94);
             this.label27.Name = "label27";
             this.label27.Size = new System.Drawing.Size(241, 13);
             this.label27.TabIndex = 9;
@@ -3959,7 +4170,7 @@
             // label25
             // 
             this.label25.AutoSize = true;
-            this.label25.Location = new System.Drawing.Point(11, 65);
+            this.label25.Location = new System.Drawing.Point(7, 77);
             this.label25.Name = "label25";
             this.label25.Size = new System.Drawing.Size(271, 13);
             this.label25.TabIndex = 7;
@@ -3970,7 +4181,7 @@
             this.checkboxImportEDDN.AutoSize = true;
             this.checkboxImportEDDN.Checked = true;
             this.checkboxImportEDDN.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkboxImportEDDN.Location = new System.Drawing.Point(10, 29);
+            this.checkboxImportEDDN.Location = new System.Drawing.Point(10, 18);
             this.checkboxImportEDDN.Name = "checkboxImportEDDN";
             this.checkboxImportEDDN.Size = new System.Drawing.Size(222, 17);
             this.checkboxImportEDDN.TabIndex = 6;
@@ -4036,15 +4247,18 @@
             this.groupBox12.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox12.Controls.Add(this.label89);
+            this.groupBox12.Controls.Add(this.nudPurgeOldDataDays);
+            this.groupBox12.Controls.Add(this.cmdPurgeOldData);
             this.groupBox12.Controls.Add(this.cbLoadStationsJSON);
             this.groupBox12.Controls.Add(this.label74);
             this.groupBox12.Controls.Add(this.cbAutoActivateSystemTab);
             this.groupBox12.Controls.Add(this.cbIncludeUnknownDTS);
             this.groupBox12.Controls.Add(this.cbAutoActivateOCRTab);
             this.groupBox12.Controls.Add(this.button6);
-            this.groupBox12.Location = new System.Drawing.Point(653, 113);
+            this.groupBox12.Location = new System.Drawing.Point(653, 166);
             this.groupBox12.Name = "groupBox12";
-            this.groupBox12.Size = new System.Drawing.Size(400, 474);
+            this.groupBox12.Size = new System.Drawing.Size(400, 421);
             this.groupBox12.TabIndex = 12;
             this.groupBox12.TabStop = false;
             this.groupBox12.Text = "Other";
@@ -4052,7 +4266,7 @@
             // cbLoadStationsJSON
             // 
             this.cbLoadStationsJSON.AutoSize = true;
-            this.cbLoadStationsJSON.Location = new System.Drawing.Point(32, 116);
+            this.cbLoadStationsJSON.Location = new System.Drawing.Point(32, 131);
             this.cbLoadStationsJSON.Name = "cbLoadStationsJSON";
             this.cbLoadStationsJSON.Size = new System.Drawing.Size(308, 30);
             this.cbLoadStationsJSON.TabIndex = 6;
@@ -4065,7 +4279,7 @@
             // 
             this.label74.AutoSize = true;
             this.label74.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label74.Location = new System.Drawing.Point(49, 144);
+            this.label74.Location = new System.Drawing.Point(49, 159);
             this.label74.Name = "label74";
             this.label74.Size = new System.Drawing.Size(269, 36);
             this.label74.TabIndex = 7;
@@ -4089,10 +4303,11 @@
             this.cbIncludeUnknownDTS.AutoSize = true;
             this.cbIncludeUnknownDTS.Location = new System.Drawing.Point(32, 80);
             this.cbIncludeUnknownDTS.Name = "cbIncludeUnknownDTS";
-            this.cbIncludeUnknownDTS.Size = new System.Drawing.Size(249, 30);
+            this.cbIncludeUnknownDTS.Size = new System.Drawing.Size(349, 43);
             this.cbIncludeUnknownDTS.TabIndex = 4;
-            this.cbIncludeUnknownDTS.Text = "include station if <distance to star> is unknown \r\n(otherwise it will be excluded" +
-    ")";
+            this.cbIncludeUnknownDTS.Text = "include station on search if a filter-by property  is unknown \r\n(otherwise it wil" +
+    "l be excluded, properties can be <Distance To Star>, \r\n<Landingpadsize> and so o" +
+    "n)";
             this.cbIncludeUnknownDTS.UseVisualStyleBackColor = true;
             this.cbIncludeUnknownDTS.CheckedChanged += new System.EventHandler(this.cbIncludeUnknownDTS_CheckedChanged);
             // 
@@ -4109,7 +4324,8 @@
             // 
             // button6
             // 
-            this.button6.Location = new System.Drawing.Point(32, 202);
+            this.button6.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.button6.Location = new System.Drawing.Point(32, 369);
             this.button6.Name = "button6";
             this.button6.Size = new System.Drawing.Size(226, 23);
             this.button6.TabIndex = 2;
@@ -4121,14 +4337,50 @@
             // 
             this.groupBox10.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox10.Controls.Add(this.cbAutoAdd_ReplaceVisited);
+            this.groupBox10.Controls.Add(this.cbAutoAdd_Marketdata);
+            this.groupBox10.Controls.Add(this.cbAutoAdd_Visited);
             this.groupBox10.Controls.Add(this.label49);
             this.groupBox10.Controls.Add(this.cbAutoAdd_JumpedTo);
             this.groupBox10.Location = new System.Drawing.Point(653, 6);
             this.groupBox10.Name = "groupBox10";
-            this.groupBox10.Size = new System.Drawing.Size(400, 98);
+            this.groupBox10.Size = new System.Drawing.Size(400, 151);
             this.groupBox10.TabIndex = 11;
             this.groupBox10.TabStop = false;
             this.groupBox10.Text = "Commander\'s Log";
+            // 
+            // cbAutoAdd_ReplaceVisited
+            // 
+            this.cbAutoAdd_ReplaceVisited.AutoSize = true;
+            this.cbAutoAdd_ReplaceVisited.Location = new System.Drawing.Point(60, 111);
+            this.cbAutoAdd_ReplaceVisited.Name = "cbAutoAdd_ReplaceVisited";
+            this.cbAutoAdd_ReplaceVisited.Size = new System.Drawing.Size(292, 17);
+            this.cbAutoAdd_ReplaceVisited.TabIndex = 4;
+            this.cbAutoAdd_ReplaceVisited.Text = "replace previous \"Visited\" with  \"Market Data Collected\"";
+            this.cbAutoAdd_ReplaceVisited.UseVisualStyleBackColor = true;
+            this.cbAutoAdd_ReplaceVisited.CheckedChanged += new System.EventHandler(this.cbAutoAdd_ReplaceVisited_CheckedChanged);
+            // 
+            // cbAutoAdd_Marketdata
+            // 
+            this.cbAutoAdd_Marketdata.AutoSize = true;
+            this.cbAutoAdd_Marketdata.Location = new System.Drawing.Point(32, 90);
+            this.cbAutoAdd_Marketdata.Name = "cbAutoAdd_Marketdata";
+            this.cbAutoAdd_Marketdata.Size = new System.Drawing.Size(173, 17);
+            this.cbAutoAdd_Marketdata.TabIndex = 3;
+            this.cbAutoAdd_Marketdata.Text = "\"Market Data Collected\"-Event";
+            this.cbAutoAdd_Marketdata.UseVisualStyleBackColor = true;
+            this.cbAutoAdd_Marketdata.CheckedChanged += new System.EventHandler(this.cbAutoAdd_Marketdata_CheckedChanged);
+            // 
+            // cbAutoAdd_Visited
+            // 
+            this.cbAutoAdd_Visited.AutoSize = true;
+            this.cbAutoAdd_Visited.Location = new System.Drawing.Point(32, 67);
+            this.cbAutoAdd_Visited.Name = "cbAutoAdd_Visited";
+            this.cbAutoAdd_Visited.Size = new System.Drawing.Size(98, 17);
+            this.cbAutoAdd_Visited.TabIndex = 2;
+            this.cbAutoAdd_Visited.Text = "\"Visited\"-Event";
+            this.cbAutoAdd_Visited.UseVisualStyleBackColor = true;
+            this.cbAutoAdd_Visited.CheckedChanged += new System.EventHandler(this.cbAutoAdd_Visited_CheckedChanged);
             // 
             // label49
             // 
@@ -4561,11 +4813,11 @@
             // cmdLoadCurrentSystem
             // 
             this.cmdLoadCurrentSystem.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.cmdLoadCurrentSystem.Location = new System.Drawing.Point(949, 57);
+            this.cmdLoadCurrentSystem.Location = new System.Drawing.Point(929, 57);
             this.cmdLoadCurrentSystem.Name = "cmdLoadCurrentSystem";
-            this.cmdLoadCurrentSystem.Size = new System.Drawing.Size(128, 23);
+            this.cmdLoadCurrentSystem.Size = new System.Drawing.Size(148, 23);
             this.cmdLoadCurrentSystem.TabIndex = 60;
-            this.cmdLoadCurrentSystem.Text = "Show System Data";
+            this.cmdLoadCurrentSystem.Text = "Show Current System Data";
             this.cmdLoadCurrentSystem.UseVisualStyleBackColor = true;
             this.cmdLoadCurrentSystem.Click += new System.EventHandler(this.cmdLoadCurrentSystem_Click);
             // 
@@ -4634,6 +4886,7 @@
             this.Text = "RegulatedNoise v";
             this.Load += new System.EventHandler(this.Form_Load);
             this.Shown += new System.EventHandler(this.Form_Shown);
+            ((System.ComponentModel.ISupportInitialize)(this.nudPurgeOldDataDays)).EndInit();
             this.contextMenuStrip1.ResumeLayout(false);
             this.tabCtrlMain.ResumeLayout(false);
             this.tabHelpAndChangeLog.ResumeLayout(false);
@@ -4644,10 +4897,10 @@
             ((System.ComponentModel.ISupportInitialize)(this.pbForegroundColour)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.tabSystemData.ResumeLayout(false);
-            this.paEconomies.ResumeLayout(false);
-            this.paEconomies.PerformLayout();
             this.groupBox14.ResumeLayout(false);
             this.groupBox14.PerformLayout();
+            this.paEconomies.ResumeLayout(false);
+            this.paEconomies.PerformLayout();
             this.gbSystemSystemData.ResumeLayout(false);
             this.gbSystemSystemData.PerformLayout();
             this.tabPriceAnalysis.ResumeLayout(false);
@@ -4741,6 +4994,7 @@
             this.PerformLayout();
 
         }
+
 
         #endregion
 
@@ -4897,7 +5151,7 @@
         private System.Windows.Forms.Label label34;
         private System.Windows.Forms.Label label33;
         private System.Windows.Forms.Label label32;
-        private System.Windows.Forms.TextBox tbUsername;
+        internal System.Windows.Forms.TextBox tbUsername;
         private System.Windows.Forms.Label label31;
         private System.Windows.Forms.CheckBox cbPostOnImport;
         private System.Windows.Forms.TextBox tbOcrSystemName;
@@ -4916,7 +5170,8 @@
         private System.Windows.Forms.Panel panel1;
         public System.Windows.Forms.PictureBox pbOriginalImage;
         private System.Windows.Forms.Label label11;
-        private System.Windows.Forms.CheckBox checkboxSpoolEddnToFile;
+        private System.Windows.Forms.CheckBox cbSpoolEddnToFile;
+        
         private System.Windows.Forms.Button bClearOcrOutput;
         private System.Windows.Forms.TextBox tbEddnStats;
         private System.Windows.Forms.Button bIgnoreTrash;
@@ -5019,7 +5274,6 @@
         private System.Windows.Forms.CheckBox cbMaxRouteDistance;
         private System.Windows.Forms.TextBox txtWebserverPort;
         private System.Windows.Forms.Label label71;
-        private System.Windows.Forms.ComboBox_ro cmbStationStations;
         private System.Windows.Forms.Label label87;
         private System.Windows.Forms.Label lblStationRenameHint;
         private System.Windows.Forms.Button cmdStationNew;
@@ -5089,6 +5343,24 @@
         private System.Windows.Forms.CheckBox_ro cbStationEcoHighTech;
         private System.Windows.Forms.CheckBox_ro cbStationEcoExtraction;
         private System.Windows.Forms.Button button8;
+        private System.Windows.Forms.ComboBox_ro cmbStationStations;
+        private System.Windows.Forms.Button cmdPurgeOldData;
+        private System.Windows.Forms.CheckBox_ro cbStationEcoNone;
+        private System.Windows.Forms.Label label89;
+        private System.Windows.Forms.NumericUpDown nudPurgeOldDataDays;
+        private System.Windows.Forms.CheckBox cbSpoolImplausibleToFile;
+        private System.Windows.Forms.CheckBox cbAutoAdd_Marketdata;
+        private System.Windows.Forms.CheckBox cbAutoAdd_Visited;
+        private System.Windows.Forms.CheckBox cbAutoAdd_ReplaceVisited;
+        internal System.Windows.Forms.Label lblUpdateInfo;
+        internal System.Windows.Forms.TextBox lblUpdateDetail;
+        private System.Windows.Forms.Button cmdUpdate;
+        private System.Windows.Forms.LinkLabel llVisitUpdate;
+        private System.Windows.Forms.Label label93;
+        private System.Windows.Forms.Label label92;
+        private System.Windows.Forms.Label label91;
+        private System.Windows.Forms.LinkLabel linkLabel11;
+        private System.Windows.Forms.LinkLabel linkLabel10;
         private System.Windows.Forms.TabPage tabExternalData;
         private System.Windows.Forms.GroupBox db_DataSource;
         private System.Windows.Forms.Button btn_TestDataSourceConnection;
@@ -5107,6 +5379,9 @@
         private System.Windows.Forms.TextBox tb_ConnectionStatus;
         private System.Windows.Forms.TextBox tb_DownloadDayLimit;
         private System.Windows.Forms.CheckBox cb_LimitDownload;
+    }
+
+        
     }
 }
 

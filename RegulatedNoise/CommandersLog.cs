@@ -23,6 +23,7 @@ namespace RegulatedNoise
             LogEvents = new SortableBindingList<CommandersLogEvent>();
 
             isLoaded = false;
+
         }
 
         public string CreateEvent()
@@ -40,7 +41,7 @@ namespace RegulatedNoise
                 CargoAction =_callingForm.cbCargoModifier.Text,
                 CargoVolume =int.Parse(_callingForm.cbLogQuantity.Text),
                 Notes =_callingForm.tbLogNotes.Text,
-                EventDate =DateTime.Parse(_callingForm.dtpLogEventDate.Text),
+                EventDate =DateTime.Parse(_callingForm.dtpLogEventDate.Text, CultureInfo.CurrentUICulture , DateTimeStyles.None),
                 EventID = newEventID
             });
 
@@ -112,6 +113,9 @@ namespace RegulatedNoise
 
             if (_callingForm.tbCurrentSystemFromLogs.Text != "")
                 _callingForm.cbLogSystemName.Text = _callingForm.tbCurrentSystemFromLogs.Text;
+
+            if (_callingForm.tbCurrentStationinfoFromLogs.Text != "")
+                _callingForm.cbLogStationName.Text = _callingForm.tbCurrentStationinfoFromLogs.Text;
         }
 
         public void SaveLog(bool force = false)
@@ -197,6 +201,7 @@ namespace RegulatedNoise
         public void UpdateCommandersLogListView()
         {
             _callingForm.lvCommandersLog.SuspendLayout();
+            _callingForm.lvCommandersLog.BeginUpdate();
 
             _callingForm.lvCommandersLog.Items.Clear();
             foreach (var x in LogEvents)
@@ -217,6 +222,7 @@ namespace RegulatedNoise
 
                 _callingForm.lvCommandersLog.Items.Add(new ListViewItem(listViewData));
             }
+            _callingForm.lvCommandersLog.EndUpdate();
             _callingForm.lvCommandersLog.ResumeLayout();
         }
     }

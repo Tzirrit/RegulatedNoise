@@ -58,7 +58,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug DJ ep|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\Debug DJ ep\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;DukeJones ep_Debug</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;DukeJones ep_Debug1</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DebugType>full</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -99,6 +99,11 @@
     <Compile Include="Brainerous Pixeltest\EBPixeltest.Designer.cs">
       <DependentUpon>EBPixeltest.cs</DependentUpon>
     </Compile>
+    <Compile Include="DialogBox\CbtHook.cs" />
+    <Compile Include="DialogBox\DialogBox.cs" />
+    <Compile Include="DialogBox\Win32API.cs" />
+    <Compile Include="DialogBox\WindowsHook.cs" />
+    <Compile Include="DialogBox\WndProcRetHook.cs" />
     <Compile Include="EDDB_Data\EDCommodities.cs" />
     <Compile Include="EDDB_Data\EDCategory.cs" />
     <Compile Include="EDDB_Data\EDCommodityListView.cs">
@@ -126,6 +131,7 @@
     <Compile Include="Enums and Utility Classes\Controls_ext.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Enums and Utility Classes\CsvRow.cs" />
     <Compile Include="Enums and Utility Classes\Extensions.cs" />
     <Compile Include="Enums and Utility Classes\centralizedErrorhandler.cs" />
     <Compile Include="Enums and Utility Classes\dsCommodities.cs">
@@ -152,6 +158,7 @@
     <Compile Include="Enums and Utility Classes\RNGraphics.cs" />
     <Compile Include="Enums and Utility Classes\SerializableDictionary.cs" />
     <Compile Include="Enums and Utility Classes\StationHistory.cs" />
+    <Compile Include="Enums and Utility Classes\UnixTimeStamp.cs" />
     <Compile Include="MRmPTestTab\MRmPTestTab.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -795,9 +802,6 @@
       <Project>{346f68dc-bcb6-4647-a21d-cf78deef1f95}</Project>
       <Name>ExternalData</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
