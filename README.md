@@ -1,6 +1,6 @@
 RegulatedNoise - EIC Edition
 ==============
-RegulatedNoise fork with support for custom datasources.
+RegulatedNoise fork with support for custom datasources, e.g. private trade data for guilds.
 
 RegulatedNoise DJ-version
 ==============
